@@ -1,0 +1,62 @@
+.blade-container {
+    margin-top: 10px;
+    outline: 1.5px solid #666;
+    min-width: 355px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: outline 0.1s ease-out;
+    box-sizing: border-box;
+    padding: 10px;
+
+    &.selected {
+        outline: 3px solid blueviolet;
+        transition: outline 0.1s ease-out;
+    }
+
+    &.edit{
+        cursor: default;
+    }
+}
+
+.label-container{
+    min-width: 50%;
+}
+
+.label {
+    font-size: 28px;
+
+    &.display{
+        margin-left: 4px; // offset to prevent shifting when entering edit mode
+    }
+
+    &.edit {
+        max-width: 100%;
+    }
+}
+.details {
+    display: flex;
+    width: 100%; /* Ensure the details container takes up the full width */
+    .detail-column {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .detail-label {
+        padding-top: 5px;
+        margin-left: auto;
+    }
+    .detail-value {
+        padding-top: 5px;
+        &.edit {
+            max-width: 65px;
+        }
+    }
+    .labels-column {
+        margin-left: 40px;
+        flex: 0 0 auto; /* Prevents the column from growing */
+    }
+    .values-column {
+        margin-left: 20px;
+        flex: 1; /* Allows the column to take up remaining space */
+    }
+}
