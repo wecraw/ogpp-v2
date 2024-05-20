@@ -1,1 +1,16 @@
-<p>builder works!</p>
+<div class="appliances">
+  <div class="title-row d-flex inter-medium flex-column">
+    <div class="title">Appliances.</div>
+    <div class="subtitle">Choose what you use.</div>
+  </div>
+  <div class="appliance-section d-flex flex-column align-items-center">
+    <div>peak wattage: {{ peakWattage }}</div>
+    <div>total wh: {{ totalWattHours }}</div>
+    <appliance-card
+      *ngFor="let appliance of allAppliances; index as i"
+      [defaultAppliance]="appliance"
+      (onEdit)="onApplianceValueChange($event, i)"
+      (onSelect)="onApplianceSelect($event, i)"
+    ></appliance-card>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { BladeDetail } from '../../interfaces/BladeDetail';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Appliance } from '../../interfaces/Appliance';
 
 @Component({
   selector: 'appliance-card',
@@ -10,26 +10,25 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './appliance-card.component.html',
   styleUrls: ['./appliance-card.component.scss']
 })
-export class ApplianceCardComponent {
-  // Required
-  @Input() name: string = 'Name';
-  @Input() description: string = 'Description';
-  @Input() selected: boolean = false;
-  @Input() wattage: number = 0;
-  @Input() hours: number = 0;
-  @Input() quantity: number = 1;
+export class ApplianceCardComponent implements OnInit {
+  // Defaults
+  @Input() defaultAppliance!: Appliance;
 
-  // Optional
+  // State
   @Input() disabled?: boolean = false;
-  @Input() iconName?: string = 'bi-lightbulb';
+  @Input() selected: boolean = false;
+  public isEditMode: boolean = false;
 
   // Events
   @Output() onEdit: EventEmitter<any> = new EventEmitter();
-  @Output() onSelect: EventEmitter<any> = new EventEmitter();
+  @Output() onSelect: EventEmitter<boolean> = new EventEmitter();
 
-  public isEditMode: boolean = false;
+  // Values
+  appliance!: Appliance;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.setDefaults();
+  }
 
   editClicked() {
     this.onEdit.emit();
@@ -38,7 +37,7 @@ export class ApplianceCardComponent {
   selectClicked() {
     if (!this.isEditMode) {
       this.selected = !this.selected;
-      this.onSelect.emit();
+      this.onSelect.emit(this.selected);
     }
   }
 
@@ -46,35 +45,25 @@ export class ApplianceCardComponent {
     event.stopPropagation();
     this.isEditMode = !this.isEditMode;
     if (!this.isEditMode) {
-      this.onEdit.emit({
-        name: this.name,
-        description: this.description,
-        wattage: this.wattage,
-        hours: this.hours,
-        quantity: this.quantity
-      });
+      this.onEdit.emit(this.appliance);
     }
   }
 
   validateInput(field: string, value: number) {
     switch (field) {
       case 'quantity':
-        this.quantity = value < 1 ? 1 : value;
+        this.appliance.quantity = value < 1 ? 1 : value;
         break;
       case 'wattage':
       case 'hours':
         if (value < 0) {
-          this[field] = 0;
+          this.appliance[field] = 0;
         }
         break;
     }
   }
 
-  resetFields() {
-    // TODO: actually get defaults from the item set
-
-    this.quantity = 1;
-    this.hours = 0;
-    this.wattage = 0;
+  setDefaults() {
+    this.appliance = this.defaultAppliance;
   }
 }
