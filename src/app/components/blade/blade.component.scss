@@ -1,62 +1,102 @@
 .blade-container {
-    margin-top: 10px;
-    outline: 1.5px solid #666;
-    min-width: 355px;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: outline 0.1s ease-out;
-    box-sizing: border-box;
-    padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 10px;
+  outline: 1px solid rgb(134, 134, 139);
+  //   min-width: 355px;
+  max-width: 328px;
+  max-height: 84px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 10px;
 
-    &.selected {
-        outline: 3px solid blueviolet;
-        transition: outline 0.1s ease-out;
-    }
+  &.selected {
+    outline: 2px solid #0071e3;
+  }
 
-    &.edit{
-        cursor: default;
-    }
+  &.edit {
+    cursor: default;
+  }
 }
 
-.label-container{
-    min-width: 50%;
+.label-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  i {
+    font-size: 28px;
+  }
 }
 
 .label {
-    font-size: 28px;
+  font-size: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
-    &.display{
-        margin-left: 4px; // offset to prevent shifting when entering edit mode
-    }
+  &.display {
+    margin-left: 4px;
+  }
 
-    &.edit {
-        max-width: 100%;
-    }
+  &.edit {
+    max-width: 100%;
+  }
 }
+
+.description {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.display {
+    margin-left: 4px;
+  }
+
+  &.edit {
+    max-width: 100%;
+  }
+}
+.detail {
+}
+
 .details {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+
+  .detail-column {
     display: flex;
-    width: 100%; /* Ensure the details container takes up the full width */
-    .detail-column {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .detail-label {
-        padding-top: 5px;
-        margin-left: auto;
-    }
-    .detail-value {
-        padding-top: 5px;
-        &.edit {
-            max-width: 65px;
-        }
-    }
-    .labels-column {
-        margin-left: 40px;
-        flex: 0 0 auto; /* Prevents the column from growing */
-    }
-    .values-column {
-        margin-left: 20px;
-        flex: 1; /* Allows the column to take up remaining space */
-    }
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .detail-label,
+  .detail-value {
+    padding-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .detail-value.edit {
+    max-width: 65px;
+  }
+
+  .labels-column {
+    margin-left: 40px;
+    flex: 0 0 auto;
+    text-align: right;
+  }
+
+  .values-column {
+    margin-left: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
 }

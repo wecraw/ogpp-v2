@@ -1,0 +1,55 @@
+<div
+  (click)="selectClicked()"
+  class="blade-container"
+  [ngClass]="{ disabled: disabled, selected: selected, edit: isEditMode }"
+>
+  <div class="view-row">
+    <div *ngIf="selected" class="edit-button" (click)="toggleEditMode($event)">
+      <i *ngIf="!isEditMode" class="bi bi-pencil"></i>
+      <i *ngIf="isEditMode" class="bi bi-x-lg"></i>
+    </div>
+    <div class="label-container" [ngClass]="{ 'edit-mode': isEditMode }">
+      <i class="main-icon bi" [ngClass]="iconName"></i>
+      <div class="d-flex flex-column" *ngIf="!isEditMode">
+        <span class="label display inter-medium">{{ name }}</span>
+        <span *ngIf="description" class="description display inter-regular">{{ description }}</span>
+      </div>
+      <div class="d-flex flex-column" *ngIf="isEditMode">
+        <input type="text" class="input-name inter-medium" [(ngModel)]="name" />
+        <input type="text" class="input-description inter-regular" [(ngModel)]="description" />
+      </div>
+    </div>
+    <div *ngIf="!isEditMode" class="details d-flex flex-column inter-regular">
+      <div *ngIf="quantity > 1" class="detail">x{{ quantity }}</div>
+      <div class="detail">{{ wattage }} Watts</div>
+      <div class="detail">{{ hours }} Hours/day</div>
+    </div>
+  </div>
+  <div class="edit-fields" *ngIf="isEditMode">
+    <div class="edit-label inter-regular">Quantity</div>
+    <input
+      type="number"
+      class="input-short"
+      [(ngModel)]="quantity"
+      (input)="validateInput('quantity', quantity)"
+    />
+    <div class="edit-label inter-regular">Wattage</div>
+    <input
+      type="number"
+      class="input-short"
+      [(ngModel)]="wattage"
+      (input)="validateInput('wattage', wattage)"
+    />
+    <div class="edit-label inter-regular">Hours used per day</div>
+    <input
+      type="number"
+      class="input-short"
+      [(ngModel)]="hours"
+      (input)="validateInput('hours', hours)"
+    />
+    <div>
+      <a (click)="resetFields()" class="reset-link">Reset defaults </a>
+    </div>
+  </div>
+</div>
+<div *ngIf="isEditMode" class="fullscreen-mask" (click)="toggleEditMode($event)"></div>

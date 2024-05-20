@@ -11,20 +11,20 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./blade.component.scss']
 })
 export class BladeComponent implements OnInit {
-
   // Required
-  @Input() label: string = 'Test';
+  @Input() label: string = 'Label';
+  @Input() description: string = 'Description';
   @Input() details!: BladeDetail[];
   @Input() selected: boolean = false;
 
   // Optional
   @Input() allowEdit?: boolean = false;
   @Input() disabled?: boolean = false;
-  @Input() iconName?: string = "bi bi-star-fill";
+  @Input() iconName?: string = 'bi-lightbulb';
 
   // Style
   @Input() height?: string = '125px';
-  
+
   // Events
   @Output() onEdit: EventEmitter<any> = new EventEmitter();
   @Output() onSelect: EventEmitter<any> = new EventEmitter();
@@ -46,7 +46,7 @@ export class BladeComponent implements OnInit {
   }
 
   selectClicked() {
-    if (!this.isEditMode){
+    if (!this.isEditMode) {
       this.selected = !this.selected;
       this.onSelect.emit();
     }
