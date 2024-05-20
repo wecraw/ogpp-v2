@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [ApplianceCardComponent, CommonModule],
   templateUrl: './builder.component.html',
-  styleUrl: './builder.component.scss'
+  styleUrls: ['./builder.component.scss']
 })
 export class BuilderComponent implements OnInit {
   @ViewChildren(ApplianceCardComponent) applianceCards!: QueryList<ApplianceCardComponent>;
@@ -26,21 +26,22 @@ export class BuilderComponent implements OnInit {
     this.updateTotals();
   }
 
-  onApplianceSelect(appliance: any, index: number) {}
+  onApplianceSelect(appliance: any, index: number) {
+    this.allAppliances[index].selected = !this.allAppliances[index].selected;
+    this.updateTotals();
+  }
 
   updateTotals() {
     // Calculate totalWattHours and peakWattage for selected appliances only
-    this.totalWattHours = this.applianceCards.reduce((total, applianceCard) => {
-      if (applianceCard.selected) {
-        const appliance = applianceCard.appliance;
+    this.totalWattHours = this.allAppliances.reduce((total, appliance) => {
+      if (appliance.selected) {
         return total + appliance.wattage * appliance.hours * appliance.quantity;
       }
       return total;
     }, 0);
 
-    this.peakWattage = this.applianceCards.reduce((total, applianceCard) => {
-      if (applianceCard.selected) {
-        const appliance = applianceCard.appliance;
+    this.peakWattage = this.allAppliances.reduce((total, appliance) => {
+      if (appliance.selected) {
         return total + appliance.wattage * appliance.quantity;
       }
       return total;
