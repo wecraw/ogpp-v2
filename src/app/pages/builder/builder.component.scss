@@ -2,6 +2,7 @@
 
 .appliances {
   .title-row {
+    align-self: flex-start;
     font-size: 24px;
     .title {
       color: $text-color;
@@ -11,5 +12,54 @@
     .subtitle {
       color: $subtitle-color;
     }
+  }
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  font-size: 14px;
+  border: none;
+  width: 351px;
+  height: 36px;
+  margin-top: 15px;
+  background-color: #0071e3;
+
+  &:hover {
+    background-color: #0076df;
+  }
+  &:active {
+    background-color: #006edb;
+  }
+
+  &:disabled {
+    background-color: #e3ecfc;
+    opacity: 1;
+  }
+}
+
+.info-icon {
+  font-size: 17px;
+  margin-left: 10px;
+  margin-bottom: 3px;
+  color: $subtitle-color;
+  cursor: pointer;
+  &:hover {
+    color: $text-color;
+  }
+}
+
+input {
+  border-radius: 12px;
+  outline: 1px solid $subtitle-color;
+  border: none;
+  font-size: 17px;
+  padding: 10px;
+  width: 150px;
+
+  &:focus {
+    outline: 2px solid $selected-blue;
   }
 }

@@ -1,0 +1,11 @@
+<div class="modal-backdrop" (click)="dismiss()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="header-text inter-medium">{{ modalHeader }}</span>
+      <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <div class="modal-body inter-regular" [innerHTML]="formattedContent"></div>
+  </div>
+</div>

@@ -1,11 +1,9 @@
 @import '../../../variables.scss';
-$grey: rgb(134, 134, 139);
 
 .blade-container {
   color: $text-color;
   margin-top: 10px;
   outline: 1px solid $grey;
-  //   max-width: 328px;
   width: 351px;
   height: 82px;
   border-radius: 12px;

@@ -1,16 +1,37 @@
 <div class="appliances">
-  <div class="title-row d-flex inter-medium flex-column">
-    <div class="title">Appliances.</div>
-    <div class="subtitle">Choose what you use.</div>
-  </div>
-  <div class="appliance-section d-flex flex-column align-items-center">
-    <div>peak wattage: {{ peakWattage }}</div>
-    <div>total wh: {{ totalWattHours }}</div>
+  <div class="section d-flex flex-column align-items-center">
+    <!-- <div>peak wattage: {{ peakWattage }}</div>
+    <div>total wh: {{ totalWattHours }}</div> -->
+    <div class="title-row d-flex inter-medium flex-column">
+      <div class="title">Appliances.</div>
+      <div class="subtitle">Choose what you use.</div>
+    </div>
     <appliance-card
       *ngFor="let appliance of allAppliances; index as i"
       [defaultAppliance]="appliance"
       (onEdit)="onApplianceValueChange($event, i)"
       (onSelect)="onApplianceSelect($event, i)"
     ></appliance-card>
+    <!-- <div class="button-container">
+        <button class="btn btn-primary inter-regular" [disabled]="!isAnyApplianceSelected">
+          Continue
+        </button>
+      </div> -->
+  </div>
+  <div class="title-row d-flex inter-medium flex-column">
+    <div class="title">Location.</div>
+    <div class="subtitle">Choose where you're off grid.</div>
+    <div>
+      <input type="text" pattern="[0-9]{5}" [(ngModel)]="zipCode" placeholder="Enter ZIP Code" />
+
+      <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
+    </div>
+    <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
   </div>
 </div>
+<app-modal
+  *ngIf="isModalOpen"
+  [modalContent]="modalContent"
+  modalHeader="Why we collect location data"
+  (closeModal)="closeModal()"
+></app-modal>
