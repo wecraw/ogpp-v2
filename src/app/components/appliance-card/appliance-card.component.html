@@ -17,9 +17,20 @@
         }}</span>
       </div>
       <div class="d-flex flex-column" *ngIf="isEditMode">
-        <input type="text" class="input-name inter-medium" [(ngModel)]="appliance.name" />
         <input
           type="text"
+          class="input-name inter-medium"
+          placeholder="Name"
+          [(ngModel)]="appliance.name"
+          (input)="clearNameError()"
+          required
+        />
+        <div [ngClass]="{ hide: !nameRequired }" class="error-message inter-regular">
+          A name is required
+        </div>
+        <input
+          type="text"
+          placeholder="Description"
           class="input-description inter-regular"
           [(ngModel)]="appliance.description"
         />
@@ -31,7 +42,7 @@
       <div class="detail">{{ appliance.hours }} Hours/day</div>
     </div>
   </div>
-  <div class="edit-fields" *ngIf="isEditMode">
+  <div class="edit-fields fade-in" *ngIf="isEditMode && editInnerVisible">
     <div class="edit-label inter-regular">Quantity</div>
     <input
       type="number"

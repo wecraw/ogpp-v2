@@ -18,6 +18,7 @@ export class ApplianceCardComponent implements OnInit {
   @Input() disabled?: boolean = false;
   @Input() selected: boolean = false;
   public isEditMode: boolean = false;
+  public nameRequired: boolean = false;
 
   // Events
   @Output() onEdit: EventEmitter<any> = new EventEmitter();
@@ -25,6 +26,7 @@ export class ApplianceCardComponent implements OnInit {
 
   // Values
   appliance!: Appliance;
+  editInnerVisible: boolean = false;
 
   ngOnInit(): void {
     this.setDefaults();
@@ -43,9 +45,32 @@ export class ApplianceCardComponent implements OnInit {
 
   toggleEditMode(event: MouseEvent) {
     event.stopPropagation();
-    this.isEditMode = !this.isEditMode;
-    if (!this.isEditMode) {
+    if (this.isEditMode) {
+      if (!this.appliance.name) {
+        this.nameRequired = true;
+        return;
+      }
+
+      // Check and reset to default values if fields are blank or invalid
+      if (!this.appliance.quantity) {
+        this.appliance.quantity = this.defaultAppliance.quantity;
+      }
+      if (!this.appliance.wattage) {
+        this.appliance.wattage = this.defaultAppliance.wattage;
+      }
+      if (!this.appliance.hours) {
+        this.appliance.hours = this.defaultAppliance.hours;
+      }
+
+      this.isEditMode = false;
+      this.editInnerVisible = false;
+      this.nameRequired = false;
       this.onEdit.emit(this.appliance);
+    } else {
+      this.isEditMode = true;
+      setTimeout(() => {
+        this.editInnerVisible = true;
+      }, 100);
     }
   }
 
@@ -64,6 +89,10 @@ export class ApplianceCardComponent implements OnInit {
   }
 
   setDefaults() {
-    this.appliance = this.defaultAppliance;
+    this.appliance = { ...this.defaultAppliance };
+  }
+
+  clearNameError() {
+    this.nameRequired = false;
   }
 }

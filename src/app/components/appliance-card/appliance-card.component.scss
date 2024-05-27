@@ -40,10 +40,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-  }
 
-  .edit-button i {
-    font-size: 16px;
+    i {
+      font-size: 16px;
+    }
   }
 
   &.selected {
@@ -65,12 +65,15 @@ i {
   align-items: center;
   flex: 1;
   min-width: 0;
+
   i {
     margin-right: 5px;
   }
+
   .input-name {
     font-size: 17px;
   }
+
   .input-description {
     font-size: 12px;
   }
@@ -106,6 +109,7 @@ i {
     max-width: 100%;
   }
 }
+
 .detail {
   align-self: flex-end;
   margin-right: 10px;
@@ -164,10 +168,10 @@ i {
   text-decoration: underline;
   cursor: pointer;
   font-size: 12px;
-}
 
-.reset-link:hover {
-  color: #0056b3;
+  &:hover {
+    color: #0056b3;
+  }
 }
 
 .input-short {
@@ -175,10 +179,46 @@ i {
   margin-bottom: 10px;
   margin-top: 2px;
 }
+
 .edit-fields {
   margin-left: 33px;
   margin-top: 0px;
+
   .edit-label {
     font-size: 12px;
+  }
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.hide {
+  opacity: 0;
+}
+
+// animations
+.fade-in {
+  -webkit-animation: fade-in 0.3s ease-in-out both;
+  animation: fade-in 0.3s ease-in-out both;
+}
+
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
