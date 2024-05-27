@@ -15,7 +15,7 @@
   transition: height 0.3s ease-out;
 
   &.edit {
-    height: 300px;
+    height: 400px;
     z-index: 1000;
     transition: height 0.3s ease-out;
   }
@@ -69,21 +69,14 @@ i {
   i {
     margin-right: 5px;
   }
-
-  .input-name {
-    font-size: 17px;
-  }
-
-  .input-description {
-    font-size: 12px;
-  }
 }
 
-.label {
+.name {
   font-size: 17px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 190px;
 
   &.display {
     margin-left: 4px;
@@ -95,7 +88,7 @@ i {
 }
 
 .description {
-  max-width: 180px;
+  max-width: 190px;
   font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
@@ -164,6 +157,7 @@ i {
 }
 
 .reset-link {
+  margin-top: 5px;
   color: #007bff;
   text-decoration: underline;
   cursor: pointer;
@@ -174,29 +168,61 @@ i {
   }
 }
 
-.input-short {
-  width: 80px;
-  margin-bottom: 10px;
-  margin-top: 2px;
-}
-
 .edit-fields {
   margin-left: 33px;
-  margin-top: 0px;
+  margin-top: 55px;
 
   .edit-label {
     font-size: 12px;
   }
 }
 
-.error-message {
-  color: red;
-  font-size: 12px;
-  margin-top: 2px;
+.title-edit-fields {
+  margin-top: 55px;
+  .input-name {
+    font-size: 17px;
+    margin-bottom: 15px;
+  }
+
+  &.error {
+    margin-top: 60px;
+    .input-name {
+      margin-bottom: 0;
+      outline: 2px solid $error-red;
+    }
+  }
+
+  .input-description {
+    font-size: 12px;
+  }
 }
 
-.hide {
-  opacity: 0;
+.error-message {
+  color: $error-red;
+  font-size: 10px;
+  margin-left: 2px;
+  margin-top: 2px;
+  margin-bottom: 3px;
+}
+
+input {
+  &.input-short {
+    width: 120px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-top: 2px;
+  }
+
+  border-radius: 12px;
+  outline: 1px solid $subtitle-color;
+  border: none;
+  font-size: 17px;
+  padding: 10px;
+  width: 190px;
+
+  &:focus {
+    outline: 2px solid $selected-blue;
+  }
 }
 
 // animations

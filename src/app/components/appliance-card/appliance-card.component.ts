@@ -80,9 +80,16 @@ export class ApplianceCardComponent implements OnInit {
         this.appliance.quantity = value < 1 ? 1 : value;
         break;
       case 'wattage':
+        if (value < 0) {
+          this.appliance[field] = 0;
+        }
+        break;
       case 'hours':
         if (value < 0) {
           this.appliance[field] = 0;
+        }
+        if (value > 24) {
+          this.appliance[field] = 24;
         }
         break;
     }

@@ -11,21 +11,29 @@
     <div class="label-container" [ngClass]="{ 'edit-mode': isEditMode }">
       <i class="main-icon bi" [ngClass]="appliance.icon"></i>
       <div class="d-flex flex-column" *ngIf="!isEditMode">
-        <span class="label display inter-medium">{{ appliance.name }}</span>
+        <span class="name display inter-medium">{{ appliance.name }}</span>
         <span *ngIf="appliance.description" class="description display inter-regular">{{
           appliance.description
         }}</span>
       </div>
-      <div class="d-flex flex-column" *ngIf="isEditMode">
+      <div
+        class="d-flex flex-column title-edit-fields"
+        [ngClass]="{ error: nameRequired }"
+        *ngIf="isEditMode"
+      >
         <input
           type="text"
           class="input-name inter-medium"
-          placeholder="Name"
+          placeholder="Name*"
           [(ngModel)]="appliance.name"
           (input)="clearNameError()"
           required
         />
-        <div [ngClass]="{ hide: !nameRequired }" class="error-message inter-regular">
+        <div
+          [ngClass]="{ hide: !nameRequired }"
+          *ngIf="nameRequired"
+          class="error-message inter-regular"
+        >
           A name is required
         </div>
         <input
@@ -43,28 +51,31 @@
     </div>
   </div>
   <div class="edit-fields fade-in" *ngIf="isEditMode && editInnerVisible">
-    <div class="edit-label inter-regular">Quantity</div>
+    <div class="edit-label inter-medium">Quantity</div>
     <input
       type="number"
       class="input-short"
+      placeholder="Quantity"
       [(ngModel)]="appliance.quantity"
       (input)="validateInput('quantity', appliance.quantity)"
     />
-    <div class="edit-label inter-regular">Wattage</div>
+    <div class="edit-label inter-medium">Wattage</div>
     <input
       type="number"
       class="input-short"
+      placeholder="Wattage"
       [(ngModel)]="appliance.wattage"
       (input)="validateInput('wattage', appliance.wattage)"
     />
-    <div class="edit-label inter-regular">Hours used per day</div>
+    <div class="edit-label inter-medium">Hours used per day</div>
     <input
       type="number"
+      placeholder="Hours / day"
       class="input-short"
       [(ngModel)]="appliance.hours"
       (input)="validateInput('hours', appliance.hours)"
     />
-    <div>
+    <div style="margin-top: 5px">
       <a (click)="setDefaults()" class="reset-link">Reset defaults </a>
     </div>
   </div>
