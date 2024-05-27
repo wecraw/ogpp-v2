@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BladeComponent } from './blade.component';
+import { MiniCardComponent } from './mini-card.component';
 
-describe('BladeComponent', () => {
-  let component: BladeComponent;
-  let fixture: ComponentFixture<BladeComponent>;
+describe('MiniCardComponent', () => {
+  let component: MiniCardComponent;
+  let fixture: ComponentFixture<MiniCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BladeComponent]
+      imports: [MiniCardComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(BladeComponent);
+    fixture = TestBed.createComponent(MiniCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -41,6 +41,10 @@
     justify-content: center;
     cursor: pointer;
 
+    &:hover {
+      background-color: #eee;
+    }
+
     i {
       font-size: 16px;
     }
@@ -103,46 +107,15 @@ i {
   }
 }
 
-.detail {
-  align-self: flex-end;
-  margin-right: 10px;
-}
-
 .details {
   display: flex;
   flex: 1;
   min-width: 0;
   font-size: 12px;
 
-  .detail-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .detail-label,
-  .detail-value {
-    padding-top: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .detail-value.edit {
-    max-width: 65px;
-  }
-
-  .labels-column {
-    margin-left: 40px;
-    flex: 0 0 auto;
-    text-align: right;
-  }
-
-  .values-column {
-    margin-left: 20px;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
+  .detail {
+    align-self: flex-end;
+    margin-right: 10px;
   }
 }
 

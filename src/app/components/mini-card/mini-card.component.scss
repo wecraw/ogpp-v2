@@ -1,0 +1,28 @@
+@import '../../../variables.scss';
+
+.blade-container {
+  color: $text-color;
+  margin-top: 10px;
+  outline: 1px solid $grey;
+  width: 150px;
+  height: 90px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 0 15px;
+  position: relative;
+  background-color: #fff;
+
+  &.selected {
+    outline: 2px solid #0071e3;
+  }
+}
+
+i {
+  font-size: 28px;
+  color: $text-color;
+}
+
+.label {
+  font-size: 17px;
+}

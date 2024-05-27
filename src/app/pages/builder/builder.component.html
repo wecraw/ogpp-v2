@@ -18,20 +18,61 @@
         </button>
       </div> -->
   </div>
-  <div class="title-row d-flex inter-medium flex-column">
-    <div class="title">Location.</div>
-    <div class="subtitle">Choose where you're off grid.</div>
-    <div>
-      <input type="text" pattern="[0-9]{5}" [(ngModel)]="zipCode" placeholder="Enter ZIP Code" />
+  <div class="section">
+    <div class="title-row d-flex inter-medium flex-column">
+      <div class="title">Location.</div>
+      <div class="subtitle">Choose where you're off grid.</div>
+      <div>
+        <input type="text" pattern="[0-9]{5}" [(ngModel)]="zipCode" placeholder="Enter ZIP Code" />
 
-      <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
+        <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
+      </div>
+      <button (click)="getSunHours(zipCode)">Get</button>
     </div>
-    <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
   </div>
+  <div class="section">
+    <div class="title-row d-flex inter-medium flex-column">
+      <div class="title">Seasons.</div>
+      <div class="subtitle">Choose when you're off grid.</div>
+      <div class="container">
+        <div class="row">
+          <div class="col-3">
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'spring')"
+              label="Spring"
+              iconName="bi-flower1"
+            ></mini-card>
+          </div>
+          <div class="col-3">
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'summer')"
+              label="Summer"
+              iconName="bi-sun"
+            ></mini-card>
+          </div>
+          <div class="col-3">
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'fall')"
+              label="Fall"
+              iconName="bi-tree"
+            ></mini-card>
+          </div>
+          <div class="col-3">
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'winter')"
+              label="Winter"
+              iconName="bi-snow"
+            ></mini-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-modal
+    *ngIf="isModalOpen"
+    [modalContent]="modalContent"
+    modalHeader="Why we collect location data"
+    (closeModal)="closeModal()"
+  ></app-modal>
 </div>
-<app-modal
-  *ngIf="isModalOpen"
-  [modalContent]="modalContent"
-  modalHeader="Why we collect location data"
-  (closeModal)="closeModal()"
-></app-modal>

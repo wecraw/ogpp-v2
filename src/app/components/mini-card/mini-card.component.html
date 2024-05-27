@@ -1,0 +1,10 @@
+<div
+  (click)="selectClicked()"
+  class="blade-container align-items-center"
+  [ngClass]="{ disabled: disabled, selected: selected }"
+>
+  <div class="d-flex flex-column align-items-center justify-content-center h-100">
+    <div class="label inter-medium">{{ label }}</div>
+    <i class="bi" [ngClass]="iconName"></i>
+  </div>
+</div>

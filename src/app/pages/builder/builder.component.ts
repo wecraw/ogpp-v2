@@ -6,11 +6,14 @@ import { SunHoursService } from '../../services/sun-hours.service';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { LOCATION_DISCLAIMER } from '../../content/strings';
+import { MiniCardComponent } from '../../components/mini-card/mini-card.component';
+import { catchError, map } from 'rxjs';
+import { Season } from '../../interfaces/Season';
 
 @Component({
   selector: 'builder',
   standalone: true,
-  imports: [ApplianceCardComponent, CommonModule, FormsModule, ModalComponent],
+  imports: [ApplianceCardComponent, CommonModule, FormsModule, ModalComponent, MiniCardComponent],
   templateUrl: './builder.component.html',
   styleUrls: ['./builder.component.scss']
 })
@@ -22,6 +25,7 @@ export class BuilderComponent implements OnInit {
   public isAnyApplianceSelected: boolean = false;
   public sunHours: number = 0;
   public zipCode: string = '';
+  public selectedSeasons: Season[] = [];
 
   isModalOpen = false;
   modalContent = LOCATION_DISCLAIMER;
@@ -50,6 +54,12 @@ export class BuilderComponent implements OnInit {
     this.checkApplianceSelection();
   }
 
+  onSeasonSelect(selected: boolean, selectedSeason: Season) {
+    if (selected) this.selectedSeasons.push(selectedSeason);
+    if (!selected)
+      this.selectedSeasons = this.selectedSeasons.filter(season => season !== selectedSeason);
+  }
+
   updateTotals() {
     // Calculate totalWattHours and peakWattage for selected appliances only
     this.totalWattHours = this.allAppliances.reduce((total, appliance) => {
@@ -68,15 +78,34 @@ export class BuilderComponent implements OnInit {
   }
 
   getSunHours(zip: string) {
-    this.sunHoursService.getSunHoursByZip(zip).subscribe(
-      (response: any) => {
-        // Assuming the response contains the sun hours data
-        this.sunHours = response.outputs.avg_ghi.annual;
-      },
-      (error: any) => {
-        console.error('Error fetching sun hours:', error);
-      }
-    );
+    this.sunHoursService
+      .getSunHoursByZip(zip)
+      .pipe(
+        map((response: any) => {
+          const monthlyData = response.avg_ghi.monthly;
+          const seasonMonthsMap: { [season in Season]: string[] } = {
+            winter: ['dec', 'jan', 'feb'],
+            spring: ['mar', 'apr', 'may'],
+            summer: ['jun', 'jul', 'aug'],
+            fall: ['sep', 'oct', 'nov']
+          };
+
+          const selectedMonths = this.selectedSeasons.reduce<string[]>((months, season) => {
+            if (seasonMonthsMap[season]) {
+              months.push(...seasonMonthsMap[season]);
+            }
+            return months;
+          }, []);
+
+          const selectedValues = selectedMonths.map(month => monthlyData[month]);
+          this.sunHours = Math.min(...selectedValues);
+        }),
+        catchError((error: any) => {
+          console.error('Error fetching sun hours:', error);
+          return error;
+        })
+      )
+      .subscribe();
   }
 
   checkApplianceSelection() {
