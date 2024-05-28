@@ -78,11 +78,12 @@ export class BuilderComponent implements OnInit {
   }
 
   getSunHours(zip: string) {
+    if (zip.length !== 5) return;
     this.sunHoursService
       .getSunHoursByZip(zip)
       .pipe(
         map((response: any) => {
-          const monthlyData = response.avg_ghi.monthly;
+          const monthlyData = response.outputs.avg_ghi.monthly;
           const seasonMonthsMap: { [season in Season]: string[] } = {
             winter: ['dec', 'jan', 'feb'],
             spring: ['mar', 'apr', 'may'],
@@ -99,6 +100,7 @@ export class BuilderComponent implements OnInit {
 
           const selectedValues = selectedMonths.map(month => monthlyData[month]);
           this.sunHours = Math.min(...selectedValues);
+          console.log(this.sunHours);
         }),
         catchError((error: any) => {
           console.error('Error fetching sun hours:', error);

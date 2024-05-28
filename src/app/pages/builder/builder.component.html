@@ -27,43 +27,41 @@
 
         <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
       </div>
-      <button (click)="getSunHours(zipCode)">Get</button>
+      <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
     </div>
   </div>
   <div class="section">
     <div class="title-row d-flex inter-medium flex-column">
       <div class="title">Seasons.</div>
       <div class="subtitle">Choose when you're off grid.</div>
-      <div class="container">
-        <div class="row">
-          <div class="col-3">
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'spring')"
-              label="Spring"
-              iconName="bi-flower1"
-            ></mini-card>
-          </div>
-          <div class="col-3">
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'summer')"
-              label="Summer"
-              iconName="bi-sun"
-            ></mini-card>
-          </div>
-          <div class="col-3">
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'fall')"
-              label="Fall"
-              iconName="bi-tree"
-            ></mini-card>
-          </div>
-          <div class="col-3">
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'winter')"
-              label="Winter"
-              iconName="bi-snow"
-            ></mini-card>
-          </div>
+      <div class="row">
+        <div class="col-6 col-md-3 d-flex justify-content-center align-items-center">
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'spring')"
+            label="Spring"
+            iconName="bi-flower1"
+          ></mini-card>
+        </div>
+        <div class="col-6 col-sm-3 d-flex justify-content-center align-items-center">
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'summer')"
+            label="Summer"
+            iconName="bi-sun"
+          ></mini-card>
+        </div>
+        <div class="col-6 col-md-3 d-flex justify-content-center align-items-center">
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'fall')"
+            label="Fall"
+            iconName="bi-tree"
+          ></mini-card>
+        </div>
+        <div class="col-6 col-md-3 d-flex justify-content-center align-items-center">
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'winter')"
+            label="Winter"
+            iconName="bi-snow"
+          ></mini-card>
         </div>
       </div>
     </div>
