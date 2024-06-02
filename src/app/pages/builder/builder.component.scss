@@ -58,8 +58,13 @@ input {
   font-size: 17px;
   padding: 10px;
   width: 150px;
+  margin-top: 10px;
 
   &:focus {
     outline: 2px solid $selected-blue;
   }
+}
+
+mini-card {
+  width: fit-content;
 }

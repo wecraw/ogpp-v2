@@ -1,0 +1,23 @@
+@import '../../../variables.scss';
+
+.name {
+  font-size: 27px;
+  color: $text-color;
+  text-decoration: none;
+}
+
+.menu-button {
+  color: $text-color;
+  font-size: 27px;
+  cursor: pointer;
+
+  &:hover {
+    color: black;
+  }
+}
+
+.navbar {
+  height: 65px;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+}
