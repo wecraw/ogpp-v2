@@ -1,15 +1,15 @@
-//kitchen
+//Kitchen
 
 import { Appliance } from '../interfaces/Appliance';
 
 // Kitchen=============================================
-let kitchenAppliances: Appliance[] = [
+let KitchenAppliances: Appliance[] = [
   {
     name: 'Toaster',
     wattage: 1200,
     hours: 0.2,
     quantity: 1,
-    applianceGroup: 'kitchen',
+    applianceGroup: 'Kitchen',
     icon: 'bi-image'
   },
   {
@@ -17,7 +17,7 @@ let kitchenAppliances: Appliance[] = [
     wattage: 1000,
     hours: 0.3,
     quantity: 1,
-    applianceGroup: 'kitchen',
+    applianceGroup: 'Kitchen',
     icon: 'bi-image'
   },
   {
@@ -26,7 +26,7 @@ let kitchenAppliances: Appliance[] = [
     wattage: 353,
     hours: 4,
     quantity: 1,
-    applianceGroup: 'kitchen',
+    applianceGroup: 'Kitchen',
     icon: 'bi-calendar3-event'
   },
   {
@@ -35,20 +35,20 @@ let kitchenAppliances: Appliance[] = [
     wattage: 270,
     hours: 0.3,
     quantity: 1,
-    applianceGroup: 'kitchen',
+    applianceGroup: 'Kitchen',
     icon: 'bi-calendar3-event'
   }
 ];
 
 // Entertainment=============================================
-let entertainmentAppliances = [
+let EntertainmentAppliances = [
   {
     name: 'TV',
     description: 'LCD',
     wattage: 150,
     hours: 3,
     quantity: 1,
-    applianceGroup: 'entertainment',
+    applianceGroup: 'Entertainment',
     icon: 'bi-tv'
   },
   {
@@ -56,12 +56,12 @@ let entertainmentAppliances = [
     wattage: 14,
     hours: 24,
     quantity: 1,
-    applianceGroup: 'entertainment',
+    applianceGroup: 'Entertainment',
     icon: 'bi-wifi'
   }
 ];
 
-let allAppliances: Appliance[] = kitchenAppliances.concat(entertainmentAppliances);
+let allAppliances: Appliance[] = KitchenAppliances.concat(EntertainmentAppliances);
 let count = 0;
 allAppliances.forEach(appliance => {
   appliance.id = '' + count;

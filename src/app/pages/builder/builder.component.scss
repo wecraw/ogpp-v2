@@ -51,6 +51,18 @@
   }
 }
 
+.appliance-group {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  .group-title {
+    font-size: 17px;
+  }
+}
+
+hr {
+  margin-top: 5px;
+}
+
 input {
   border-radius: 12px;
   outline: 1px solid $subtitle-color;

@@ -8,6 +8,6 @@ export interface Appliance {
   hours: number;
   quantity: number;
 
-  applianceGroup?: string;
+  applianceGroup: string;
   selected?: boolean;
 }

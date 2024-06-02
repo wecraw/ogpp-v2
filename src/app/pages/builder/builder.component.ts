@@ -9,6 +9,7 @@ import { LOCATION_DISCLAIMER } from '../../content/strings';
 import { MiniCardComponent } from '../../components/mini-card/mini-card.component';
 import { catchError, map } from 'rxjs';
 import { Season } from '../../interfaces/Season';
+import { Appliance } from '../../interfaces/Appliance';
 
 @Component({
   selector: 'builder',
@@ -26,6 +27,7 @@ export class BuilderComponent implements OnInit {
   public sunHours: number = 0;
   public zipCode: string = '';
   public selectedSeasons: Season[] = [];
+  public applianceGroups: string[] = [];
 
   isModalOpen = false;
   modalContent = LOCATION_DISCLAIMER;
@@ -41,6 +43,12 @@ export class BuilderComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateTotals();
+    this.applianceGroups = [
+      ...new Set(this.allAppliances.map(appliance => appliance.applianceGroup))
+    ];
+  }
+  getAppliancesByGroup(group: string): Appliance[] {
+    return this.allAppliances.filter(appliance => appliance.applianceGroup === group);
   }
 
   onApplianceValueChange(updatedAppliance: any, index: number) {

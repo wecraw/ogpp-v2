@@ -1,17 +1,25 @@
 <div class="appliances">
   <div class="section d-flex flex-column">
-    <!-- <div>peak wattage: {{ peakWattage }}</div>
-    <div>total wh: {{ totalWattHours }}</div> -->
     <div class="title-row d-flex inter-medium flex-column">
       <div class="title">Appliances.</div>
       <div class="subtitle">Choose what you use.</div>
     </div>
-    <appliance-card
-      *ngFor="let appliance of allAppliances; index as i"
-      [defaultAppliance]="appliance"
-      (onEdit)="onApplianceValueChange($event, i)"
-      (onSelect)="onApplianceSelect($event, i)"
-    ></appliance-card>
+    <div class="appliance-group" *ngFor="let group of applianceGroups">
+      <div class="group-title inter-medium">{{ group }}</div>
+      <hr />
+      <div class="row">
+        <div
+          class="col-lg-5 col-xl-4"
+          *ngFor="let appliance of getAppliancesByGroup(group); index as i"
+        >
+          <appliance-card
+            [defaultAppliance]="appliance"
+            (onEdit)="onApplianceValueChange($event, i)"
+            (onSelect)="onApplianceSelect($event, i)"
+          ></appliance-card>
+        </div>
+      </div>
+    </div>
     <!-- <div class="button-container">
         <button class="btn btn-primary inter-regular" [disabled]="!isAnyApplianceSelected">
           Continue
