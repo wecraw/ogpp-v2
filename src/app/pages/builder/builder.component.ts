@@ -28,6 +28,9 @@ export class BuilderComponent implements OnInit {
   public zipCode: string = '';
   public selectedSeasons: Season[] = [];
   public applianceGroups: string[] = [];
+  public showStep2: boolean = false;
+  public zipErrorLength: boolean = false;
+  public zipErrorFormat: boolean = false;
 
   isModalOpen = false;
   modalContent = LOCATION_DISCLAIMER;
@@ -51,8 +54,8 @@ export class BuilderComponent implements OnInit {
     return this.allAppliances.filter(appliance => appliance.applianceGroup === group);
   }
 
-  onApplianceValueChange(updatedAppliance: any, index: number) {
-    this.allAppliances[index] = updatedAppliance;
+  onApplianceValueChange(updatedAppliance: any, appliance: Appliance) {
+    Object.assign(appliance, updatedAppliance); // Update the properties of the existing appliance
     this.updateTotals();
   }
 
@@ -66,6 +69,26 @@ export class BuilderComponent implements OnInit {
     if (selected) this.selectedSeasons.push(selectedSeason);
     if (!selected)
       this.selectedSeasons = this.selectedSeasons.filter(season => season !== selectedSeason);
+  }
+
+  validateZip(checkLength: boolean) {
+    this.zipErrorFormat = /\D/.test(this.zipCode);
+    if (checkLength) this.zipErrorLength = this.zipCode.length !== 5;
+    if (this.zipErrorLength) this.zipErrorLength = this.zipCode.length !== 5;
+  }
+
+  enableStep2() {
+    this.showStep2 = true;
+    setTimeout(() => {
+      const element = document.getElementById('step2');
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      }
+    }, 1);
   }
 
   updateTotals() {
@@ -119,6 +142,8 @@ export class BuilderComponent implements OnInit {
   }
 
   checkApplianceSelection() {
-    this.isAnyApplianceSelected = this.allAppliances.some(appliance => appliance.selected);
+    //permanent flag, once set to true will not turn back off
+    if (!this.isAnyApplianceSelected)
+      this.isAnyApplianceSelected = this.allAppliances.some(appliance => appliance.selected);
   }
 }

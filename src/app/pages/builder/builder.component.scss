@@ -1,6 +1,7 @@
 @import '../../../variables.scss';
 
 .appliances {
+  margin-top: 35px;
   .title-row {
     align-self: flex-start;
     font-size: 24px;
@@ -16,7 +17,14 @@
 }
 
 .section {
-  margin-bottom: 20px;
+  transition: opacity 0.2s;
+  margin-bottom: 50px;
+
+  &.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
 }
 
 .btn-primary {
@@ -24,7 +32,7 @@
   border: none;
   width: 351px;
   height: 36px;
-  margin-top: 15px;
+  margin-top: 35px;
   background-color: #0071e3;
 
   &:hover {
@@ -79,4 +87,72 @@ input {
 
 mini-card {
   width: fit-content;
+}
+
+.content-below-md {
+  display: none;
+}
+
+.content-above-md {
+  display: flex;
+}
+
+@media (max-width: 767.98px) {
+  .content-below-md {
+    display: flex;
+  }
+
+  .content-above-md {
+    display: none;
+  }
+}
+
+.step2-wrapper {
+  min-height: 100vh;
+}
+
+// animations
+.fade-in {
+  -webkit-animation: fade-in 0.3s ease-in-out both;
+  animation: fade-in 0.3s ease-in-out both;
+}
+
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-out {
+  -webkit-animation: fade-out 0.3s ease-out both;
+  animation: fade-out 0.3s ease-out both;
+}
+
+@-webkit-keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

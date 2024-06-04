@@ -4,9 +4,18 @@ $prefix: 'mo-';
 
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import '../node_modules/bootstrap-icons/font/bootstrap-icons.css';
+@import './variables.scss';
 
 // <uniquifier>: Use a unique and descriptive class name
 // <weight>: Use a value from 100 to 900
+
+.input-error-message {
+  color: $error-red;
+  font-size: 12px;
+  margin-left: 2px;
+  margin-top: 2px;
+  margin-bottom: 3px;
+}
 
 .inter-regular {
   font-family: 'Inter', sans-serif;

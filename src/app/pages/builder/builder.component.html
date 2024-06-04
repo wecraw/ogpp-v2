@@ -14,60 +14,110 @@
         >
           <appliance-card
             [defaultAppliance]="appliance"
-            (onEdit)="onApplianceValueChange($event, i)"
+            (onEdit)="onApplianceValueChange($event, appliance)"
             (onSelect)="onApplianceSelect($event, i)"
           ></appliance-card>
         </div>
       </div>
     </div>
-    <!-- <div class="button-container">
-        <button class="btn btn-primary inter-regular" [disabled]="!isAnyApplianceSelected">
-          Continue
-        </button>
-      </div> -->
-  </div>
-  <div class="section">
-    <div class="title-row d-flex inter-medium flex-column">
-      <div class="title">Location.</div>
-      <div class="subtitle">Choose where you're off grid.</div>
-      <div>
-        <input type="text" pattern="[0-9]{5}" [(ngModel)]="zipCode" placeholder="Enter ZIP Code" />
-
-        <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
-      </div>
-      <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
+    <div class="button-container">
+      <button
+        [ngClass]="{ 'fade-out': showStep2 }"
+        class="btn btn-primary inter-regular"
+        [disabled]="!isAnyApplianceSelected || showStep2"
+        (click)="enableStep2()"
+      >
+        Continue
+      </button>
+      <!-- scroll anchor here to create margin top -->
+      <div id="step2" style="height: 1px"></div>
     </div>
   </div>
-  <div class="section">
-    <div class="title-row d-flex inter-medium flex-column">
-      <div class="title">Seasons.</div>
-      <div class="subtitle">Choose when you're off grid.</div>
-      <div class="row">
-        <mini-card
-          (onSelect)="onSeasonSelect($event, 'spring')"
-          label="Spring"
-          iconName="bi-flower1"
-        ></mini-card>
-
-        <mini-card
-          (onSelect)="onSeasonSelect($event, 'summer')"
-          label="Summer"
-          iconName="bi-sun"
-        ></mini-card>
+  <div class="step2-wrapper fade-in" *ngIf="showStep2">
+    <div class="section" [ngClass]="{ disabled: !isAnyApplianceSelected }">
+      <div class="title-row d-flex inter-medium flex-column">
+        <div class="title">Location.</div>
+        <div class="subtitle">Choose where you're off grid.</div>
+        <div>
+          <input
+            type="text"
+            pattern="[0-9]{5}"
+            maxlength="5"
+            [(ngModel)]="zipCode"
+            placeholder="Enter ZIP Code*"
+            (ngModelChange)="validateZip(false)"
+            (blur)="validateZip(true)"
+          />
+          <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
+        </div>
+        <div *ngIf="zipErrorLength || zipErrorFormat" class="input-error-message inter-regular">
+          Enter a valid 5 digit ZIP code
+        </div>
+        <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
       </div>
-      <div class="row">
-        <mini-card
-          (onSelect)="onSeasonSelect($event, 'fall')"
-          label="Fall"
-          iconName="bi-tree"
-        ></mini-card>
+    </div>
+    <div class="section" [ngClass]="{ disabled: !isAnyApplianceSelected }">
+      <div class="title-row d-flex inter-medium flex-column">
+        <div class="title">Seasons.</div>
+        <div class="subtitle">Choose when you're off grid.</div>
+        <div class="row content-above-md">
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'spring')"
+            label="Spring"
+            iconName="bi-flower1"
+          ></mini-card>
 
-        <mini-card
-          (onSelect)="onSeasonSelect($event, 'winter')"
-          label="Winter"
-          iconName="bi-snow"
-        ></mini-card>
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'summer')"
+            label="Summer"
+            iconName="bi-sun"
+          ></mini-card>
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'fall')"
+            label="Fall"
+            iconName="bi-tree"
+          ></mini-card>
+
+          <mini-card
+            (onSelect)="onSeasonSelect($event, 'winter')"
+            label="Winter"
+            iconName="bi-snow"
+          ></mini-card>
+        </div>
+        <div class="row content-below-md">
+          <div class="row">
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'spring')"
+              label="Spring"
+              iconName="bi-flower1"
+            ></mini-card>
+
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'summer')"
+              label="Summer"
+              iconName="bi-sun"
+            ></mini-card>
+          </div>
+          <div class="row">
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'fall')"
+              label="Fall"
+              iconName="bi-tree"
+            ></mini-card>
+
+            <mini-card
+              (onSelect)="onSeasonSelect($event, 'winter')"
+              label="Winter"
+              iconName="bi-snow"
+            ></mini-card>
+          </div>
+        </div>
       </div>
+    </div>
+    <div class="button-container">
+      <button class="btn btn-primary inter-regular" [disabled]="!isAnyApplianceSelected">
+        Get results
+      </button>
     </div>
   </div>
 
