@@ -31,6 +31,9 @@ export class BuilderComponent implements OnInit {
   public showStep2: boolean = false;
   public zipErrorLength: boolean = false;
   public zipErrorFormat: boolean = false;
+  public showResults: boolean = false;
+
+  public debug = true;
 
   isModalOpen = false;
   modalContent = LOCATION_DISCLAIMER;
@@ -59,10 +62,13 @@ export class BuilderComponent implements OnInit {
     this.updateTotals();
   }
 
-  onApplianceSelect(appliance: any, index: number) {
-    this.allAppliances[index].selected = !this.allAppliances[index].selected;
-    this.updateTotals();
-    this.checkApplianceSelection();
+  onApplianceSelect(appliance: any, id: string) {
+    const selectedAppliance = this.allAppliances.find(item => item.id === id);
+    if (selectedAppliance) {
+      selectedAppliance.selected = !selectedAppliance.selected;
+      this.updateTotals();
+      this.checkApplianceSelection();
+    }
   }
 
   onSeasonSelect(selected: boolean, selectedSeason: Season) {
@@ -106,44 +112,62 @@ export class BuilderComponent implements OnInit {
       }
       return total;
     }, 0);
+
+    console.log(this.totalWattHours);
+    console.log(this.peakWattage);
   }
 
   getSunHours(zip: string) {
-    if (zip.length !== 5) return;
-    this.sunHoursService
-      .getSunHoursByZip(zip)
-      .pipe(
-        map((response: any) => {
-          const monthlyData = response.outputs.avg_ghi.monthly;
-          const seasonMonthsMap: { [season in Season]: string[] } = {
-            winter: ['dec', 'jan', 'feb'],
-            spring: ['mar', 'apr', 'may'],
-            summer: ['jun', 'jul', 'aug'],
-            fall: ['sep', 'oct', 'nov']
-          };
+    if (!this.debug) {
+      if (this.zipErrorFormat || this.zipErrorLength) return;
+      this.sunHoursService
+        .getSunHoursByZip(zip)
+        .pipe(
+          map((response: any) => {
+            const monthlyData = response.outputs.avg_ghi.monthly;
+            const seasonMonthsMap: { [season in Season]: string[] } = {
+              winter: ['dec', 'jan', 'feb'],
+              spring: ['mar', 'apr', 'may'],
+              summer: ['jun', 'jul', 'aug'],
+              fall: ['sep', 'oct', 'nov']
+            };
 
-          const selectedMonths = this.selectedSeasons.reduce<string[]>((months, season) => {
-            if (seasonMonthsMap[season]) {
-              months.push(...seasonMonthsMap[season]);
-            }
-            return months;
-          }, []);
+            const selectedMonths = this.selectedSeasons.reduce<string[]>((months, season) => {
+              if (seasonMonthsMap[season]) {
+                months.push(...seasonMonthsMap[season]);
+              }
+              return months;
+            }, []);
 
-          const selectedValues = selectedMonths.map(month => monthlyData[month]);
-          this.sunHours = Math.min(...selectedValues);
-          console.log(this.sunHours);
-        }),
-        catchError((error: any) => {
-          console.error('Error fetching sun hours:', error);
-          return error;
-        })
-      )
-      .subscribe();
+            const selectedValues = selectedMonths.map(month => monthlyData[month]);
+            this.sunHours = Math.min(...selectedValues);
+            console.log(this.sunHours);
+          }),
+          catchError((error: any) => {
+            console.error('Error fetching sun hours:', error);
+            return error;
+          })
+        )
+        .subscribe();
+    } else {
+      this.sunHours = 1;
+    }
   }
 
   checkApplianceSelection() {
     //permanent flag, once set to true will not turn back off
     if (!this.isAnyApplianceSelected)
       this.isAnyApplianceSelected = this.allAppliances.some(appliance => appliance.selected);
+  }
+
+  wattageNeeded() {
+    return Math.ceil(this.totalWattHours / this.sunHours);
+  }
+
+  generateBuild() {
+    console.log(this.allAppliances);
+    this.updateTotals();
+    this.getSunHours(this.zipCode);
+    this.showResults = true;
   }
 }

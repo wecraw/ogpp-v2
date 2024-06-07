@@ -8,14 +8,11 @@
       <div class="group-title inter-medium">{{ group }}</div>
       <hr />
       <div class="row">
-        <div
-          class="col-lg-5 col-xl-4"
-          *ngFor="let appliance of getAppliancesByGroup(group); index as i"
-        >
+        <div class="col-lg-5 col-xl-4" *ngFor="let appliance of getAppliancesByGroup(group)">
           <appliance-card
             [defaultAppliance]="appliance"
             (onEdit)="onApplianceValueChange($event, appliance)"
-            (onSelect)="onApplianceSelect($event, i)"
+            (onSelect)="onApplianceSelect($event, appliance.id!)"
           ></appliance-card>
         </div>
       </div>
@@ -29,12 +26,12 @@
       >
         Continue
       </button>
-      <!-- scroll anchor here to create margin top -->
-      <div id="step2" style="height: 1px"></div>
     </div>
   </div>
+  <!-- scroll anchor here to create margin top -->
+  <div id="step2" class="scroll-anchor"></div>
   <div class="step2-wrapper fade-in" *ngIf="showStep2">
-    <div class="section" [ngClass]="{ disabled: !isAnyApplianceSelected }">
+    <div class="section zip" [ngClass]="{ disabled: !isAnyApplianceSelected }">
       <div class="title-row d-flex inter-medium flex-column">
         <div class="title">Location.</div>
         <div class="subtitle">Choose where you're off grid.</div>
@@ -115,10 +112,20 @@
       </div>
     </div>
     <div class="button-container">
-      <button class="btn btn-primary inter-regular" [disabled]="!isAnyApplianceSelected">
+      <button
+        class="btn btn-primary inter-regular"
+        (click)="generateBuild()"
+        [disabled]="!isAnyApplianceSelected"
+      >
         Get results
       </button>
     </div>
+  </div>
+  <div *ngIf="showResults">
+    <span>Peak wattage: {{ peakWattage }}</span>
+    <span>Total watt hours: {{ totalWattHours }}</span>
+    <span>Sun hours: {{ sunHours }}</span>
+    <span>Total wattage needed: {{ wattageNeeded() }}</span>
   </div>
 
   <app-modal
