@@ -25,7 +25,34 @@
   }
 
   &.zip {
-    margin-bottom: 50px;
+    margin-bottom: 40px;
+  }
+}
+
+.build-stats {
+  margin-bottom: 15px;
+  display: flex;
+  .stat {
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    .number {
+      font-size: 36px;
+      color: $selected-blue;
+      margin-right: 3px;
+    }
+    .unit {
+      font-size: 22px;
+      color: $selected-blue;
+    }
+    .description {
+      font-size: 14px;
+      color: $text-color;
+    }
+    &:first-of-type {
+      margin-left: 5px;
+      margin-right: 35px;
+    }
   }
 }
 
@@ -115,7 +142,8 @@ mini-card {
 
 .scroll-anchor {
   height: 1px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 // animations

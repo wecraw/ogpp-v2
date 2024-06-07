@@ -10,11 +10,19 @@ import { MiniCardComponent } from '../../components/mini-card/mini-card.componen
 import { catchError, map } from 'rxjs';
 import { Season } from '../../interfaces/Season';
 import { Appliance } from '../../interfaces/Appliance';
+import { CountUpModule } from 'ngx-countup';
 
 @Component({
   selector: 'builder',
   standalone: true,
-  imports: [ApplianceCardComponent, CommonModule, FormsModule, ModalComponent, MiniCardComponent],
+  imports: [
+    ApplianceCardComponent,
+    CommonModule,
+    FormsModule,
+    ModalComponent,
+    MiniCardComponent,
+    CountUpModule
+  ],
   templateUrl: './builder.component.html',
   styleUrls: ['./builder.component.scss']
 })
@@ -32,6 +40,7 @@ export class BuilderComponent implements OnInit {
   public zipErrorLength: boolean = false;
   public zipErrorFormat: boolean = false;
   public showResults: boolean = false;
+  public hideButton: boolean = false;
 
   public debug = true;
 
@@ -85,6 +94,7 @@ export class BuilderComponent implements OnInit {
 
   enableStep2() {
     this.showStep2 = true;
+    this.hideButton = true;
     setTimeout(() => {
       const element = document.getElementById('step2');
       if (element) {
@@ -112,9 +122,6 @@ export class BuilderComponent implements OnInit {
       }
       return total;
     }, 0);
-
-    console.log(this.totalWattHours);
-    console.log(this.peakWattage);
   }
 
   getSunHours(zip: string) {
@@ -141,7 +148,6 @@ export class BuilderComponent implements OnInit {
 
             const selectedValues = selectedMonths.map(month => monthlyData[month]);
             this.sunHours = Math.min(...selectedValues);
-            console.log(this.sunHours);
           }),
           catchError((error: any) => {
             console.error('Error fetching sun hours:', error);
@@ -165,7 +171,6 @@ export class BuilderComponent implements OnInit {
   }
 
   generateBuild() {
-    console.log(this.allAppliances);
     this.updateTotals();
     this.getSunHours(this.zipCode);
     this.showResults = true;

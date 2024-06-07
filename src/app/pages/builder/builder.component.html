@@ -20,6 +20,7 @@
       </div>
       <div class="button-container">
         <button
+          *ngIf="!hideButton"
           [ngClass]="{ 'fade-out': showStep2 }"
           class="btn btn-primary inter-regular"
           [disabled]="!isAnyApplianceSelected || showStep2"
@@ -28,12 +29,29 @@
           Continue
         </button>
       </div>
+      <div id="step2" class="scroll-anchor"></div>
+      <hr *ngIf="showStep2" />
+
+      <div *ngIf="showStep2" class="fade-in build-stats">
+        <div class="stat">
+          <div class="inter-medium">
+            <span [countUp]="peakWattage" class="number">0</span><span class="unit">W</span>
+          </div>
+          <span class="description inter-regular">Peak Wattage</span>
+        </div>
+        <div class="stat">
+          <div class="inter-medium">
+            <span [countUp]="totalWattHours" class="number">0</span><span class="unit">Wh</span>
+          </div>
+          <span class="description inter-regular">Watt hours per day</span>
+        </div>
+      </div>
+      <hr *ngIf="showStep2" />
     </div>
   </div>
 </div>
-<div class="container">
+<div class="container" style="margin-top: 10px">
   <!-- scroll anchor here to create margin top -->
-  <div id="step2" class="scroll-anchor"></div>
   <div class="step2-wrapper fade-in" *ngIf="showStep2">
     <div class="section zip" [ngClass]="{ disabled: !isAnyApplianceSelected }">
       <div class="title-row d-flex inter-medium flex-column">
@@ -119,17 +137,21 @@
       <button
         class="btn btn-primary inter-regular"
         (click)="generateBuild()"
-        [disabled]="!isAnyApplianceSelected"
+        [disabled]="
+          !isAnyApplianceSelected ||
+          zipErrorFormat ||
+          zipErrorLength ||
+          zipCode.length < 5 ||
+          selectedSeasons.length === 0
+        "
       >
         Get results
       </button>
     </div>
-  </div>
-  <div *ngIf="showResults">
-    <span>Peak wattage: {{ peakWattage }}</span>
-    <span>Total watt hours: {{ totalWattHours }}</span>
-    <span>Sun hours: {{ sunHours }}</span>
-    <span>Total wattage needed: {{ wattageNeeded() }}</span>
+    <div *ngIf="showResults">
+      <span>Sun hours: {{ sunHours }}</span>
+      <span>Total wattage needed: {{ wattageNeeded() }}</span>
+    </div>
   </div>
 
   <app-modal
