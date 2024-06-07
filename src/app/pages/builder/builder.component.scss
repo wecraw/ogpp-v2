@@ -2,20 +2,19 @@
 
 .appliances {
   margin-top: 35px;
-  .title-row {
-    align-self: flex-start;
-    font-size: 24px;
-    .title {
-      color: $text-color;
-      margin-right: 5px;
-      margin-bottom: -8px;
-    }
-    .subtitle {
-      color: $subtitle-color;
-    }
+}
+.title-row {
+  align-self: flex-start;
+  font-size: 24px;
+  .title {
+    color: $text-color;
+    margin-right: 5px;
+    margin-bottom: -8px;
+  }
+  .subtitle {
+    color: $subtitle-color;
   }
 }
-
 .section {
   transition: opacity 0.2s;
 
@@ -55,7 +54,7 @@
   font-size: 17px;
   margin-left: 10px;
   margin-bottom: 3px;
-  color: $subtitle-color;
+  color: $grey-secondary;
   cursor: pointer;
   &:hover {
     color: $text-color;
@@ -76,7 +75,7 @@ hr {
 
 input {
   border-radius: 12px;
-  outline: 1px solid $subtitle-color;
+  outline: 1px solid $grey-secondary;
   border: none;
   font-size: 17px;
   padding: 10px;
