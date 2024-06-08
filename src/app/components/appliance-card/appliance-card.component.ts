@@ -12,7 +12,8 @@ import { Appliance } from '../../interfaces/Appliance';
 })
 export class ApplianceCardComponent implements OnInit {
   // Defaults
-  @Input() defaultAppliance!: Appliance;
+  @Input() appliance!: Appliance;
+  public defaultAppliance!: Appliance;
 
   // State
   @Input() disabled?: boolean = false;
@@ -25,10 +26,11 @@ export class ApplianceCardComponent implements OnInit {
   @Output() onSelect: EventEmitter<boolean> = new EventEmitter();
 
   // Values
-  appliance!: Appliance;
+  // appliance!: Appliance;
   editInnerVisible: boolean = false;
 
   ngOnInit(): void {
+    this.defaultAppliance = { ...this.appliance };
     this.setDefaults();
   }
 
