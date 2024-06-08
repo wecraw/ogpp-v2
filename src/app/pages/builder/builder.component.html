@@ -13,7 +13,7 @@
             <appliance-card
               [defaultAppliance]="appliance"
               (onEdit)="onApplianceValueChange($event, appliance)"
-              (onSelect)="onApplianceSelect($event, appliance.id!)"
+              (onSelect)="onApplianceSelect(appliance.id!)"
             ></appliance-card>
           </div>
         </div>
@@ -23,7 +23,7 @@
           *ngIf="!hideButton"
           [ngClass]="{ 'fade-out': showStep2 }"
           class="btn btn-primary inter-regular"
-          [disabled]="!isAnyApplianceSelected || showStep2"
+          [disabled]="!isAnyApplianceSelected() || showStep2"
           (click)="enableStep2()"
         >
           Continue
@@ -35,13 +35,15 @@
       <div *ngIf="showStep2" class="fade-in build-stats">
         <div class="stat">
           <div class="inter-medium">
-            <span [countUp]="peakWattage" class="number">0</span><span class="unit">W</span>
+            <span [countUp]="calculationUtils.peakWattage(build)" class="number">0</span
+            ><span class="unit">W</span>
           </div>
           <span class="description inter-regular">Peak Wattage</span>
         </div>
         <div class="stat">
           <div class="inter-medium">
-            <span [countUp]="totalWattHours" class="number">0</span><span class="unit">Wh</span>
+            <span [countUp]="calculationUtils.totalWattHours(build)" class="number">0</span
+            ><span class="unit">Wh</span>
           </div>
           <span class="description inter-regular">Watt hours per day</span>
         </div>
@@ -75,7 +77,7 @@
         <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
       </div>
     </div>
-    <div class="section" [ngClass]="{ disabled: !isAnyApplianceSelected }">
+    <div class="section">
       <div class="title-row d-flex inter-medium flex-column">
         <div class="title">Seasons.</div>
         <div class="subtitle">Choose when you're off grid.</div>
@@ -138,7 +140,7 @@
         class="btn btn-primary inter-regular"
         (click)="generateBuild()"
         [disabled]="
-          !isAnyApplianceSelected ||
+          !isAnyApplianceSelected() ||
           zipErrorFormat ||
           zipErrorLength ||
           zipCode.length < 5 ||
@@ -149,8 +151,8 @@
       </button>
     </div>
     <div *ngIf="showResults">
-      <span>Sun hours: {{ sunHours }}</span>
-      <span>Total wattage needed: {{ wattageNeeded() }}</span>
+      <!-- <span>Sun hours: {{ sunHours }}</span> -->
+      <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span>
     </div>
   </div>
 

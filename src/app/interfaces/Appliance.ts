@@ -9,5 +9,4 @@ export interface Appliance {
   quantity: number;
 
   applianceGroup: string;
-  selected?: boolean;
 }
