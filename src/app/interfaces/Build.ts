@@ -11,7 +11,7 @@ export interface Build {
   appliances: Appliance[];
   seasons: Season[];
   zipCode: string;
-  annualGhi: any;
+  monthlyGhi: any;
 
   powerSources: PowerSource[];
   inverter: Inverter;
@@ -20,3 +20,17 @@ export interface Build {
   createdOn: Date;
   lastEdited: Date;
 }
+
+export const defaultBuild: Build = {
+  name: '',
+  id: '',
+  appliances: [],
+  seasons: [],
+  zipCode: '',
+  monthlyGhi: null,
+  powerSources: [],
+  inverter: {} as Inverter,
+  batteries: [],
+  createdOn: new Date(),
+  lastEdited: new Date()
+};

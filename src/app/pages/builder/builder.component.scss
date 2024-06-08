@@ -18,12 +18,6 @@
 .section {
   transition: opacity 0.2s;
 
-  &.disabled {
-    opacity: 0.4;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-
   &.zip {
     margin-bottom: 40px;
   }

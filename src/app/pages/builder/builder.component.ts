@@ -1,4 +1,4 @@
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { allAppliances } from '../../content/appliances';
 import { ApplianceCardComponent } from '../../components/appliance-card/appliance-card.component';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,7 @@ import { catchError, map } from 'rxjs';
 import { Season } from '../../interfaces/Season';
 import { Appliance } from '../../interfaces/Appliance';
 import { CountUpModule } from 'ngx-countup';
+import { Build, defaultBuild } from '../../interfaces/Build';
 
 @Component({
   selector: 'builder',
@@ -31,18 +32,23 @@ export class BuilderComponent implements OnInit {
   public allAppliances = allAppliances;
   public totalWattHours: number = 0;
   public peakWattage: number = 0;
-  public isAnyApplianceSelected: boolean = false;
   public sunHours: number = 0;
   public zipCode: string = '';
-  public selectedSeasons: Season[] = [];
   public applianceGroups: string[] = [];
-  public showStep2: boolean = false;
+
+  //Input validation
   public zipErrorLength: boolean = false;
   public zipErrorFormat: boolean = false;
+  public isAnyApplianceSelected: boolean = false;
+
+  //DOM controllers
   public showResults: boolean = false;
   public hideButton: boolean = false;
+  public showStep2: boolean = false;
 
-  public debug = true;
+  @Input() build: Build = defaultBuild;
+
+  public debug = false;
 
   isModalOpen = false;
   modalContent = LOCATION_DISCLAIMER;
@@ -81,9 +87,9 @@ export class BuilderComponent implements OnInit {
   }
 
   onSeasonSelect(selected: boolean, selectedSeason: Season) {
-    if (selected) this.selectedSeasons.push(selectedSeason);
+    if (selected) this.build.seasons.push(selectedSeason);
     if (!selected)
-      this.selectedSeasons = this.selectedSeasons.filter(season => season !== selectedSeason);
+      this.build.seasons = this.build.seasons.filter(season => season !== selectedSeason);
   }
 
   validateZip(checkLength: boolean) {
@@ -125,29 +131,26 @@ export class BuilderComponent implements OnInit {
   }
 
   getSunHours(zip: string) {
-    if (!this.debug) {
-      if (this.zipErrorFormat || this.zipErrorLength) return;
+    if (this.debug) {
+      this.sunHours = 1;
+      return;
+    }
+
+    if (this.zipErrorFormat || this.zipErrorLength) return;
+
+    if (this.build.monthlyGhi && this.build.zipCode === zip) {
+      // Use existing monthlyGhi data
+      console.log('using existing data!');
+      this.filterMonthsAndUpdateSunHours();
+    } else {
+      // Fetch sun hours data from the service
       this.sunHoursService
         .getSunHoursByZip(zip)
         .pipe(
           map((response: any) => {
-            const monthlyData = response.outputs.avg_ghi.monthly;
-            const seasonMonthsMap: { [season in Season]: string[] } = {
-              winter: ['dec', 'jan', 'feb'],
-              spring: ['mar', 'apr', 'may'],
-              summer: ['jun', 'jul', 'aug'],
-              fall: ['sep', 'oct', 'nov']
-            };
-
-            const selectedMonths = this.selectedSeasons.reduce<string[]>((months, season) => {
-              if (seasonMonthsMap[season]) {
-                months.push(...seasonMonthsMap[season]);
-              }
-              return months;
-            }, []);
-
-            const selectedValues = selectedMonths.map(month => monthlyData[month]);
-            this.sunHours = Math.min(...selectedValues);
+            this.build.monthlyGhi = response.outputs.avg_ghi.monthly;
+            this.build.zipCode = zip;
+            this.filterMonthsAndUpdateSunHours();
           }),
           catchError((error: any) => {
             console.error('Error fetching sun hours:', error);
@@ -155,15 +158,30 @@ export class BuilderComponent implements OnInit {
           })
         )
         .subscribe();
-    } else {
-      this.sunHours = 1;
     }
   }
 
+  private filterMonthsAndUpdateSunHours() {
+    const seasonMonthsMap: { [season in Season]: string[] } = {
+      winter: ['dec', 'jan', 'feb'],
+      spring: ['mar', 'apr', 'may'],
+      summer: ['jun', 'jul', 'aug'],
+      fall: ['sep', 'oct', 'nov']
+    };
+
+    const selectedMonths = this.build.seasons.reduce<string[]>((months, season) => {
+      if (seasonMonthsMap[season]) {
+        months.push(...seasonMonthsMap[season]);
+      }
+      return months;
+    }, []);
+
+    const selectedValues = selectedMonths.map(month => this.build.monthlyGhi[month]);
+    this.sunHours = Math.min(...selectedValues);
+  }
+
   checkApplianceSelection() {
-    //permanent flag, once set to true will not turn back off
-    if (!this.isAnyApplianceSelected)
-      this.isAnyApplianceSelected = this.allAppliances.some(appliance => appliance.selected);
+    this.isAnyApplianceSelected = this.allAppliances.some(appliance => appliance.selected);
   }
 
   wattageNeeded() {

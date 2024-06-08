@@ -53,7 +53,7 @@
 <div class="container" style="margin-top: 10px">
   <!-- scroll anchor here to create margin top -->
   <div class="step2-wrapper fade-in" *ngIf="showStep2">
-    <div class="section zip" [ngClass]="{ disabled: !isAnyApplianceSelected }">
+    <div class="section zip">
       <div class="title-row d-flex inter-medium flex-column">
         <div class="title">Location.</div>
         <div class="subtitle">Choose where you're off grid.</div>
@@ -142,7 +142,7 @@
           zipErrorFormat ||
           zipErrorLength ||
           zipCode.length < 5 ||
-          selectedSeasons.length === 0
+          build.seasons.length === 0
         "
       >
         Get results
