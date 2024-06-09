@@ -23,8 +23,14 @@ export class CalculationUtilsService {
       return months;
     }, []);
 
-    const selectedValues = selectedMonths.map(month => build.monthlyGhi[month]);
-    return Math.min(...selectedValues);
+    if (build.monthlyGhi) {
+      const selectedValues = selectedMonths.map(month => build.monthlyGhi[month]);
+      return Math.min(...selectedValues);
+    } else {
+      // Handle the case when build.monthlyGhi is null
+      console.warn('build.monthlyGhi is null. Returning a default value.');
+      return 0; // or any other default value you want to use
+    }
   }
 
   peakWattage(build: Build): number {

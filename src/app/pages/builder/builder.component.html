@@ -150,7 +150,7 @@
         Get results
       </button>
     </div>
-    <div *ngIf="showResults">
+    <div *ngIf="showResults && build.monthlyGhi">
       <!-- <span>Sun hours: {{ sunHours }}</span> -->
       <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span>
     </div>

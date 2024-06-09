@@ -13,6 +13,8 @@ import { Appliance } from '../../interfaces/Appliance';
 import { CountUpModule } from 'ngx-countup';
 import { Build, defaultBuild } from '../../interfaces/Build';
 import { CalculationUtilsService } from '../../services/calculation-utils.service';
+import { BuildService } from '../../services/build.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'builder',
@@ -55,7 +57,8 @@ export class BuilderComponent implements OnInit {
 
   constructor(
     private sunHoursService: SunHoursService,
-    public calculationUtils: CalculationUtilsService
+    public calculationUtils: CalculationUtilsService,
+    private buildService: BuildService
   ) {}
 
   ngOnInit(): void {
@@ -130,6 +133,8 @@ export class BuilderComponent implements OnInit {
 
   generateBuild() {
     this.getSunHours(this.zipCode);
+    this.build.id = uuidv4();
+    this.buildService.saveBuild(this.build);
     this.showResults = true;
   }
 
