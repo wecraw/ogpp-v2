@@ -15,6 +15,7 @@ import { Build, defaultBuild } from '../../interfaces/Build';
 import { CalculationUtilsService } from '../../services/calculation-utils.service';
 import { BuildService } from '../../services/build.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'builder',
@@ -45,6 +46,7 @@ export class BuilderComponent implements OnInit {
 
   // DOM controllers
   public showResults: boolean = false;
+  public generatingBuild: boolean = false;
   public hideButton: boolean = false;
   public showStep2: boolean = false;
   public isModalOpen = false;
@@ -56,6 +58,7 @@ export class BuilderComponent implements OnInit {
   public debug = false;
 
   constructor(
+    private router: Router,
     private sunHoursService: SunHoursService,
     public calculationUtils: CalculationUtilsService,
     private buildService: BuildService
@@ -93,49 +96,76 @@ export class BuilderComponent implements OnInit {
       this.build.seasons = this.build.seasons.filter(season => season !== selectedSeason);
   }
 
-  getSunHours(zip: string) {
-    if (this.debug) {
-      this.build.monthlyGhi = {
-        jan: 1,
-        feb: 1,
-        mar: 1,
-        apr: 1,
-        may: 1,
-        jun: 1,
-        jul: 1,
-        aug: 1,
-        sep: 1,
-        oct: 1,
-        nov: 1,
-        dec: 1
-      };
-      return;
-    }
+  // Modify getSunHours to return a Promise
+  getSunHours(zip: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.debug) {
+        this.build.monthlyGhi = {
+          jan: 1,
+          feb: 1,
+          mar: 1,
+          apr: 1,
+          may: 1,
+          jun: 1,
+          jul: 1,
+          aug: 1,
+          sep: 1,
+          oct: 1,
+          nov: 1,
+          dec: 1
+        };
+        resolve();
+        return;
+      }
 
-    if (this.zipErrorFormat || this.zipErrorLength) return;
+      if (this.zipErrorFormat || this.zipErrorLength) {
+        reject('Invalid ZIP code.');
+        return;
+      }
 
-    if (!this.build.monthlyGhi || this.build.zipCode !== zip) {
-      this.sunHoursService
-        .getSunHoursByZip(zip)
-        .pipe(
-          map((response: any) => {
-            this.build.monthlyGhi = response.outputs.avg_ghi.monthly;
-            this.build.zipCode = zip;
-          }),
-          catchError((error: any) => {
-            console.error('Error fetching sun hours:', error);
-            return error;
-          })
-        )
-        .subscribe();
-    }
+      if (!this.build.monthlyGhi || this.build.zipCode !== zip) {
+        this.build.zipCode = zip;
+        this.sunHoursService
+          .getSunHoursByZip(zip)
+          .pipe(
+            map((response: any) => {
+              this.build.monthlyGhi = response.outputs.avg_ghi.monthly;
+              resolve();
+            }),
+            catchError((error: any) => {
+              console.error('Error fetching sun hours:', error);
+              reject(error);
+              return error;
+            })
+          )
+          .subscribe();
+      } else {
+        resolve();
+      }
+    });
   }
 
-  generateBuild() {
-    this.getSunHours(this.zipCode);
-    this.build.id = uuidv4();
-    this.buildService.saveBuild(this.build);
-    this.showResults = true;
+  // Modify generateBuild to await the completion of getSunHours
+  async generateBuild() {
+    this.generatingBuild = true;
+    try {
+      await this.getSunHours(this.zipCode);
+      this.build.id = uuidv4();
+      this.buildService.saveBuild(this.build);
+      // Navigate to the "builds" page with the buildId as a query param
+      const navigationExtras = {
+        queryParams: { buildId: this.build.id }
+      };
+      setTimeout(() => {
+        //spoof loading time, not needed, purely ux
+        this.router.navigate(['/build'], navigationExtras);
+      }, 1200);
+    } catch (error) {
+      this.generatingBuild = false;
+      console.error('Failed to generate build:', error);
+    } finally {
+      //
+    }
   }
 
   // Validators =============================================================

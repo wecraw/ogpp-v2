@@ -135,7 +135,7 @@
         </div>
       </div>
     </div>
-    <div class="button-container">
+    <div *ngIf="!generatingBuild" class="button-container">
       <button
         class="btn btn-primary inter-regular"
         (click)="generateBuild()"
@@ -154,6 +154,7 @@
       <!-- <span>Sun hours: {{ sunHours }}</span> -->
       <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span>
     </div>
+    <div *ngIf="generatingBuild" class="loader"></div>
   </div>
 
   <app-modal
