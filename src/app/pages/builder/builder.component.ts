@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  QueryList,
+  ViewChildren
+} from '@angular/core';
 import { allAppliances } from '../../content/appliances';
 import { ApplianceCardComponent } from '../../components/appliance-card/appliance-card.component';
 import { CommonModule } from '@angular/common';
@@ -38,7 +45,7 @@ export class BuilderComponent implements OnInit {
   public allAppliances: Appliance[] = allAppliances;
   public applianceGroups: string[] = [];
   public modalContent: string = LOCATION_DISCLAIMER;
-  
+
   // Display values
   public peakWattage: number = 0;
   public totalWattHours: number = 0;
@@ -54,7 +61,7 @@ export class BuilderComponent implements OnInit {
   public hideButton: boolean = false;
   public showStep2: boolean = false;
   public isModalOpen: boolean = false;
-  public countUpOptions = { duration: 1.5}
+  public countUpOptions = { duration: 1.5 };
 
   // Inputs
   @Input() build: Build = defaultBuild;
@@ -82,6 +89,7 @@ export class BuilderComponent implements OnInit {
 
   onApplianceValueChange(updatedAppliance: any, appliance: Appliance) {
     Object.assign(appliance, updatedAppliance); // Update the properties of the existing appliance
+    this.updateTotals();
   }
 
   onApplianceSelect(id: string) {
@@ -95,7 +103,7 @@ export class BuilderComponent implements OnInit {
       }
     }
 
-    this.updateTotals()
+    this.updateTotals();
   }
 
   onSeasonSelect(selected: boolean, selectedSeason: Season) {
@@ -153,14 +161,14 @@ export class BuilderComponent implements OnInit {
     });
   }
 
-  updateTotals(){
+  updateTotals() {
     if (this.showStep2) {
-      this.countUpOptions = {duration: 0.7}
+      this.countUpOptions = { duration: 0.7 };
       this.changeDetectorRef.detectChanges();
-    } 
-    
-    this.totalWattHours = this.calculationUtils.totalWattHours(this.build)
-    this.peakWattage = this.calculationUtils.peakWattage(this.build)
+    }
+
+    this.totalWattHours = this.calculationUtils.totalWattHours(this.build);
+    this.peakWattage = this.calculationUtils.peakWattage(this.build);
   }
 
   // Modify generateBuild to await the completion of getSunHours
