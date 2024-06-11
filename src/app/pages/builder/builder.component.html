@@ -35,10 +35,7 @@
       <div *ngIf="showStep2" class="fade-in build-stats">
         <div class="stat">
           <div class="inter-medium">
-            <span
-              [countUp]="peakWattage"
-              [options]="countUpOptions"
-              class="number"
+            <span [countUp]="peakWattage" [options]="countUpOptionsPeakWattage" class="number"
               >0</span
             ><span class="unit">W</span>
           </div>
@@ -46,10 +43,7 @@
         </div>
         <div class="stat">
           <div class="inter-medium">
-            <span
-              [countUp]="totalWattHours"
-              [options]="countUpOptions"
-              class="number"
+            <span [countUp]="totalWattHours" [options]="countUpOptionsTotalWattHours" class="number"
               >0</span
             ><span class="unit">Wh</span>
           </div>

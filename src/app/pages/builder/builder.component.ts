@@ -61,7 +61,8 @@ export class BuilderComponent implements OnInit {
   public hideButton: boolean = false;
   public showStep2: boolean = false;
   public isModalOpen: boolean = false;
-  public countUpOptions = { duration: 1.5 };
+  public countUpOptionsPeakWattage = { duration: 1.5, startVal: 0 };
+  public countUpOptionsTotalWattHours = { duration: 1.5, startVal: 0 };
 
   // Inputs
   @Input() build: Build = defaultBuild;
@@ -163,7 +164,8 @@ export class BuilderComponent implements OnInit {
 
   updateTotals() {
     if (this.showStep2) {
-      this.countUpOptions = { duration: 0.7 };
+      this.countUpOptionsPeakWattage = { duration: 0.7, startVal: this.peakWattage };
+      this.countUpOptionsTotalWattHours = { duration: 0.7, startVal: this.totalWattHours };
       this.changeDetectorRef.detectChanges();
     }
 
@@ -223,11 +225,6 @@ export class BuilderComponent implements OnInit {
       }
     }, 1);
   }
-
-  // updateCountUpDuration() {
-  //   // pending updates to countUp
-  //   this.firstCountComplete = true; //countUp runs faster after initial compute
-  // }
 
   openModal() {
     this.isModalOpen = true;
