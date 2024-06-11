@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { allAppliances } from '../../content/appliances';
 import { ApplianceCardComponent } from '../../components/appliance-card/appliance-card.component';
 import { CommonModule } from '@angular/common';
@@ -35,9 +35,13 @@ export class BuilderComponent implements OnInit {
   @ViewChildren(ApplianceCardComponent) applianceCards!: QueryList<ApplianceCardComponent>;
 
   // Content
-  public allAppliances = allAppliances;
+  public allAppliances: Appliance[] = allAppliances;
   public applianceGroups: string[] = [];
-  public modalContent = LOCATION_DISCLAIMER;
+  public modalContent: string = LOCATION_DISCLAIMER;
+  
+  // Display values
+  public peakWattage: number = 0;
+  public totalWattHours: number = 0;
 
   // Input validation
   public zipCode: string = '';
@@ -49,7 +53,8 @@ export class BuilderComponent implements OnInit {
   public generatingBuild: boolean = false;
   public hideButton: boolean = false;
   public showStep2: boolean = false;
-  public isModalOpen = false;
+  public isModalOpen: boolean = false;
+  public countUpOptions = { duration: 1.5}
 
   // Inputs
   @Input() build: Build = defaultBuild;
@@ -61,7 +66,8 @@ export class BuilderComponent implements OnInit {
     private router: Router,
     private sunHoursService: SunHoursService,
     public calculationUtils: CalculationUtilsService,
-    private buildService: BuildService
+    private buildService: BuildService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -88,6 +94,8 @@ export class BuilderComponent implements OnInit {
         this.build.appliances.push(selectedAppliance);
       }
     }
+
+    this.updateTotals()
   }
 
   onSeasonSelect(selected: boolean, selectedSeason: Season) {
@@ -145,6 +153,16 @@ export class BuilderComponent implements OnInit {
     });
   }
 
+  updateTotals(){
+    if (this.showStep2) {
+      this.countUpOptions = {duration: 0.7}
+      this.changeDetectorRef.detectChanges();
+    } 
+    
+    this.totalWattHours = this.calculationUtils.totalWattHours(this.build)
+    this.peakWattage = this.calculationUtils.peakWattage(this.build)
+  }
+
   // Modify generateBuild to await the completion of getSunHours
   async generateBuild() {
     this.generatingBuild = true;
@@ -185,6 +203,7 @@ export class BuilderComponent implements OnInit {
   enableStep2() {
     this.showStep2 = true;
     this.hideButton = true;
+
     setTimeout(() => {
       const element = document.getElementById('step2');
       if (element) {
@@ -196,6 +215,11 @@ export class BuilderComponent implements OnInit {
       }
     }, 1);
   }
+
+  // updateCountUpDuration() {
+  //   // pending updates to countUp
+  //   this.firstCountComplete = true; //countUp runs faster after initial compute
+  // }
 
   openModal() {
     this.isModalOpen = true;

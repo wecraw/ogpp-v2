@@ -35,14 +35,22 @@
       <div *ngIf="showStep2" class="fade-in build-stats">
         <div class="stat">
           <div class="inter-medium">
-            <span [countUp]="calculationUtils.peakWattage(build)" class="number">0</span
+            <span
+              [countUp]="peakWattage"
+              [options]="countUpOptions"
+              class="number"
+              >0</span
             ><span class="unit">W</span>
           </div>
           <span class="description inter-regular">Peak Wattage</span>
         </div>
         <div class="stat">
           <div class="inter-medium">
-            <span [countUp]="calculationUtils.totalWattHours(build)" class="number">0</span
+            <span
+              [countUp]="totalWattHours"
+              [options]="countUpOptions"
+              class="number"
+              >0</span
             ><span class="unit">Wh</span>
           </div>
           <span class="description inter-regular">Watt hours per day</span>
