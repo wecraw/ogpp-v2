@@ -42,7 +42,8 @@ export class BuilderComponent implements OnInit {
   @ViewChildren(ApplianceCardComponent) applianceCards!: QueryList<ApplianceCardComponent>;
 
   // Content
-  public allAppliances: Appliance[] = allAppliances;
+  public allAppliances: Appliance[] = [...allAppliances];
+  public originalAppliances: Appliance[] = [...allAppliances];
   public applianceGroups: string[] = [];
   public modalContent: string = LOCATION_DISCLAIMER;
 
@@ -79,6 +80,8 @@ export class BuilderComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.originalAppliances = allAppliances.map(appliance => ({ ...appliance }));
+
     this.route.queryParams.subscribe(params => {
       const buildId = params['buildId'];
       if (buildId) {
@@ -86,6 +89,7 @@ export class BuilderComponent implements OnInit {
           this.build = this.buildService.getBuild(buildId)!;
           this.showStep2 = true;
           this.zipCode = this.build.zipCode;
+          console.log(this.build);
           this.updateTotals();
 
           // Update appliance properties based on the loaded build
@@ -107,6 +111,10 @@ export class BuilderComponent implements OnInit {
     this.applianceGroups = [
       ...new Set(this.allAppliances.map(appliance => appliance.applianceGroup))
     ];
+  }
+
+  getOriginalApplianceById(id: string): Appliance | undefined {
+    return this.originalAppliances.find(appliance => appliance.id === id);
   }
 
   isApplianceSelected(id: string): boolean {
@@ -155,6 +163,7 @@ export class BuilderComponent implements OnInit {
   getSunHours(zip: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.debug) {
+        this.build.zipCode = zip;
         this.build.monthlyGhi = {
           jan: 1,
           feb: 1,

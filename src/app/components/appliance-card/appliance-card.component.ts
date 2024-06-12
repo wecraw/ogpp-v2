@@ -27,7 +27,6 @@ export class ApplianceCardComponent implements OnInit {
   @Output() onSelect: EventEmitter<boolean> = new EventEmitter();
 
   // Values
-  // appliance!: Appliance;
   editInnerVisible: boolean = false;
 
   ngOnInit(): void {
@@ -100,13 +99,11 @@ export class ApplianceCardComponent implements OnInit {
   }
 
   setDefaults() {
-    // console.log(this.originalAppliance);
-    // if (this.originalAppliance) {
-    //   this.appliance = { ...this.originalAppliance };
-    // } else {
-    //   this.appliance = { ...this.defaultAppliance };
-    // }
-    this.appliance = { ...this.defaultAppliance };
+    if (this.originalAppliance) {
+      this.appliance = { ...this.originalAppliance };
+    } else {
+      this.appliance = { ...this.defaultAppliance };
+    }
   }
 
   clearNameError() {
