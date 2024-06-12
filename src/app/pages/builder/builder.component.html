@@ -92,37 +92,45 @@
             (onSelect)="onSeasonSelect($event, 'spring')"
             label="Spring"
             iconName="bi-flower1"
+            [selected]="build.seasons.includes('spring')"
           ></mini-card>
 
           <mini-card
             (onSelect)="onSeasonSelect($event, 'summer')"
             label="Summer"
             iconName="bi-sun"
+            [selected]="build.seasons.includes('summer')"
           ></mini-card>
+
           <mini-card
             (onSelect)="onSeasonSelect($event, 'fall')"
             label="Fall"
             iconName="bi-tree"
+            [selected]="build.seasons.includes('fall')"
           ></mini-card>
 
           <mini-card
             (onSelect)="onSeasonSelect($event, 'winter')"
             label="Winter"
             iconName="bi-snow"
+            [selected]="build.seasons.includes('winter')"
           ></mini-card>
         </div>
+
         <div class="row content-below-md">
           <div class="row">
             <mini-card
               (onSelect)="onSeasonSelect($event, 'spring')"
               label="Spring"
               iconName="bi-flower1"
+              [selected]="build.seasons.includes('spring')"
             ></mini-card>
 
             <mini-card
               (onSelect)="onSeasonSelect($event, 'summer')"
               label="Summer"
               iconName="bi-sun"
+              [selected]="build.seasons.includes('summer')"
             ></mini-card>
           </div>
           <div class="row">
@@ -130,12 +138,14 @@
               (onSelect)="onSeasonSelect($event, 'fall')"
               label="Fall"
               iconName="bi-tree"
+              [selected]="build.seasons.includes('fall')"
             ></mini-card>
 
             <mini-card
               (onSelect)="onSeasonSelect($event, 'winter')"
               label="Winter"
               iconName="bi-snow"
+              [selected]="build.seasons.includes('winter')"
             ></mini-card>
           </div>
         </div>

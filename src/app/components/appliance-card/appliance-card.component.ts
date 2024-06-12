@@ -40,7 +40,6 @@ export class ApplianceCardComponent implements OnInit {
 
   selectClicked() {
     if (!this.isEditMode) {
-      console.log('toggling! Current: ' + this.selected);
       this.selected = !this.selected;
       this.onSelect.emit(this.selected);
     }

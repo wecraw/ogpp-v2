@@ -39,7 +39,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./builder.component.scss']
 })
 export class BuilderComponent implements OnInit {
-  @ViewChildren(ApplianceCardComponent) applianceCards!: QueryList<ApplianceCardComponent>;
+  @ViewChildren(MiniCardComponent) miniCards!: QueryList<MiniCardComponent>;
 
   // Content
   public allAppliances: Appliance[] = [...allAppliances];
@@ -89,7 +89,6 @@ export class BuilderComponent implements OnInit {
           this.build = this.buildService.getBuild(buildId)!;
           this.showStep2 = true;
           this.zipCode = this.build.zipCode;
-          console.log(this.build);
           this.updateTotals();
 
           // Update appliance properties based on the loaded build
