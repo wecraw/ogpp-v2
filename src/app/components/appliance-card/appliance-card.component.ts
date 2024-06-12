@@ -13,11 +13,12 @@ import { Appliance } from '../../interfaces/Appliance';
 export class ApplianceCardComponent implements OnInit {
   // Defaults
   @Input() appliance!: Appliance;
-  public defaultAppliance!: Appliance;
 
   // State
   @Input() disabled?: boolean = false;
   @Input() selected: boolean = false;
+  @Input() originalAppliance?: Appliance | undefined;
+  public defaultAppliance!: Appliance;
   public isEditMode: boolean = false;
   public nameRequired: boolean = false;
 
@@ -31,7 +32,7 @@ export class ApplianceCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.defaultAppliance = { ...this.appliance };
-    this.setDefaults();
+    if (this.originalAppliance) this.defaultAppliance = { ...this.originalAppliance };
   }
 
   editClicked() {
@@ -40,6 +41,7 @@ export class ApplianceCardComponent implements OnInit {
 
   selectClicked() {
     if (!this.isEditMode) {
+      console.log('toggling! Current: ' + this.selected);
       this.selected = !this.selected;
       this.onSelect.emit(this.selected);
     }
@@ -98,6 +100,12 @@ export class ApplianceCardComponent implements OnInit {
   }
 
   setDefaults() {
+    // console.log(this.originalAppliance);
+    // if (this.originalAppliance) {
+    //   this.appliance = { ...this.originalAppliance };
+    // } else {
+    //   this.appliance = { ...this.defaultAppliance };
+    // }
     this.appliance = { ...this.defaultAppliance };
   }
 

@@ -1,1 +1,31 @@
-<p>build works!</p>
+<div *ngIf="!buildNotFound" class="container">
+  <div class="fade-in build-stats">
+    <div class="stat appliance-count">
+      <div class="inter-medium">
+        <span [countUp]="build.appliances.length" [options]="countUpOptions" class="number">0</span>
+      </div>
+
+      <span class="description inter-regular">Appliances</span>
+    </div>
+    <div class="button-container">
+      <button class="btn outlined inter-regular" (click)="editAppliances()">Edit appliances</button>
+    </div>
+  </div>
+  <hr />
+  <div class="fade-in build-stats">
+    <div class="stat">
+      <div class="inter-medium">
+        <span [countUp]="peakWattage" [options]="countUpOptions" class="number">0</span
+        ><span class="unit">W</span>
+      </div>
+      <span class="description inter-regular">Peak Wattage</span>
+    </div>
+    <div class="stat">
+      <div class="inter-medium">
+        <span [countUp]="totalWattHours" [options]="countUpOptions" class="number">0</span
+        ><span class="unit">Wh</span>
+      </div>
+      <span class="description inter-regular">Watt hours per day</span>
+    </div>
+  </div>
+</div>

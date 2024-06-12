@@ -1,0 +1,45 @@
+@import 'src/variables.scss';
+
+.build-stats {
+  margin-bottom: 15px;
+  display: flex;
+  .stat {
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    .number {
+      font-size: 36px;
+      color: $selected-blue;
+      margin-right: 3px;
+    }
+    .unit {
+      font-size: 22px;
+      color: $selected-blue;
+    }
+    .description {
+      font-size: 14px;
+      color: $text-color;
+    }
+    &:first-of-type {
+      margin-left: 5px;
+      margin-right: 35px;
+    }
+    &.appliance-count {
+      &:first-of-type {
+        margin-right: 15px;
+      }
+    }
+  }
+}
+
+.button-container {
+  margin-top: auto;
+  margin-bottom: auto;
+  .btn {
+    &.outlined {
+      background: transparent;
+      border: 1px solid $selected-blue;
+      color: $selected-blue;
+    }
+  }
+}

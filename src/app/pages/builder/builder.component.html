@@ -1,3 +1,5 @@
+<!-- [defaultAppliance]="getDefaultAppliance(appliance.id!)" -->
+
 <div class="container">
   <div class="appliances">
     <div class="section d-flex flex-column">
@@ -12,6 +14,7 @@
           <div class="col-lg-5 col-xl-4" *ngFor="let appliance of getAppliancesByGroup(group)">
             <appliance-card
               [appliance]="appliance"
+              [selected]="isApplianceSelected(appliance.id!)"
               (onEdit)="onApplianceValueChange($event, appliance)"
               (onSelect)="onApplianceSelect(appliance.id!)"
             ></appliance-card>
@@ -20,7 +23,7 @@
       </div>
       <div class="button-container">
         <button
-          *ngIf="!hideButton"
+          *ngIf="!showStep2"
           [ngClass]="{ 'fade-out': showStep2 }"
           class="btn btn-primary inter-regular"
           [disabled]="!isAnyApplianceSelected() || showStep2"
@@ -152,10 +155,10 @@
         Get results
       </button>
     </div>
-    <div *ngIf="showResults && build.monthlyGhi">
-      <!-- <span>Sun hours: {{ sunHours }}</span> -->
-      <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span>
-    </div>
+    <!-- <div *ngIf="showResults && build.monthlyGhi"> -->
+    <!-- <span>Sun hours: {{ sunHours }}</span> -->
+    <!-- <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span> -->
+    <!-- </div> -->
     <div *ngIf="generatingBuild" class="loader"></div>
   </div>
 

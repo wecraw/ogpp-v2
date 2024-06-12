@@ -22,7 +22,7 @@ import { Build, defaultBuild } from '../../interfaces/Build';
 import { CalculationUtilsService } from '../../services/calculation-utils.service';
 import { BuildService } from '../../services/build.service';
 import { v4 as uuidv4 } from 'uuid';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'builder',
@@ -56,9 +56,8 @@ export class BuilderComponent implements OnInit {
   public zipErrorFormat: boolean = false;
 
   // DOM controllers
-  public showResults: boolean = false;
+  // public showResults: boolean = false; //debug
   public generatingBuild: boolean = false;
-  public hideButton: boolean = false;
   public showStep2: boolean = false;
   public isModalOpen: boolean = false;
   public countUpOptionsPeakWattage = { duration: 1.5, startVal: 0 };
@@ -72,18 +71,47 @@ export class BuilderComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private sunHoursService: SunHoursService,
-    public calculationUtils: CalculationUtilsService,
+    private calculationUtils: CalculationUtilsService,
     private buildService: BuildService,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const buildId = params['buildId'];
+      if (buildId) {
+        if (this.buildService.getBuild(buildId)) {
+          this.build = this.buildService.getBuild(buildId)!;
+          this.showStep2 = true;
+          this.zipCode = this.build.zipCode;
+          this.updateTotals();
+
+          // Update appliance properties based on the loaded build
+          this.build.appliances.forEach(buildAppliance => {
+            const applianceIndex = this.allAppliances.findIndex(
+              appliance => appliance.id === buildAppliance.id
+            );
+            if (applianceIndex !== -1) {
+              this.allAppliances[applianceIndex] = {
+                ...this.allAppliances[applianceIndex],
+                ...buildAppliance
+              };
+            }
+          });
+        }
+      }
+    });
+
     this.applianceGroups = [
       ...new Set(this.allAppliances.map(appliance => appliance.applianceGroup))
     ];
   }
 
+  isApplianceSelected(id: string): boolean {
+    return this.build.appliances.some(appliance => appliance.id === id);
+  }
   getAppliancesByGroup(group: string): Appliance[] {
     return this.allAppliances.filter(appliance => appliance.applianceGroup === group);
   }
@@ -96,7 +124,9 @@ export class BuilderComponent implements OnInit {
   onApplianceSelect(id: string) {
     const selectedAppliance = this.allAppliances.find(item => item.id === id);
     if (selectedAppliance) {
-      const index = this.build.appliances.indexOf(selectedAppliance);
+      const index = this.build.appliances.findIndex(
+        appliance => appliance.id === selectedAppliance.id
+      );
       if (index !== -1) {
         this.build.appliances.splice(index, 1);
       } else {
@@ -212,7 +242,6 @@ export class BuilderComponent implements OnInit {
 
   enableStep2() {
     this.showStep2 = true;
-    this.hideButton = true;
 
     setTimeout(() => {
       const element = document.getElementById('step2');
