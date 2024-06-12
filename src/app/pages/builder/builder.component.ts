@@ -56,7 +56,6 @@ export class BuilderComponent implements OnInit {
   public zipErrorFormat: boolean = false;
 
   // DOM controllers
-  // public showResults: boolean = false; //debug
   public generatingBuild: boolean = false;
   public showStep2: boolean = false;
   public isModalOpen: boolean = false;
@@ -67,7 +66,8 @@ export class BuilderComponent implements OnInit {
   @Input() build: Build = defaultBuild;
 
   // Debug
-  public debug = false;
+  public debug = true;
+  // public showResults: boolean = false; //debug
 
   constructor(
     private router: Router,
@@ -112,12 +112,20 @@ export class BuilderComponent implements OnInit {
   isApplianceSelected(id: string): boolean {
     return this.build.appliances.some(appliance => appliance.id === id);
   }
+
   getAppliancesByGroup(group: string): Appliance[] {
     return this.allAppliances.filter(appliance => appliance.applianceGroup === group);
   }
 
   onApplianceValueChange(updatedAppliance: any, appliance: Appliance) {
-    Object.assign(appliance, updatedAppliance); // Update the properties of the existing appliance
+    const buildApplianceIndex = this.build.appliances.findIndex(item => item.id === appliance.id);
+    if (buildApplianceIndex !== -1) {
+      this.build.appliances[buildApplianceIndex] = {
+        ...this.build.appliances[buildApplianceIndex],
+        ...updatedAppliance
+      };
+    }
+
     this.updateTotals();
   }
 
