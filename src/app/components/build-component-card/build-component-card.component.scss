@@ -1,0 +1,199 @@
+@import 'src/variables.scss';
+
+.blade-container {
+  color: $text-color;
+  margin-top: 10px;
+  outline: 1px solid $grey;
+  width: 351px;
+  height: 82px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 0 15px;
+  position: relative;
+  background-color: #fff;
+  transition: height 0.3s ease-out;
+
+  &.detail {
+    height: 400px;
+    z-index: 1000;
+    transition: height 0.3s ease-out;
+  }
+
+  .view-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 82px;
+  }
+
+  .edit-button {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid $grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eee;
+    }
+
+    i {
+      font-size: 16px;
+    }
+  }
+
+  &.selected {
+    outline: 2px solid #0071e3;
+  }
+
+  &.edit {
+    cursor: default;
+  }
+}
+
+i {
+  font-size: 28px;
+  color: $text-color;
+}
+
+.label-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.name {
+  font-size: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+
+  &.display {
+    margin-left: 4px;
+  }
+
+  &.edit {
+    max-width: 100%;
+  }
+}
+
+.description {
+  max-width: 190px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.display {
+    margin-left: 4px;
+  }
+
+  &.edit {
+    max-width: 100%;
+  }
+}
+
+.details {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+
+  .detail {
+    align-self: flex-end;
+    margin-right: 10px;
+  }
+}
+
+.fullscreen-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.reset-link {
+  margin-top: 5px;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover {
+    color: #0056b3;
+  }
+}
+
+.edit-fields {
+  margin-left: 33px;
+  margin-top: 55px;
+
+  .edit-label {
+    font-size: 12px;
+  }
+}
+
+.title-edit-fields {
+  margin-top: 55px;
+  .input-name {
+    font-size: 17px;
+    margin-bottom: 15px;
+  }
+
+  &.error {
+    margin-top: 60px;
+    .input-name {
+      margin-bottom: 0;
+      outline: 2px solid $error-red;
+    }
+  }
+
+  .input-description {
+    font-size: 12px;
+  }
+}
+
+.error-message {
+  color: $error-red;
+  font-size: 10px;
+  margin-left: 2px;
+  margin-top: 2px;
+  margin-bottom: 3px;
+}
+
+input {
+  &.input-short {
+    width: 120px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-top: 2px;
+  }
+
+  border-radius: 12px;
+  outline: 1px solid $grey-secondary;
+  border: none;
+  font-size: 17px;
+  padding: 10px;
+  width: 190px;
+
+  &:focus {
+    outline: 2px solid $selected-blue;
+  }
+}

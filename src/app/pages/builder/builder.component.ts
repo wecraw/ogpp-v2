@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 import { SunHoursService } from '../../services/sun-hours.service';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../components/modal/modal.component';
-import { LOCATION_DISCLAIMER } from '../../content/strings';
+import { LOCATION_DISCLAIMER, LOCATION_DISCLAIMER_TITLE } from '../../content/strings';
 import { MiniCardComponent } from '../../components/mini-card/mini-card.component';
 import { catchError, map } from 'rxjs';
 import { Season } from '../../interfaces/Season';
@@ -46,6 +46,7 @@ export class BuilderComponent implements OnInit {
   public originalAppliances: Appliance[] = [...allAppliances];
   public applianceGroups: string[] = [];
   public modalContent: string = LOCATION_DISCLAIMER;
+  public modalTitle: string = LOCATION_DISCLAIMER_TITLE;
 
   // Display values
   public peakWattage: number = 0;
@@ -271,11 +272,7 @@ export class BuilderComponent implements OnInit {
     }, 1);
   }
 
-  openModal() {
-    this.isModalOpen = true;
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
+  toggleModal() {
+    this.isModalOpen = !this.isModalOpen;
   }
 }

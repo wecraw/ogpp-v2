@@ -5,10 +5,56 @@
         <span [countUp]="build.appliances.length" [options]="countUpOptions" class="number">0</span>
       </div>
 
-      <span class="description inter-regular">Appliances</span>
+      <span *ngIf="build.appliances.length > 1" class="description inter-regular">Appliances</span>
+      <span *ngIf="build.appliances.length === 1" class="description inter-regular">Appliance</span>
     </div>
     <div class="button-container">
       <button class="btn outlined inter-regular" (click)="editAppliances()">Edit appliances</button>
+    </div>
+  </div>
+  <hr />
+
+  <div class="section">
+    <div class="title-row d-flex inter-medium flex-column">
+      <div class="title">Inverter.</div>
+      <div class="subtitle">
+        Converts to AC power
+        <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
+      </div>
+      <build-component-card
+        *ngFor="let inverter of inverters"
+        [buildComponent]="inverter"
+      ></build-component-card>
+    </div>
+  </div>
+  <hr />
+  <div class="section">
+    <div class="title-row d-flex inter-medium flex-column">
+      <div class="title">Batteries.</div>
+      <div class="subtitle">Stores energy for future use.</div>
+      <build-component-card
+        *ngFor="let inverter of inverters"
+        [buildComponent]="inverter"
+      ></build-component-card>
+    </div>
+  </div>
+  <hr />
+  <div class="section">
+    <div class="title-row d-flex inter-medium flex-column">
+      <div class="title">Solar panels.</div>
+      <div class="subtitle">Provides renewable energy.</div>
+      <div class="button-container">
+        <button
+          *ngIf="build.powerSources.length < 1"
+          class="btn add btn-primary inter-regular fit-content"
+          (click)="toggleModal()"
+        >
+          <div class="button-content">
+            <i class="bi bi-plus"></i><span> Choose an Inverter</span>
+          </div>
+        </button>
+      </div>
+      <!-- <build-component-card [buildComponent]="inverter"></build-component-card> -->
     </div>
   </div>
   <hr />
@@ -20,12 +66,20 @@
       </div>
       <span class="description inter-regular">Peak Wattage</span>
     </div>
-    <div class="stat">
-      <div class="inter-medium">
-        <span [countUp]="totalWattHours" [options]="countUpOptions" class="number">0</span
-        ><span class="unit">Wh</span>
-      </div>
-      <span class="description inter-regular">Watt hours per day</span>
+  </div>
+
+  <div class="stat">
+    <div class="inter-medium">
+      <span [countUp]="totalWattHours" [options]="countUpOptions" class="number">0</span
+      ><span class="unit">Wh</span>
     </div>
+    <span class="description inter-regular">Watt hours per day</span>
   </div>
 </div>
+
+<app-modal
+  *ngIf="isModalOpen"
+  [modalContent]="modalContent"
+  [modalHeader]="modalTitle"
+  (closeModal)="toggleModal()"
+></app-modal>

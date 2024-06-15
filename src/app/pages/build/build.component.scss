@@ -32,14 +32,60 @@
   }
 }
 
+build-component-card {
+  margin-bottom: 5px;
+}
+
+.info-icon {
+  font-size: 17px;
+  vertical-align: middle;
+  display: inline-block;
+  height: 27px;
+  cursor: pointer;
+  &:hover {
+    color: $selected-blue;
+  }
+}
+
+.bi-plus {
+  font-size: 24px;
+}
+
 .button-container {
   margin-top: auto;
   margin-bottom: auto;
   .btn {
+    &.add {
+      padding: 0 10px;
+      padding-right: 20px;
+      width: fit-content;
+      margin: 20px 0;
+    }
     &.outlined {
       background: transparent;
       border: 1px solid $selected-blue;
       color: $selected-blue;
     }
+  }
+  .button-content {
+    display: flex;
+    align-items: center;
+  }
+
+  .button-content i {
+    margin-right: 5px;
+  }
+}
+
+.title-row {
+  align-self: flex-start;
+  font-size: 24px;
+  .title {
+    color: $text-color;
+    margin-right: 5px;
+    margin-bottom: -8px;
+  }
+  .subtitle {
+    color: $subtitle-color;
   }
 }

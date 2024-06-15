@@ -75,7 +75,7 @@
             (ngModelChange)="validateZip(false)"
             (blur)="validateZip(true)"
           />
-          <i class="bi bi-question-circle info-icon" (click)="openModal()"></i>
+          <i class="bi bi-question-circle info-icon" (click)="toggleModal()"></i>
         </div>
         <div *ngIf="zipErrorLength || zipErrorFormat" class="input-error-message inter-regular">
           Enter a valid 5 digit ZIP code
@@ -177,6 +177,6 @@
     *ngIf="isModalOpen"
     [modalContent]="modalContent"
     modalHeader="Why we collect location data"
-    (closeModal)="closeModal()"
+    (closeModal)="toggleModal()"
   ></app-modal>
 </div>

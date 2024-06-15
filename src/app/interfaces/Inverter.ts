@@ -1,11 +1,15 @@
 export interface Inverter {
   name: string;
-  id: string;
-  description?: string;
+  brand: string;
+  id?: string;
+  icon?: string;
 
-  voltage: number;
-  maxInput: number;
+  voltages: number[];
+  maxSolarInput: number;
+  maxTotalInput: number;
   maxOutput: number;
 
   batteryCapacity?: number;
+
+  price: number;
 }

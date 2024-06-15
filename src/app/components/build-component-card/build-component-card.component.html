@@ -1,0 +1,44 @@
+<div
+  (click)="selectClicked()"
+  class="blade-container"
+  [ngClass]="{ disabled: disabled, selected: selected, detail: isDetailMode }"
+>
+  <div class="view-row">
+    <div class="edit-button" (click)="toggleDetailMode()">
+      <i *ngIf="!isDetailMode" class="bi bi-card-list"></i>
+      <i *ngIf="isDetailMode" class="bi bi-x-lg"></i>
+    </div>
+    <div class="label-container">
+      <i class="main-icon bi" [ngClass]="buildComponent.icon"></i>
+      <div class="d-flex flex-column">
+        <span class="name display inter-medium">{{ buildComponent.brand }}</span>
+        <span class="name display inter-medium">{{ buildComponent.name }}</span>
+      </div>
+    </div>
+    <div *ngIf="!isDetailMode" class="details d-flex flex-column inter-regular">
+      <!-- <div *ngIf="buildComponent.quantity > 1" class="detail">x{{ buildComponent.quantity }}</div> -->
+      <div *ngIf="isInverter(buildComponent)" class="detail">
+        {{ buildComponent.maxOutput }} W Output
+      </div>
+      <div
+        *ngIf="
+          (isInverter(buildComponent) || isBattery(buildComponent)) &&
+          buildComponent.batteryCapacity
+        "
+        class="detail"
+      >
+        {{ buildComponent.batteryCapacity }} Wh Capacity
+      </div>
+      <div class="detail">${{ buildComponent.price }}</div>
+    </div>
+  </div>
+  <div class="edit-fields fade-in" *ngIf="isDetailMode && editInnerVisible">
+    <div class="edit-label inter-medium">Quantity</div>
+    x2
+    <div class="edit-label inter-medium">Wattage</div>
+    1000W
+    <div class="edit-label inter-medium">Hours used per day</div>
+    20
+  </div>
+</div>
+<div *ngIf="isDetailMode" class="fullscreen-mask" (click)="toggleDetailMode()"></div>

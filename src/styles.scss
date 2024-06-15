@@ -61,7 +61,27 @@ $prefix: 'mo-';
   font-style: normal;
 }
 
+// common components
 
+.btn-primary {
+  font-size: 14px;
+  border: none;
+  width: 351px;
+  height: 36px;
+  background-color: #0071e3;
+
+  &:hover {
+    background-color: #0076df;
+  }
+  &:active {
+    background-color: #006edb;
+  }
+
+  &:disabled {
+    background-color: #e3ecfc;
+    opacity: 1;
+  }
+}
 
 // Animations
 
