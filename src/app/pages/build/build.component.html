@@ -14,69 +14,76 @@
   </div>
   <hr />
 
-  <div class="section">
+  <div class="section first">
     <div class="title-row d-flex inter-medium flex-column">
       <div class="title">Inverter.</div>
       <div class="subtitle">
         Converts to AC power
         <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
       </div>
-      <build-component-card
-        *ngFor="let inverter of inverters"
-        [buildComponent]="inverter"
-      ></build-component-card>
+      <div class="row">
+        <div class="col-lg-5 col-xl-4" *ngFor="let inverter of inverters">
+          <build-component-card
+            (onSelect)="onInverterSelect($event, inverter)"
+            [selected]="build.inverter === inverter"
+            [buildComponent]="inverter"
+          ></build-component-card>
+        </div>
+      </div>
     </div>
   </div>
-  <hr />
-  <div class="section">
+  <div *ngIf="showStep2" class="section fade-in">
     <div class="title-row d-flex inter-medium flex-column">
       <div class="title">Batteries.</div>
-      <div class="subtitle">Stores energy for future use.</div>
-      <build-component-card
-        *ngFor="let inverter of inverters"
-        [buildComponent]="inverter"
-      ></build-component-card>
+      <div class="subtitle">Store energy for future use.</div>
+      <div class="row">
+        <div class="col-lg-5 col-xl-4" *ngFor="let inverter of inverters">
+          <build-component-card [buildComponent]="inverter"></build-component-card>
+        </div>
+      </div>
     </div>
   </div>
-  <hr />
-  <div class="section">
+  <div *ngIf="showStep3" class="section fade-in">
     <div class="title-row d-flex inter-medium flex-column">
       <div class="title">Solar panels.</div>
-      <div class="subtitle">Provides renewable energy.</div>
-      <div class="button-container">
-        <button
-          *ngIf="build.powerSources.length < 1"
-          class="btn add btn-primary inter-regular fit-content"
-          (click)="toggleModal()"
-        >
-          <div class="button-content">
-            <i class="bi bi-plus"></i><span> Choose an Inverter</span>
-          </div>
-        </button>
+      <div class="subtitle">Generate renewable energy.</div>
+      <div class="row">
+        <div class="col-lg-5 col-xl-4" *ngFor="let inverter of inverters">
+          <build-component-card [buildComponent]="inverter"></build-component-card>
+        </div>
       </div>
       <!-- <build-component-card [buildComponent]="inverter"></build-component-card> -->
     </div>
   </div>
-  <hr />
-  <div class="fade-in build-stats">
-    <div class="stat">
-      <div class="inter-medium">
-        <span [countUp]="peakWattage" [options]="countUpOptions" class="number">0</span
-        ><span class="unit">W</span>
-      </div>
-      <span class="description inter-regular">Peak Wattage</span>
-    </div>
-  </div>
+</div>
+<div class="compatibility">
+  <div class="container compatibility-container">
+    <div class="fade-in build-stats">
+      <div class="inter-medium">Peak Wattage:</div>
 
-  <div class="stat">
-    <div class="inter-medium">
-      <span [countUp]="totalWattHours" [options]="countUpOptions" class="number">0</span
-      ><span class="unit">Wh</span>
+      <div
+        class="stat"
+        [ngClass]="{
+        compatible: this.isInverterCompatible,
+        incompatible: !this.isInverterCompatible,
+        unset: build.inverter.maxOutput === 0 || !build.inverter.maxOutput,
+      }"
+      >
+        <div class="inter-medium">
+          <span [countUp]="build.inverter.maxOutput" [options]="countUpOptions" class="number"
+            >0</span
+          >
+        </div>
+        <div class="inter-medium">
+          <span class="fraction">/</span
+          ><span [countUp]="peakWattage" [options]="countUpOptions" class="number">0</span
+          ><span class="unit">W</span>
+          <i *ngIf="showInverterCheck" class="fade-in bi-check-circle compatibility-check"></i>
+        </div>
+      </div>
     </div>
-    <span class="description inter-regular">Watt hours per day</span>
   </div>
 </div>
-
 <app-modal
   *ngIf="isModalOpen"
   [modalContent]="modalContent"

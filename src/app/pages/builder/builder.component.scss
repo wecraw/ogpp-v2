@@ -7,7 +7,7 @@
   align-self: flex-start;
   font-size: 24px;
   .title {
-    color: $text-color;
+    color: $text-color-black;
     margin-right: 5px;
     margin-bottom: -8px;
   }
@@ -39,7 +39,7 @@
     }
     .description {
       font-size: 14px;
-      color: $text-color;
+      color: $text-color-black;
     }
     &:first-of-type {
       margin-left: 5px;
@@ -59,7 +59,7 @@
   color: $grey-secondary;
   cursor: pointer;
   &:hover {
-    color: $text-color;
+    color: $text-color-black;
   }
 }
 

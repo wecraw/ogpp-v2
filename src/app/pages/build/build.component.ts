@@ -7,11 +7,10 @@ import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
 import { INVERTER_EXPLANATION, INVERTER_EXPLANATION_TITLE } from 'src/app/content/strings';
-import { inverters } from 'src/app/content/inverters';
 import { BuildComponentCardComponent } from 'src/app/components/build-component-card/build-component-card.component';
 import { ProductSelectorService } from 'src/app/services/product-selector.service';
-import { Inverter } from 'src/app/interfaces/Inverter';
-
+import { Inverter, defaultInverter } from 'src/app/interfaces/Inverter';
+import { Battery, defaultBattery } from 'src/app/interfaces/Battery';
 @Component({
   selector: 'app-build',
   standalone: true,
@@ -33,7 +32,7 @@ export class BuildComponent implements OnInit {
     private productSelectorService: ProductSelectorService
   ) {}
 
-  public countUpOptions = { duration: 1.5 };
+  public countUpOptions = { duration: 0.7 };
 
   public peakWattage: number = 0;
   public totalWattHours: number = 0;
@@ -45,8 +44,14 @@ export class BuildComponent implements OnInit {
   public modalContent: string = '';
   public modalTitle: string = '';
 
+  // Compatibility
+  public isInverterCompatible: boolean = false;
+
   // DOM Controllers
   public isModalOpen: boolean = false;
+  public showInverterCheck: boolean = false;
+  public showStep2: boolean = false;
+  public showStep3: boolean = false;
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -66,6 +71,18 @@ export class BuildComponent implements OnInit {
     }
   }
 
+  onInverterSelect(selected: boolean, inverter: Inverter) {
+    setTimeout(() => {
+      this.showStep2 = true;
+    }, this.countUpOptions.duration * 1000);
+    if (selected) {
+      this.build.inverter = inverter;
+    } else {
+      this.build.inverter = defaultInverter;
+    }
+    this.confirmCompatibility('inverter');
+  }
+
   editAppliances() {
     // Navigate to the "builds" page with the buildId as a query param
     const navigationExtras = {
@@ -74,13 +91,25 @@ export class BuildComponent implements OnInit {
     this.router.navigate(['/builder'], navigationExtras);
   }
 
+  confirmCompatibility(device: string) {
+    if (device === 'inverter') {
+      if (this.build.inverter.maxOutput >= this.peakWattage) {
+        this.isInverterCompatible = true;
+        setTimeout(() => {
+          this.showInverterCheck = true;
+        }, this.countUpOptions.duration * 1000);
+      } else {
+        this.isInverterCompatible = false;
+        this.showInverterCheck = false;
+      }
+    }
+  }
+
   // DOM Helpers
   toggleModal(content?: string) {
     this.isModalOpen = !this.isModalOpen;
-    console.log(content);
 
     if (content === 'inverter') {
-      console.log('hey');
       this.modalContent = INVERTER_EXPLANATION;
       this.modalTitle = INVERTER_EXPLANATION_TITLE;
     }

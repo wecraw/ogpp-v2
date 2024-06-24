@@ -3,6 +3,7 @@ import { Inverter } from 'src/app/interfaces/Inverter';
 import { inverters } from 'src/app/content/inverters'; // Assuming the inverter data is in a separate file
 import { Build } from 'src/app/interfaces/Build';
 import { CalculationUtilsService } from './calculation-utils.service';
+import { Battery, defaultBattery } from '../interfaces/Battery';
 
 @Injectable({
   providedIn: 'root'
@@ -16,5 +17,9 @@ export class ProductSelectorService {
     return inverters.filter(inverter => {
       return inverter.maxOutput !== undefined && inverter.maxOutput >= peakWattage;
     });
+  }
+
+  getMatchingBatteries(build: Build): Battery[] {
+    return [defaultBattery];
   }
 }

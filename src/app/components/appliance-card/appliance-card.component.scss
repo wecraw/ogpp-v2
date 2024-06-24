@@ -1,7 +1,7 @@
 @import 'src/variables.scss';
 
 .blade-container {
-  color: $text-color;
+  color: $text-color-black;
   margin-top: 10px;
   outline: 1px solid $grey;
   width: 351px;
@@ -61,7 +61,7 @@
 
 i {
   font-size: 28px;
-  color: $text-color;
+  color: $text-color-black;
 }
 
 .label-container {
