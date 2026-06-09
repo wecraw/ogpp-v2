@@ -1,20 +1,28 @@
 @import 'src/variables.scss';
 
 .appliances {
-  margin-top: 35px;
+  margin-top: 8px;
 }
+
 .title-row {
   align-self: flex-start;
-  font-size: 24px;
   .title {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.1;
     color: $text-color-black;
     margin-right: 5px;
-    margin-bottom: -8px;
   }
   .subtitle {
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
     color: $subtitle-color;
+    margin-top: 2px;
   }
 }
+
 .section {
   &.zip {
     margin-bottom: 40px;
@@ -22,28 +30,32 @@
 }
 
 .build-stats {
-  margin-bottom: 15px;
+  margin: 6px 0 18px;
   display: flex;
   .stat {
     min-width: 150px;
     display: flex;
     flex-direction: column;
     .number {
-      font-size: 36px;
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       color: $selected-blue;
       margin-right: 3px;
     }
     .unit {
       font-size: 22px;
+      font-weight: 500;
       color: $selected-blue;
     }
     .description {
-      font-size: 14px;
-      color: $text-color-black;
+      font-size: 13px;
+      color: $text-secondary;
+      margin-top: 2px;
     }
     &:first-of-type {
-      margin-left: 5px;
-      margin-right: 35px;
+      margin-left: 0;
+      margin-right: 48px;
     }
   }
 }
@@ -53,40 +65,36 @@
 }
 
 .info-icon {
-  font-size: 17px;
-  margin-left: 10px;
+  font-size: 16px;
+  margin-left: 9px;
   margin-bottom: 3px;
-  color: $grey-secondary;
+  color: $text-tertiary;
   cursor: pointer;
+  transition: color $dur-fast $ease-out;
   &:hover {
-    color: $text-color-black;
+    color: $selected-blue;
   }
 }
 
 .appliance-group {
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 26px;
+  margin-bottom: 18px;
   .group-title {
-    font-size: 17px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: $text-secondary;
   }
 }
 
 hr {
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 input {
-  border-radius: 12px;
-  outline: 1px solid $grey-secondary;
-  border: none;
-  font-size: 17px;
-  padding: 10px;
-  width: 170px;
-  margin-top: 10px;
-
-  &:focus {
-    outline: 2px solid $selected-blue;
-  }
+  width: 200px;
+  margin-top: 12px;
 }
 
 mini-card {

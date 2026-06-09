@@ -3,20 +3,21 @@
   class="blade-container"
   [ngClass]="{ disabled: disabled, selected: selected, edit: isEditMode }"
   >
-  <div class="view-row">
-    @if (selected) {
-      <div class="edit-button" (click)="toggleEditMode($event)">
-        @if (!isEditMode) {
-          <i class="bi bi-pencil"></i>
-        }
-        @if (isEditMode) {
-          <i class="bi bi-x-lg"></i>
-        }
-      </div>
-    }
-    <div class="label-container" [ngClass]="{ 'edit-mode': isEditMode }">
-      <i class="main-icon bi" [ngClass]="appliance.icon"></i>
+  @if (selected) {
+    <div class="edit-button" (click)="toggleEditMode($event)" [ngClass]="{ active: isEditMode }">
       @if (!isEditMode) {
+        <i class="bi bi-pencil"></i>
+      }
+      @if (isEditMode) {
+        <i class="bi bi-x-lg"></i>
+      }
+    </div>
+  }
+
+  @if (!isEditMode) {
+    <div class="view-row">
+      <div class="label-container">
+        <i class="main-icon bi" [ngClass]="appliance.icon"></i>
         <div class="d-flex flex-column">
           <span class="name display inter-medium">{{ appliance.name }}</span>
           @if (appliance.description) {
@@ -25,38 +26,7 @@
             }}</span>
           }
         </div>
-      }
-      @if (isEditMode) {
-        <div
-          class="d-flex flex-column title-edit-fields"
-          [ngClass]="{ error: nameRequired }"
-          >
-          <input
-            type="text"
-            class="input-name inter-medium"
-            placeholder="Name*"
-            [(ngModel)]="appliance.name"
-            (input)="clearNameError()"
-            required
-            />
-          @if (nameRequired) {
-            <div
-              [ngClass]="{ hide: !nameRequired }"
-              class="error-message inter-regular"
-              >
-              A name is required
-            </div>
-          }
-          <input
-            type="text"
-            placeholder="Description"
-            class="input-description inter-regular"
-            [(ngModel)]="appliance.description"
-            />
-        </div>
-      }
-    </div>
-    @if (!isEditMode) {
+      </div>
       <div class="details d-flex flex-column inter-regular">
         @if (appliance.quantity > 1) {
           <div class="detail">x{{ appliance.quantity }}</div>
@@ -64,37 +34,80 @@
         <div class="detail">{{ appliance.wattage }} Watts</div>
         <div class="detail">{{ appliance.hours }} Hours/day</div>
       </div>
-    }
-  </div>
-  @if (isEditMode && editInnerVisible) {
-    <div class="edit-fields fade-in">
-      <div class="edit-label inter-medium">Quantity</div>
-      <input
-        type="number"
-        class="input-short"
-        placeholder="Quantity"
-        [(ngModel)]="appliance.quantity"
-        (input)="validateInput('quantity', appliance.quantity)"
-        />
-      <div class="edit-label inter-medium">Wattage</div>
-      <input
-        type="number"
-        class="input-short"
-        placeholder="Wattage"
-        [(ngModel)]="appliance.wattage"
-        (input)="validateInput('wattage', appliance.wattage)"
-        />
-      <div class="edit-label inter-medium">Hours used per day</div>
-      <input
-        type="number"
-        placeholder="Hours / day"
-        class="input-short"
-        [(ngModel)]="appliance.hours"
-        (input)="validateInput('hours', appliance.hours)"
-        />
-      <div style="margin-top: 5px">
-        <a (click)="setDefaults()" class="reset-link">Reset defaults </a>
+    </div>
+  }
+
+  @if (isEditMode) {
+    <div class="edit-panel">
+      <div class="identity-row" [ngClass]="{ error: nameRequired }">
+        <i class="main-icon bi" [ngClass]="appliance.icon"></i>
+        <div class="identity-fields">
+          <input
+            type="text"
+            class="input-name inter-medium"
+            placeholder="Name"
+            [(ngModel)]="appliance.name"
+            (input)="clearNameError()"
+            required
+            />
+          @if (nameRequired) {
+            <div class="error-message inter-regular">A name is required</div>
+          }
+          <input
+            type="text"
+            placeholder="Add a description"
+            class="input-description inter-regular"
+            [(ngModel)]="appliance.description"
+            />
+        </div>
       </div>
+
+      @if (editInnerVisible) {
+        <div class="spec-section fade-in">
+          <div class="spec-grid">
+            <div class="spec-field">
+              <label class="spec-label inter-medium">Quantity</label>
+              <div class="spec-input-wrap">
+                <span class="spec-affix prefix">&times;</span>
+                <input
+                  type="number"
+                  class="spec-input has-prefix"
+                  [(ngModel)]="appliance.quantity"
+                  (input)="validateInput('quantity', appliance.quantity)"
+                  />
+              </div>
+            </div>
+            <div class="spec-field">
+              <label class="spec-label inter-medium">Wattage</label>
+              <div class="spec-input-wrap">
+                <input
+                  type="number"
+                  class="spec-input has-suffix"
+                  [(ngModel)]="appliance.wattage"
+                  (input)="validateInput('wattage', appliance.wattage)"
+                  />
+                <span class="spec-affix suffix">W</span>
+              </div>
+            </div>
+            <div class="spec-field">
+              <label class="spec-label inter-medium">Hours/day</label>
+              <div class="spec-input-wrap">
+                <input
+                  type="number"
+                  class="spec-input has-suffix"
+                  [(ngModel)]="appliance.hours"
+                  (input)="validateInput('hours', appliance.hours)"
+                  />
+                <span class="spec-affix suffix">h</span>
+              </div>
+            </div>
+          </div>
+          <a (click)="setDefaults()" class="reset-link inter-medium">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Reset defaults
+          </a>
+        </div>
+      }
     </div>
   }
 </div>

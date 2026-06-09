@@ -1,30 +1,37 @@
-$primary: #900;
-$enable-shadows: true;
+$primary: #0071e3;
+$enable-shadows: false;
 $prefix: 'mo-';
 
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import '../node_modules/bootstrap-icons/font/bootstrap-icons.css';
 @import './variables.scss';
 
-// <uniquifier>: Use a unique and descriptive class name
-// <weight>: Use a value from 100 to 900
-
-.input-error-message {
-  color: $error-red;
-  font-size: 12px;
-  margin-left: 2px;
-  margin-top: 2px;
-  margin-bottom: 3px;
+// ============================================================
+//  Base canvas
+// ============================================================
+html,
+body {
+  background-color: $page-bg;
+  color: $text-color-black;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-//Fonts
+::selection {
+  background: $accent-tint;
+  color: $text-color-black;
+}
 
+// ============================================================
+//  Typography
+// ============================================================
 .inter-regular {
   font-family: 'Inter', sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  font-variation-settings: 'slnt' 0;
 }
 
 .inter-medium {
@@ -32,7 +39,6 @@ $prefix: 'mo-';
   font-optical-sizing: auto;
   font-weight: 500;
   font-style: normal;
-  font-variation-settings: 'slnt' 0;
 }
 
 .inter-semibold {
@@ -40,7 +46,6 @@ $prefix: 'mo-';
   font-optical-sizing: auto;
   font-weight: 600;
   font-style: normal;
-  font-variation-settings: 'slnt' 0;
 }
 
 .inter-bold {
@@ -48,79 +53,150 @@ $prefix: 'mo-';
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
-  font-variation-settings: 'slnt' 0;
 }
 
-// <uniquifier>: Use a unique and descriptive class name
-// <weight>: Use a value from 200 to 700
-
 .oswald-regular {
-  font-family: 'Oswald', sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   font-style: normal;
 }
 
-// common components
+// Big section headers get Apple-style tight tracking + weight.
+.section-title {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
 
-.btn-primary {
-  font-size: 14px;
+// ============================================================
+//  Dividers
+// ============================================================
+hr {
   border: none;
-  width: 351px;
-  height: 36px;
-  background-color: #0071e3;
+  border-top: 1px solid $divider;
+  opacity: 1;
+  margin: 18px 0;
+}
+
+// ============================================================
+//  Inputs
+// ============================================================
+input {
+  background-color: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-sm;
+  outline: none;
+  color: $text-color-black;
+  font-size: 16px;
+  padding: 11px 13px;
+  transition: border-color $dur-fast $ease-out, box-shadow $dur-fast $ease-out;
+  -webkit-appearance: none;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
 
   &:hover {
-    background-color: #0076df;
+    border-color: $border-hairline-strong;
   }
+
+  &:focus {
+    border-color: $selected-blue;
+    box-shadow: 0 0 0 4px $accent-ring;
+  }
+}
+
+.input-error-message {
+  color: $error-red;
+  font-size: 12px;
+  margin-left: 2px;
+  margin-top: 4px;
+  margin-bottom: 3px;
+}
+
+// ============================================================
+//  Buttons — Apple primary action
+// ============================================================
+.btn-primary {
+  --mo-btn-bg: #{$selected-blue};
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: $radius-sm;
+  width: 351px;
+  max-width: 100%;
+  height: 44px;
+  color: #fff;
+  background-color: var(--mo-btn-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: background-color $dur-fast $ease-out, transform $dur-fast $ease-out,
+    box-shadow $dur-fast $ease-out, opacity $dur-fast $ease-out;
+
+  &:hover {
+    background-color: $selected-blue-hover;
+    box-shadow: 0 4px 14px $accent-ring;
+    transform: translateY(-1px);
+  }
+
   &:active {
-    background-color: #006edb;
+    background-color: $selected-blue-active;
+    transform: translateY(0) scale(0.985);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px $accent-ring;
   }
 
   &:disabled {
-    background-color: #e3ecfc;
+    background-color: #d2d2d7;
+    color: #fafafa;
     opacity: 1;
+    box-shadow: none;
+    transform: none;
   }
 }
 
-// Animations
+// Secondary / outlined button
+.btn.outlined {
+  font-weight: 500;
+  border-radius: $radius-pill;
+  border: 1px solid $border-hairline-strong;
+  color: $selected-blue;
+  background: transparent;
+  transition: background-color $dur-fast $ease-out, border-color $dur-fast $ease-out;
 
+  &:hover {
+    background: $accent-tint;
+    border-color: $selected-blue;
+  }
+}
+
+// ============================================================
+//  Animations
+// ============================================================
 .fade-in {
-  -webkit-animation: fade-in 0.3s ease-in-out both;
-  animation: fade-in 0.3s ease-in-out both;
-}
-
-@-webkit-keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  animation: fade-in $dur $ease-out both;
 }
 
 @keyframes fade-in {
   0% {
     opacity: 0;
+    transform: translateY(6px);
   }
   100% {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .fade-out {
-  -webkit-animation: fade-out 0.3s ease-out both;
-  animation: fade-out 0.3s ease-out both;
+  animation: fade-out $dur-fast $ease-out both;
 }
 
-@-webkit-keyframes fade-out {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
 @keyframes fade-out {
   0% {
     opacity: 1;
@@ -130,11 +206,14 @@ $prefix: 'mo-';
   }
 }
 
+// ============================================================
+//  Loader
+// ============================================================
 .loader {
   width: 90px;
   height: 14px;
   margin-top: 50px;
-  box-shadow: 0 3px 0 #fff;
+  box-shadow: 0 3px 0 $page-bg;
   position: relative;
   clip-path: inset(-40px 0 -5px);
 }

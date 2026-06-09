@@ -11,7 +11,7 @@ let KitchenAppliances: Appliance[] = [
     hours: 0.2,
     quantity: 1,
     applianceGroup: 'Kitchen',
-    icon: 'bi-image'
+    icon: 'bi-fire'
   },
   {
     name: 'Microwave',
@@ -19,7 +19,7 @@ let KitchenAppliances: Appliance[] = [
     hours: 0.3,
     quantity: 1,
     applianceGroup: 'Kitchen',
-    icon: 'bi-image'
+    icon: 'bi-box-seam'
   },
   {
     name: 'Fridge',
@@ -28,7 +28,7 @@ let KitchenAppliances: Appliance[] = [
     hours: 4,
     quantity: 1,
     applianceGroup: 'Kitchen',
-    icon: 'bi-calendar3-event'
+    icon: 'bi-thermometer-snow'
   },
   {
     name: 'Freezer',
@@ -37,7 +37,7 @@ let KitchenAppliances: Appliance[] = [
     hours: 0.3,
     quantity: 1,
     applianceGroup: 'Kitchen',
-    icon: 'bi-calendar3-event'
+    icon: 'bi-snow2'
   }
 ];
 

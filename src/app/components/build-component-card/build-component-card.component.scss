@@ -2,66 +2,102 @@
 
 .blade-container {
   color: $text-color-black;
-  margin-top: 10px;
-  outline: 1px solid $grey;
+  margin-top: 12px;
   width: 351px;
-  height: 82px;
-  border-radius: 12px;
+  max-width: 100%;
+  height: 84px;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-lg;
   cursor: pointer;
   box-sizing: border-box;
-  padding: 0 15px;
+  padding: 0 18px;
   position: relative;
-  background-color: #fff;
-  transition: height 0.3s ease-out;
+  background-color: $surface;
+  box-shadow: $shadow-sm;
+  transition: height $dur $ease-out, box-shadow $dur $ease-out, border-color $dur $ease-out,
+    transform $dur-fast $ease-out;
+
+  &:hover:not(.detail) {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &:active:not(.detail) {
+    transform: translateY(0) scale(0.992);
+  }
 
   &.detail {
     height: 400px;
     z-index: 1000;
-    transition: height 0.3s ease-out;
+    cursor: default;
+    box-shadow: $shadow-lg;
   }
 
   .view-row {
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 82px;
+    height: 84px;
   }
 
   .edit-button {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: -11px;
+    right: -11px;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: #fff;
-    border: 1px solid $grey;
+    background-color: $surface;
+    border: 1px solid $border-hairline;
+    box-shadow: $shadow-sm;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: $text-secondary;
+    transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out,
+      transform $dur-fast $ease-out;
 
     &:hover {
-      background-color: #eee;
+      background-color: #f5f5f7;
+      color: $text-color-black;
+      transform: scale(1.06);
     }
 
     i {
-      font-size: 16px;
+      font-size: 14px;
     }
   }
 
   &.selected {
-    outline: 2px solid #0071e3;
+    border-color: transparent;
+    box-shadow: 0 0 0 2px $selected-blue, $shadow-sm;
+
+    .main-icon {
+      background-color: $selected-blue;
+      color: #fff;
+    }
   }
 
-  &.edit {
-    cursor: default;
+  // Keep the selection ring above the hover rule's specificity.
+  &.selected:hover:not(.detail) {
+    box-shadow: 0 0 0 2px $selected-blue, $shadow-md;
   }
 }
 
-i {
-  font-size: 28px;
-  color: $text-color-black;
+.main-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  background-color: $accent-tint;
+  color: $selected-blue;
+  font-size: 20px;
+  margin-right: 13px;
+  transition: background-color $dur $ease-out, color $dur $ease-out;
 }
 
 .label-container {
@@ -69,45 +105,24 @@ i {
   align-items: center;
   flex: 1;
   min-width: 0;
-
-  i {
-    margin-right: 5px;
-  }
 }
 
 .name {
-  font-size: 17px;
+  font-size: 16px;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 190px;
 
   &.brand {
-    font-size: 14px;
+    font-size: 12px;
+    color: $text-secondary;
+    letter-spacing: 0.01em;
   }
 
   &.display {
-    margin-left: 4px;
-  }
-
-  &.edit {
-    max-width: 100%;
-  }
-}
-
-.description {
-  max-width: 190px;
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &.display {
-    margin-left: 4px;
-  }
-
-  &.edit {
-    max-width: 100%;
+    margin-left: 0;
   }
 }
 
@@ -116,10 +131,16 @@ i {
   flex: 1;
   min-width: 0;
   font-size: 12px;
+  color: $text-secondary;
 
   .detail {
     align-self: flex-end;
-    margin-right: 10px;
+    line-height: 1.5;
+
+    &:last-child {
+      color: $text-color-black;
+      font-weight: 500;
+    }
   }
 }
 
@@ -129,75 +150,19 @@ i {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   z-index: 999;
-}
-
-.reset-link {
-  margin-top: 5px;
-  color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 12px;
-
-  &:hover {
-    color: #0056b3;
-  }
+  animation: fade-in $dur-fast $ease-out both;
 }
 
 .edit-fields {
-  margin-left: 33px;
+  margin-left: 53px;
   margin-top: 55px;
 
   .edit-label {
     font-size: 12px;
-  }
-}
-
-.title-edit-fields {
-  margin-top: 55px;
-  .input-name {
-    font-size: 17px;
-    margin-bottom: 15px;
-  }
-
-  &.error {
-    margin-top: 60px;
-    .input-name {
-      margin-bottom: 0;
-      outline: 2px solid $error-red;
-    }
-  }
-
-  .input-description {
-    font-size: 12px;
-  }
-}
-
-.error-message {
-  color: $error-red;
-  font-size: 10px;
-  margin-left: 2px;
-  margin-top: 2px;
-  margin-bottom: 3px;
-}
-
-input {
-  &.input-short {
-    width: 120px;
-    font-size: 12px;
-    margin-bottom: 10px;
-    margin-top: 2px;
-  }
-
-  border-radius: 12px;
-  outline: 1px solid $grey-secondary;
-  border: none;
-  font-size: 17px;
-  padding: 10px;
-  width: 190px;
-
-  &:focus {
-    outline: 2px solid $selected-blue;
+    color: $text-secondary;
   }
 }
