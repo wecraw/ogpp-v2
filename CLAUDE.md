@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 OGPP ("Off Grid Part Picker") recommends an all-in-one solar power system (EcoFlow, Jackery, Bluetti, etc.) based on the appliances a user wants to run off-grid. The user selects appliances and a location, and the app sizes and recommends matching gear.
 
-Angular 17 SPA, standalone components (no NgModules), client-side only. State persists in `localStorage` — there is no backend of our own; the only external call is to NREL for solar irradiance data.
+Angular 21 SPA, standalone components (no NgModules), built-in control flow (`@if`/`@for`), client-side only. State persists in `localStorage` — there is no backend of our own; the only external call is to NREL for solar irradiance data.
+
+> **Angular version:** on 21 (current LTS). The next major (22) requires Node ≥ 22.22.3; this machine has 22.14.0, so bump Node before running `ng update @angular/core@22 @angular/cli@22`. Upgrade one major at a time, building between each.
 
 This project is **unfinished and was picked back up from a stale state** — see "Current state / known gaps" before assuming a feature works end to end.
 
@@ -15,8 +17,11 @@ This project is **unfinished and was picked back up from a stale state** — see
 - `npm start` / `ng serve` — dev server at http://localhost:4200 (auto-reload)
 - `npm run build` / `ng build` — production build to `dist/ogpp-v2`
 - `npm run watch` — dev build, rebuild on change
-- `npm test` / `ng test` — Karma + Jasmine unit tests (Chrome)
+- `npm test` / `ng test` — Karma + Jasmine unit tests (Chrome). Karma is deprecated in Angular 21; a future move to the new test runner is expected.
+- Run once, headless (CI-style): `ng test --watch=false --browsers=ChromeHeadless`
 - Single test: `ng test --include='**/calculation-utils.service.spec.ts'`
+
+> The component `*.spec.ts` files are unmodified CLI scaffolding and **5 of them currently fail** — the auto-generated `should create` tests don't provide required inputs/providers (e.g. `BuilderComponent` needs `HttpClient`; `BuildComponentCardComponent` needs its `[component]` input). These are stale stubs, not real coverage; fix or delete them when you touch a component.
 
 Prettier enforces: single quotes, semicolons, no trailing commas, 100-char width, avoid-arrow-parens. TypeScript runs in `strict` mode with `strictTemplates`.
 
