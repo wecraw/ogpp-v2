@@ -4,6 +4,22 @@ import { PowerSource } from './PowerSource';
 import { Inverter } from './Inverter';
 import { Battery } from './Battery';
 
+export type Month =
+  | 'jan'
+  | 'feb'
+  | 'mar'
+  | 'apr'
+  | 'may'
+  | 'jun'
+  | 'jul'
+  | 'aug'
+  | 'sep'
+  | 'oct'
+  | 'nov'
+  | 'dec';
+
+export type MonthlyGhi = Record<Month, number>;
+
 export interface Build {
   name: string;
   id: string;
@@ -11,7 +27,7 @@ export interface Build {
   appliances: Appliance[];
   seasons: Season[];
   zipCode: string;
-  monthlyGhi: any;
+  monthlyGhi: MonthlyGhi | null;
 
   powerSources: PowerSource[];
   inverter: Inverter;

@@ -1,4 +1,5 @@
 import { Inverter } from 'src/app/interfaces/Inverter';
+import { assignStableIds } from './catalog-utils';
 
 let inverters: Inverter[] = [
   {
@@ -36,10 +37,6 @@ let inverters: Inverter[] = [
   }
 ];
 
-let count = 0;
-inverters.forEach(inverter => {
-  inverter.id = '' + count;
-  count++;
-});
+assignStableIds(inverters, inverter => `${inverter.brand}-${inverter.name}`);
 
 export { inverters };

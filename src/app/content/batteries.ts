@@ -1,4 +1,5 @@
 import { Battery } from 'src/app/interfaces/Battery';
+import { assignStableIds } from './catalog-utils';
 
 let batteries: Battery[] = [
   {
@@ -23,3 +24,7 @@ let batteries: Battery[] = [
     price: 949
   }
 ];
+
+assignStableIds(batteries, battery => `${battery.brand}-${battery.name}`);
+
+export { batteries };

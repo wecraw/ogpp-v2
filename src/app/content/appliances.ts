@@ -1,6 +1,7 @@
 //Kitchen
 
 import { Appliance } from '../interfaces/Appliance';
+import { assignStableIds } from './catalog-utils';
 
 // Kitchen=============================================
 let KitchenAppliances: Appliance[] = [
@@ -62,10 +63,6 @@ let EntertainmentAppliances = [
 ];
 
 let allAppliances: Appliance[] = KitchenAppliances.concat(EntertainmentAppliances);
-let count = 0;
-allAppliances.forEach(appliance => {
-  appliance.id = '' + count;
-  count++;
-});
+assignStableIds(allAppliances, appliance => `${appliance.applianceGroup}-${appliance.name}`);
 
 export { allAppliances };

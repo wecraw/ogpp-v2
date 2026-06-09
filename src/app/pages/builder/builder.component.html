@@ -12,7 +12,7 @@
           <div class="group-title inter-medium">{{ group }}</div>
           <hr />
           <div class="row">
-            @for (appliance of getAppliancesByGroup(group); track appliance) {
+            @for (appliance of getAppliancesByGroup(group); track appliance.id) {
               <div class="col-lg-5 col-xl-4">
                 <appliance-card
                   [appliance]="appliance"

@@ -45,7 +45,7 @@ Pages pass the build between each other **only via the `?buildId=` query param**
 - **`ProductSelectorService`** — filters the gear catalogs against a build's requirements.
 
 ### Content catalogs (hand-curated product/appliance data)
-`src/app/content/*.ts` export plain arrays: `appliances.ts`, `inverters.ts`, `batteries.ts`, `solarPanels.ts`, plus `strings.ts` for UI copy. **IDs are assigned at module-load time** by a `forEach` counter (`id = '' + count`), so an item's ID is its position in the array — reordering or removing entries renumbers everything. Components match builds back to catalog items by these positional IDs.
+`src/app/content/*.ts` export plain arrays: `appliances.ts`, `inverters.ts`, `batteries.ts`, `solarPanels.ts`, plus `strings.ts` for UI copy. **IDs are stable content-derived slugs** assigned at module-load time via `assignStableIds` (`catalog-utils.ts`) — e.g. an appliance's ID is `slug(applianceGroup-name)`, an inverter's is `slug(brand-name)`. Reordering/inserting/removing entries does **not** renumber the others, so builds persisted in `localStorage` keep mapping to the right item. Collisions get a numeric suffix. (Previously IDs were positional array indices — a data-integrity hazard, now removed.)
 
 ### Terminology gotcha
 "Inverter" in this codebase means the **all-in-one power station unit** (e.g. DELTA Pro 3), not just the DC→AC converter. The `Inverter` interface carries `maxOutput`, `maxSolarInput`, `batteryCapacity`, `compatibleBatteries`, etc. The separate `PowerSource` interface is for add-on generation sources. `BuildComponent.ts` (the interface, not the page) is fully commented out — an abandoned earlier unified model; don't use it.

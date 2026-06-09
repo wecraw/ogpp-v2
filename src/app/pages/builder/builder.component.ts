@@ -14,7 +14,6 @@ import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { LOCATION_DISCLAIMER, LOCATION_DISCLAIMER_TITLE } from '../../content/strings';
 import { MiniCardComponent } from '../../components/mini-card/mini-card.component';
-import { catchError, map } from 'rxjs';
 import { Season } from '../../interfaces/Season';
 import { Appliance } from '../../interfaces/Appliance';
 import { CountUpDirective } from '../../directives/count-up.directive';
@@ -41,8 +40,9 @@ export class BuilderComponent implements OnInit {
   @ViewChildren(MiniCardComponent) miniCards!: QueryList<MiniCardComponent>;
 
   // Content
-  public allAppliances: Appliance[] = [...allAppliances];
-  public originalAppliances: Appliance[] = [...allAppliances];
+  // Deep-clone the catalog so in-card edits never mutate the shared module arrays.
+  public allAppliances: Appliance[] = allAppliances.map(appliance => ({ ...appliance }));
+  public originalAppliances: Appliance[] = allAppliances.map(appliance => ({ ...appliance }));
   public applianceGroups: string[] = [];
   public modalContent: string = LOCATION_DISCLAIMER;
   public modalTitle: string = LOCATION_DISCLAIMER_TITLE;
@@ -80,13 +80,12 @@ export class BuilderComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.originalAppliances = allAppliances.map(appliance => ({ ...appliance }));
-
     this.route.queryParams.subscribe(params => {
       const buildId = params['buildId'];
       if (buildId) {
-        if (this.buildService.getBuild(buildId)) {
-          this.build = this.buildService.getBuild(buildId)!;
+        const existingBuild = this.buildService.getBuild(buildId);
+        if (existingBuild) {
+          this.build = existingBuild;
           this.showStep2 = true;
           this.zipCode = this.build.zipCode;
           this.updateTotals();
@@ -188,20 +187,16 @@ export class BuilderComponent implements OnInit {
 
       if (!this.build.monthlyGhi || this.build.zipCode !== zip) {
         this.build.zipCode = zip;
-        this.sunHoursService
-          .getSunHoursByZip(zip)
-          .pipe(
-            map((response: any) => {
-              this.build.monthlyGhi = response.outputs.avg_ghi.monthly;
-              resolve();
-            }),
-            catchError((error: any) => {
-              console.error('Error fetching sun hours:', error);
-              reject(error);
-              return error;
-            })
-          )
-          .subscribe();
+        this.sunHoursService.getSunHoursByZip(zip).subscribe({
+          next: (response: any) => {
+            this.build.monthlyGhi = response.outputs.avg_ghi.monthly;
+            resolve();
+          },
+          error: (error: any) => {
+            console.error('Error fetching sun hours:', error);
+            reject(error);
+          }
+        });
       } else {
         resolve();
       }
@@ -247,7 +242,6 @@ export class BuilderComponent implements OnInit {
   validateZip(checkLength: boolean) {
     this.zipErrorFormat = /\D/.test(this.zipCode);
     if (checkLength) this.zipErrorLength = this.zipCode.length !== 5;
-    if (this.zipErrorLength) this.zipErrorLength = this.zipCode.length !== 5;
   }
 
   isAnyApplianceSelected() {

@@ -55,19 +55,16 @@ export class BuildComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const buildId = params['buildId'];
-      if (buildId) {
-        if (this.buildService.getBuild(buildId)) {
-          this.build = this.buildService.getBuild(buildId)!;
-        } else {
-          this.buildNotFound = true;
-        }
+      const existingBuild = buildId ? this.buildService.getBuild(buildId) : null;
+      if (!existingBuild) {
+        this.buildNotFound = true;
+        return;
       }
-    });
-    if (this.build) {
+      this.build = existingBuild;
       this.peakWattage = this.calculationUtils.peakWattage(this.build);
       this.totalWattHours = this.calculationUtils.totalWattHours(this.build);
       this.inverters = this.productSelectorService.getMatchingInverters(this.build);
-    }
+    });
   }
 
   onInverterSelect(selected: boolean, inverter: Inverter) {
