@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'mini-card',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './mini-card.component.html',
-  styleUrl: './mini-card.component.scss'
+    selector: 'mini-card',
+    imports: [CommonModule],
+    templateUrl: './mini-card.component.html',
+    styleUrl: './mini-card.component.scss'
 })
 export class MiniCardComponent {
   @Input() disabled?: boolean = false;

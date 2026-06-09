@@ -4,11 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Appliance } from '../../interfaces/Appliance';
 
 @Component({
-  selector: 'appliance-card',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './appliance-card.component.html',
-  styleUrls: ['./appliance-card.component.scss']
+    selector: 'appliance-card',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './appliance-card.component.html',
+    styleUrls: ['./appliance-card.component.scss']
 })
 export class ApplianceCardComponent implements OnInit {
   // Defaults

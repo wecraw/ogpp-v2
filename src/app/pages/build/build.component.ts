@@ -12,11 +12,10 @@ import { ProductSelectorService } from 'src/app/services/product-selector.servic
 import { Inverter, defaultInverter } from 'src/app/interfaces/Inverter';
 import { Battery, defaultBattery } from 'src/app/interfaces/Battery';
 @Component({
-  selector: 'app-build',
-  standalone: true,
-  imports: [CommonModule, CountUpDirective, ModalComponent, BuildComponentCardComponent],
-  templateUrl: './build.component.html',
-  styleUrl: './build.component.scss'
+    selector: 'app-build',
+    imports: [CommonModule, CountUpDirective, ModalComponent, BuildComponentCardComponent],
+    templateUrl: './build.component.html',
+    styleUrl: './build.component.scss'
 })
 export class BuildComponent implements OnInit {
   public build: Build = defaultBuild;

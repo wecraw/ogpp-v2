@@ -5,11 +5,10 @@ import { Inverter } from 'src/app/interfaces/Inverter';
 import { Battery } from 'src/app/interfaces/Battery';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
 @Component({
-  selector: 'build-component-card',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './build-component-card.component.html',
-  styleUrl: './build-component-card.component.scss'
+    selector: 'build-component-card',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './build-component-card.component.html',
+    styleUrl: './build-component-card.component.scss'
 })
 export class BuildComponentCardComponent implements OnInit {
   // Defaults

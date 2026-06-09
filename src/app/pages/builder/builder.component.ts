@@ -25,18 +25,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'builder',
-  standalone: true,
-  imports: [
-    ApplianceCardComponent,
-    CommonModule,
-    FormsModule,
-    ModalComponent,
-    MiniCardComponent,
-    CountUpDirective
-  ],
-  templateUrl: './builder.component.html',
-  styleUrls: ['./builder.component.scss']
+    selector: 'builder',
+    imports: [
+        ApplianceCardComponent,
+        CommonModule,
+        FormsModule,
+        ModalComponent,
+        MiniCardComponent,
+        CountUpDirective
+    ],
+    templateUrl: './builder.component.html',
+    styleUrls: ['./builder.component.scss']
 })
 export class BuilderComponent implements OnInit {
   @ViewChildren(MiniCardComponent) miniCards!: QueryList<MiniCardComponent>;
