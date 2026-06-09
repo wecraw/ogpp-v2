@@ -17,7 +17,7 @@ import { MiniCardComponent } from '../../components/mini-card/mini-card.componen
 import { catchError, map } from 'rxjs';
 import { Season } from '../../interfaces/Season';
 import { Appliance } from '../../interfaces/Appliance';
-import { CountUpModule } from 'ngx-countup';
+import { CountUpDirective } from '../../directives/count-up.directive';
 import { Build, defaultBuild } from '../../interfaces/Build';
 import { CalculationUtilsService } from '../../services/calculation-utils.service';
 import { BuildService } from '../../services/build.service';
@@ -33,7 +33,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     FormsModule,
     ModalComponent,
     MiniCardComponent,
-    CountUpModule
+    CountUpDirective
   ],
   templateUrl: './builder.component.html',
   styleUrls: ['./builder.component.scss']

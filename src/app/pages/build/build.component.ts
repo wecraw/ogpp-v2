@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CountUpModule } from 'ngx-countup';
+import { CountUpDirective } from 'src/app/directives/count-up.directive';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
@@ -14,7 +14,7 @@ import { Battery, defaultBattery } from 'src/app/interfaces/Battery';
 @Component({
   selector: 'app-build',
   standalone: true,
-  imports: [CommonModule, CountUpModule, ModalComponent, BuildComponentCardComponent],
+  imports: [CommonModule, CountUpDirective, ModalComponent, BuildComponentCardComponent],
   templateUrl: './build.component.html',
   styleUrl: './build.component.scss'
 })
