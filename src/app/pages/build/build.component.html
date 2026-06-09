@@ -1,61 +1,75 @@
-<div *ngIf="!buildNotFound" class="container">
-  <div class="fade-in build-stats">
-    <div class="stat appliance-count">
-      <div class="inter-medium">
-        <span [countUp]="build.appliances.length" [options]="countUpOptions" class="number">0</span>
+@if (!buildNotFound) {
+  <div class="container">
+    <div class="fade-in build-stats">
+      <div class="stat appliance-count">
+        <div class="inter-medium">
+          <span [countUp]="build.appliances.length" [options]="countUpOptions" class="number">0</span>
+        </div>
+        @if (build.appliances.length > 1) {
+          <span class="description inter-regular">Appliances</span>
+        }
+        @if (build.appliances.length === 1) {
+          <span class="description inter-regular">Appliance</span>
+        }
       </div>
-
-      <span *ngIf="build.appliances.length > 1" class="description inter-regular">Appliances</span>
-      <span *ngIf="build.appliances.length === 1" class="description inter-regular">Appliance</span>
-    </div>
-    <div class="button-container">
-      <button class="btn outlined inter-regular" (click)="editAppliances()">Edit appliances</button>
-    </div>
-  </div>
-  <hr />
-
-  <div class="section first">
-    <div class="title-row d-flex inter-medium flex-column">
-      <div class="title">Inverter.</div>
-      <div class="subtitle">
-        Converts to AC power
-        <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
+      <div class="button-container">
+        <button class="btn outlined inter-regular" (click)="editAppliances()">Edit appliances</button>
       </div>
-      <div class="row">
-        <div class="col-lg-5 col-xl-4" *ngFor="let inverter of inverters">
-          <build-component-card
-            (onSelect)="onInverterSelect($event, inverter)"
-            [selected]="build.inverter === inverter"
-            [buildComponent]="inverter"
-          ></build-component-card>
+    </div>
+    <hr />
+    <div class="section first">
+      <div class="title-row d-flex inter-medium flex-column">
+        <div class="title">Inverter.</div>
+        <div class="subtitle">
+          Converts to AC power
+          <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
+        </div>
+        <div class="row">
+          @for (inverter of inverters; track inverter) {
+            <div class="col-lg-5 col-xl-4">
+              <build-component-card
+                (onSelect)="onInverterSelect($event, inverter)"
+                [selected]="build.inverter === inverter"
+                [buildComponent]="inverter"
+              ></build-component-card>
+            </div>
+          }
         </div>
       </div>
     </div>
-  </div>
-  <div *ngIf="showStep2" class="section fade-in">
-    <div class="title-row d-flex inter-medium flex-column">
-      <div class="title">Batteries.</div>
-      <div class="subtitle">Store energy for future use.</div>
-      <div class="row">
-        <div class="col-lg-5 col-xl-4" *ngFor="let inverter of inverters">
-          <build-component-card [buildComponent]="inverter"></build-component-card>
+    @if (showStep2) {
+      <div class="section fade-in">
+        <div class="title-row d-flex inter-medium flex-column">
+          <div class="title">Batteries.</div>
+          <div class="subtitle">Store energy for future use.</div>
+          <div class="row">
+            @for (inverter of inverters; track inverter) {
+              <div class="col-lg-5 col-xl-4">
+                <build-component-card [buildComponent]="inverter"></build-component-card>
+              </div>
+            }
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div *ngIf="showStep3" class="section fade-in">
-    <div class="title-row d-flex inter-medium flex-column">
-      <div class="title">Solar panels.</div>
-      <div class="subtitle">Generate renewable energy.</div>
-      <div class="row">
-        <div class="col-lg-5 col-xl-4" *ngFor="let inverter of inverters">
-          <build-component-card [buildComponent]="inverter"></build-component-card>
+    }
+    @if (showStep3) {
+      <div class="section fade-in">
+        <div class="title-row d-flex inter-medium flex-column">
+          <div class="title">Solar panels.</div>
+          <div class="subtitle">Generate renewable energy.</div>
+          <div class="row">
+            @for (inverter of inverters; track inverter) {
+              <div class="col-lg-5 col-xl-4">
+                <build-component-card [buildComponent]="inverter"></build-component-card>
+              </div>
+            }
+          </div>
+          <!-- <build-component-card [buildComponent]="inverter"></build-component-card> -->
         </div>
       </div>
-      <!-- <build-component-card [buildComponent]="inverter"></build-component-card> -->
-    </div>
+    }
   </div>
-</div>
+}
 <div class="compatibility">
   <div class="container compatibility-container">
     <div class="fade-in build-stats">
@@ -68,25 +82,28 @@
         incompatible: !this.isInverterCompatible,
         unset: build.inverter.maxOutput === 0 || !build.inverter.maxOutput,
       }"
-      >
+        >
         <div class="inter-medium">
           <span [countUp]="build.inverter.maxOutput" [options]="countUpOptions" class="number"
             >0</span
-          >
-        </div>
-        <div class="inter-medium">
-          <span class="fraction">/</span
-          ><span [countUp]="peakWattage" [options]="countUpOptions" class="number">0</span
-          ><span class="unit">W</span>
-          <i *ngIf="showInverterCheck" class="fade-in bi-check-circle compatibility-check"></i>
+            >
+          </div>
+          <div class="inter-medium">
+            <span class="fraction">/</span
+              ><span [countUp]="peakWattage" [options]="countUpOptions" class="number">0</span
+              ><span class="unit">W</span>
+              @if (showInverterCheck) {
+                <i class="fade-in bi-check-circle compatibility-check"></i>
+              }
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-<app-modal
-  *ngIf="isModalOpen"
-  [modalContent]="modalContent"
-  [modalHeader]="modalTitle"
-  (closeModal)="toggleModal()"
-></app-modal>
+    @if (isModalOpen) {
+      <app-modal
+        [modalContent]="modalContent"
+        [modalHeader]="modalTitle"
+        (closeModal)="toggleModal()"
+      ></app-modal>
+    }

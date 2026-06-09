@@ -2,11 +2,15 @@
   (click)="selectClicked()"
   class="blade-container"
   [ngClass]="{ disabled: disabled, selected: selected, detail: isDetailMode }"
->
+  >
   <div class="view-row">
     <div class="edit-button" (click)="toggleDetailMode()">
-      <i *ngIf="!isDetailMode" class="bi bi-card-list"></i>
-      <i *ngIf="isDetailMode" class="bi bi-x-lg"></i>
+      @if (!isDetailMode) {
+        <i class="bi bi-card-list"></i>
+      }
+      @if (isDetailMode) {
+        <i class="bi bi-x-lg"></i>
+      }
     </div>
     <div class="label-container">
       <i class="main-icon bi" [ngClass]="buildComponent.icon"></i>
@@ -15,30 +19,39 @@
         <span class="name display inter-medium">{{ buildComponent.name }}</span>
       </div>
     </div>
-    <div *ngIf="!isDetailMode" class="details d-flex flex-column inter-regular">
-      <!-- <div *ngIf="buildComponent.quantity > 1" class="detail">x{{ buildComponent.quantity }}</div> -->
-      <div *ngIf="isInverter(buildComponent)" class="detail">
-        {{ buildComponent.maxOutput }} W Output
-      </div>
-      <div
-        *ngIf="
+    @if (!isDetailMode) {
+      <div class="details d-flex flex-column inter-regular">
+        <!-- <div *ngIf="buildComponent.quantity > 1" class="detail">x{{ buildComponent.quantity }}</div> -->
+        @if (isInverter(buildComponent)) {
+          <div class="detail">
+            {{ buildComponent.maxOutput }} W Output
+          </div>
+        }
+        @if (
           (isInverter(buildComponent) || isBattery(buildComponent)) &&
           buildComponent.batteryCapacity
-        "
-        class="detail"
-      >
-        {{ buildComponent.batteryCapacity }} Wh Capacity
+          ) {
+          <div
+            class="detail"
+            >
+            {{ buildComponent.batteryCapacity }} Wh Capacity
+          </div>
+        }
+        <div class="detail">${{ buildComponent.price }}</div>
       </div>
-      <div class="detail">${{ buildComponent.price }}</div>
+    }
+  </div>
+  @if (isDetailMode && editInnerVisible) {
+    <div class="edit-fields fade-in">
+      <div class="edit-label inter-medium">Quantity</div>
+      x2
+      <div class="edit-label inter-medium">Wattage</div>
+      1000W
+      <div class="edit-label inter-medium">Hours used per day</div>
+      20
     </div>
-  </div>
-  <div class="edit-fields fade-in" *ngIf="isDetailMode && editInnerVisible">
-    <div class="edit-label inter-medium">Quantity</div>
-    x2
-    <div class="edit-label inter-medium">Wattage</div>
-    1000W
-    <div class="edit-label inter-medium">Hours used per day</div>
-    20
-  </div>
+  }
 </div>
-<div *ngIf="isDetailMode" class="fullscreen-mask" (click)="toggleDetailMode()"></div>
+@if (isDetailMode) {
+  <div class="fullscreen-mask" (click)="toggleDetailMode()"></div>
+}

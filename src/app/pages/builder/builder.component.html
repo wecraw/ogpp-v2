@@ -7,154 +7,163 @@
         <div class="title">Appliances.</div>
         <div class="subtitle">Choose what you use.</div>
       </div>
-      <div class="appliance-group" *ngFor="let group of applianceGroups">
-        <div class="group-title inter-medium">{{ group }}</div>
-        <hr />
-        <div class="row">
-          <div class="col-lg-5 col-xl-4" *ngFor="let appliance of getAppliancesByGroup(group)">
-            <appliance-card
-              [appliance]="appliance"
-              [originalAppliance]="getOriginalApplianceById(appliance.id!)"
-              [selected]="isApplianceSelected(appliance.id!)"
-              (onEdit)="onApplianceValueChange($event, appliance)"
-              (onSelect)="onApplianceSelect(appliance.id!)"
-            ></appliance-card>
+      @for (group of applianceGroups; track group) {
+        <div class="appliance-group">
+          <div class="group-title inter-medium">{{ group }}</div>
+          <hr />
+          <div class="row">
+            @for (appliance of getAppliancesByGroup(group); track appliance) {
+              <div class="col-lg-5 col-xl-4">
+                <appliance-card
+                  [appliance]="appliance"
+                  [originalAppliance]="getOriginalApplianceById(appliance.id!)"
+                  [selected]="isApplianceSelected(appliance.id!)"
+                  (onEdit)="onApplianceValueChange($event, appliance)"
+                  (onSelect)="onApplianceSelect(appliance.id!)"
+                ></appliance-card>
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
       <div class="button-container">
-        <button
-          *ngIf="!showStep2"
-          [ngClass]="{ 'fade-out': showStep2 }"
-          class="btn btn-primary inter-regular"
-          [disabled]="!isAnyApplianceSelected() || showStep2"
-          (click)="enableStep2()"
-        >
-          Continue
-        </button>
+        @if (!showStep2) {
+          <button
+            [ngClass]="{ 'fade-out': showStep2 }"
+            class="btn btn-primary inter-regular"
+            [disabled]="!isAnyApplianceSelected() || showStep2"
+            (click)="enableStep2()"
+            >
+            Continue
+          </button>
+        }
       </div>
       <div id="step2" class="scroll-anchor"></div>
-      <hr *ngIf="showStep2" />
+      @if (showStep2) {
+        <hr />
+      }
 
-      <div *ngIf="showStep2" class="fade-in build-stats">
-        <div class="stat">
-          <div class="inter-medium">
-            <span [countUp]="peakWattage" [options]="countUpOptionsPeakWattage" class="number"
-              >0</span
-            ><span class="unit">W</span>
-          </div>
-          <span class="description inter-regular">Peak Wattage</span>
-        </div>
-        <div class="stat">
-          <div class="inter-medium">
-            <span [countUp]="totalWattHours" [options]="countUpOptionsTotalWattHours" class="number"
-              >0</span
-            ><span class="unit">Wh</span>
-          </div>
-          <span class="description inter-regular">Watt hours per day</span>
-        </div>
-      </div>
-      <hr *ngIf="showStep2" />
-    </div>
-  </div>
-</div>
-<div class="container" style="margin-top: 10px">
-  <!-- scroll anchor here to create margin top -->
-  <div class="step2-wrapper fade-in" *ngIf="showStep2">
-    <div class="section zip">
-      <div class="title-row d-flex inter-medium flex-column">
-        <div class="title">Location.</div>
-        <div class="subtitle">Choose where you're off grid.</div>
-        <div>
-          <input
-            type="text"
-            pattern="[0-9]{5}"
-            maxlength="5"
-            [(ngModel)]="zipCode"
-            placeholder="Enter ZIP Code*"
-            (ngModelChange)="validateZip(false)"
-            (blur)="validateZip(true)"
-          />
-          <i class="bi bi-question-circle info-icon" (click)="toggleModal()"></i>
-        </div>
-        <div *ngIf="zipErrorLength || zipErrorFormat" class="input-error-message inter-regular">
-          Enter a valid 5 digit ZIP code
-        </div>
-        <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
-      </div>
-    </div>
-    <div class="section">
-      <div class="title-row d-flex inter-medium flex-column">
-        <div class="title">Seasons.</div>
-        <div class="subtitle">Choose when you're off grid.</div>
-        <div class="row content-above-md">
-          <mini-card
-            (onSelect)="onSeasonSelect($event, 'spring')"
-            label="Spring"
-            iconName="bi-flower1"
-            [selected]="build.seasons.includes('spring')"
-          ></mini-card>
-
-          <mini-card
-            (onSelect)="onSeasonSelect($event, 'summer')"
-            label="Summer"
-            iconName="bi-sun"
-            [selected]="build.seasons.includes('summer')"
-          ></mini-card>
-
-          <mini-card
-            (onSelect)="onSeasonSelect($event, 'fall')"
-            label="Fall"
-            iconName="bi-tree"
-            [selected]="build.seasons.includes('fall')"
-          ></mini-card>
-
-          <mini-card
-            (onSelect)="onSeasonSelect($event, 'winter')"
-            label="Winter"
-            iconName="bi-snow"
-            [selected]="build.seasons.includes('winter')"
-          ></mini-card>
-        </div>
-
-        <div class="row content-below-md">
-          <div class="row">
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'spring')"
-              label="Spring"
-              iconName="bi-flower1"
-              [selected]="build.seasons.includes('spring')"
-            ></mini-card>
-
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'summer')"
-              label="Summer"
-              iconName="bi-sun"
-              [selected]="build.seasons.includes('summer')"
-            ></mini-card>
-          </div>
-          <div class="row">
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'fall')"
-              label="Fall"
-              iconName="bi-tree"
-              [selected]="build.seasons.includes('fall')"
-            ></mini-card>
-
-            <mini-card
-              (onSelect)="onSeasonSelect($event, 'winter')"
-              label="Winter"
-              iconName="bi-snow"
-              [selected]="build.seasons.includes('winter')"
-            ></mini-card>
-          </div>
+      @if (showStep2) {
+        <div class="fade-in build-stats">
+          <div class="stat">
+            <div class="inter-medium">
+              <span [countUp]="peakWattage" [options]="countUpOptionsPeakWattage" class="number"
+                >0</span
+                ><span class="unit">W</span>
+              </div>
+              <span class="description inter-regular">Peak Wattage</span>
+            </div>
+            <div class="stat">
+              <div class="inter-medium">
+                <span [countUp]="totalWattHours" [options]="countUpOptionsTotalWattHours" class="number"
+                  >0</span
+                  ><span class="unit">Wh</span>
+                </div>
+                <span class="description inter-regular">Watt hours per day</span>
+              </div>
+            </div>
+          }
+          @if (showStep2) {
+            <hr />
+          }
         </div>
       </div>
     </div>
-    <div *ngIf="!generatingBuild" class="button-container">
-      <button
-        class="btn btn-primary inter-regular"
-        (click)="generateBuild()"
+    <div class="container" style="margin-top: 10px">
+      <!-- scroll anchor here to create margin top -->
+      @if (showStep2) {
+        <div class="step2-wrapper fade-in">
+          <div class="section zip">
+            <div class="title-row d-flex inter-medium flex-column">
+              <div class="title">Location.</div>
+              <div class="subtitle">Choose where you're off grid.</div>
+              <div>
+                <input
+                  type="text"
+                  pattern="[0-9]{5}"
+                  maxlength="5"
+                  [(ngModel)]="zipCode"
+                  placeholder="Enter ZIP Code*"
+                  (ngModelChange)="validateZip(false)"
+                  (blur)="validateZip(true)"
+                  />
+                <i class="bi bi-question-circle info-icon" (click)="toggleModal()"></i>
+              </div>
+              @if (zipErrorLength || zipErrorFormat) {
+                <div class="input-error-message inter-regular">
+                  Enter a valid 5 digit ZIP code
+                </div>
+              }
+              <!-- <button (click)="getSunHours(zipCode)">Get</button> -->
+            </div>
+          </div>
+          <div class="section">
+            <div class="title-row d-flex inter-medium flex-column">
+              <div class="title">Seasons.</div>
+              <div class="subtitle">Choose when you're off grid.</div>
+              <div class="row content-above-md">
+                <mini-card
+                  (onSelect)="onSeasonSelect($event, 'spring')"
+                  label="Spring"
+                  iconName="bi-flower1"
+                  [selected]="build.seasons.includes('spring')"
+                ></mini-card>
+                <mini-card
+                  (onSelect)="onSeasonSelect($event, 'summer')"
+                  label="Summer"
+                  iconName="bi-sun"
+                  [selected]="build.seasons.includes('summer')"
+                ></mini-card>
+                <mini-card
+                  (onSelect)="onSeasonSelect($event, 'fall')"
+                  label="Fall"
+                  iconName="bi-tree"
+                  [selected]="build.seasons.includes('fall')"
+                ></mini-card>
+                <mini-card
+                  (onSelect)="onSeasonSelect($event, 'winter')"
+                  label="Winter"
+                  iconName="bi-snow"
+                  [selected]="build.seasons.includes('winter')"
+                ></mini-card>
+              </div>
+              <div class="row content-below-md">
+                <div class="row">
+                  <mini-card
+                    (onSelect)="onSeasonSelect($event, 'spring')"
+                    label="Spring"
+                    iconName="bi-flower1"
+                    [selected]="build.seasons.includes('spring')"
+                  ></mini-card>
+                  <mini-card
+                    (onSelect)="onSeasonSelect($event, 'summer')"
+                    label="Summer"
+                    iconName="bi-sun"
+                    [selected]="build.seasons.includes('summer')"
+                  ></mini-card>
+                </div>
+                <div class="row">
+                  <mini-card
+                    (onSelect)="onSeasonSelect($event, 'fall')"
+                    label="Fall"
+                    iconName="bi-tree"
+                    [selected]="build.seasons.includes('fall')"
+                  ></mini-card>
+                  <mini-card
+                    (onSelect)="onSeasonSelect($event, 'winter')"
+                    label="Winter"
+                    iconName="bi-snow"
+                    [selected]="build.seasons.includes('winter')"
+                  ></mini-card>
+                </div>
+              </div>
+            </div>
+          </div>
+          @if (!generatingBuild) {
+            <div class="button-container">
+              <button
+                class="btn btn-primary inter-regular"
+                (click)="generateBuild()"
         [disabled]="
           !isAnyApplianceSelected() ||
           zipErrorFormat ||
@@ -162,21 +171,26 @@
           zipCode.length < 5 ||
           build.seasons.length === 0
         "
-      >
-        Continue
-      </button>
-    </div>
-    <!-- <div *ngIf="showResults && build.monthlyGhi"> -->
-    <!-- <span>Sun hours: {{ sunHours }}</span> -->
-    <!-- <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span> -->
-    <!-- </div> -->
-    <div *ngIf="generatingBuild" class="loader"></div>
-  </div>
+                >
+                Continue
+              </button>
+            </div>
+          }
+          <!-- <div *ngIf="showResults && build.monthlyGhi"> -->
+          <!-- <span>Sun hours: {{ sunHours }}</span> -->
+          <!-- <span>Total wattage needed: {{ calculationUtils.wattageNeeded(build) }}</span> -->
+        <!-- </div> -->
+        @if (generatingBuild) {
+          <div class="loader"></div>
+        }
+      </div>
+    }
 
-  <app-modal
-    *ngIf="isModalOpen"
-    [modalContent]="modalContent"
-    modalHeader="Why we collect location data"
-    (closeModal)="toggleModal()"
-  ></app-modal>
-</div>
+    @if (isModalOpen) {
+      <app-modal
+        [modalContent]="modalContent"
+        modalHeader="Why we collect location data"
+        (closeModal)="toggleModal()"
+      ></app-modal>
+    }
+  </div>
