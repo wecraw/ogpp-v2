@@ -335,6 +335,83 @@ build-component-card {
   }
 }
 
+// Inline "why this size?" affordance: a quiet text button under each step's subtitle
+// that toggles the math breakdown sourced from CalculationUtilsService.
+.why-toggle {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: $selected-blue;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  i {
+    font-size: 11px;
+    transition: transform $dur-fast $ease-out;
+  }
+  &.open i {
+    transform: rotate(180deg);
+  }
+}
+
+// The expanded breakdown reads as a small ledger: a plain-language lead line, then
+// one row per input with the resulting target emphasized at the bottom.
+.why-panel {
+  margin: -4px 0 22px;
+  padding: 16px 18px;
+  background-color: $page-bg;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-md;
+  max-width: 520px;
+
+  .why-lead {
+    margin: 0 0 12px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: $text-secondary;
+
+    strong {
+      color: $text-color-black;
+      font-weight: 600;
+    }
+  }
+
+  .why-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    font-size: 14px;
+
+    & + .why-row {
+      border-top: 1px solid $divider;
+    }
+
+    .why-label {
+      color: $text-secondary;
+    }
+    .why-value {
+      color: $text-color-black;
+      white-space: nowrap;
+    }
+
+    &.total .why-label {
+      color: $text-color-black;
+      font-weight: 600;
+    }
+    &.total .why-value {
+      color: $selected-blue;
+      font-weight: 600;
+    }
+  }
+}
+
 .bi-plus {
   font-size: 24px;
 }

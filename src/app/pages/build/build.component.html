@@ -34,8 +34,24 @@
             Converts to AC power
             <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
           </div>
+          <button type="button" class="why-toggle inter-regular" [class.open]="whyOpen.inverter" (click)="toggleWhy('inverter')">
+            Why {{ peakWattage | number }} W?
+            <i class="bi bi-chevron-down"></i>
+          </button>
         </div>
       </div>
+      @if (whyOpen.inverter) {
+        <div class="why-panel fade-in">
+          <p class="why-lead inter-regular">
+            Your appliances draw up to <strong>{{ peakWattage | number }} W</strong> when running at the
+            same time, so your inverter must supply at least that much continuous output.
+          </p>
+          <div class="why-row">
+            <span class="why-label inter-regular">Peak draw (all appliances at once)</span>
+            <span class="why-value inter-medium">{{ peakWattage | number }} W</span>
+          </div>
+        </div>
+      }
       <div class="row card-grid">
         @for (inverter of inverters; track inverter.id) {
           <div class="col-lg-5 col-xl-4">
@@ -66,8 +82,33 @@
               Store energy for later
               <i class="bi bi-question-circle info-icon" (click)="toggleModal('battery')"></i>
             </div>
+            <button type="button" class="why-toggle inter-regular" [class.open]="whyOpen.battery" (click)="toggleWhy('battery')">
+              Why {{ batteryTarget | number }} Wh?
+              <i class="bi bi-chevron-down"></i>
+            </button>
           </div>
         </div>
+        @if (whyOpen.battery) {
+          <div class="why-panel fade-in">
+            <p class="why-lead inter-regular">
+              Your appliances use <strong>{{ totalWattHours | number }} Wh</strong> over a day. We size
+              storage to cover {{ daysOfAutonomy }} day{{ daysOfAutonomy === 1 ? '' : 's' }} of use
+              (your inverter's built-in battery counts toward this).
+            </p>
+            <div class="why-row">
+              <span class="why-label inter-regular">Daily energy use</span>
+              <span class="why-value inter-medium">{{ totalWattHours | number }} Wh/day</span>
+            </div>
+            <div class="why-row">
+              <span class="why-label inter-regular">Days of autonomy</span>
+              <span class="why-value inter-medium">× {{ daysOfAutonomy }}</span>
+            </div>
+            <div class="why-row total">
+              <span class="why-label inter-regular">Target storage</span>
+              <span class="why-value inter-medium">{{ batteryTarget | number }} Wh</span>
+            </div>
+          </div>
+        }
         <div class="row card-grid">
           @for (battery of batteries; track battery.id; let i = $index) {
             <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
@@ -101,8 +142,40 @@
               Generate renewable energy
               <i class="bi bi-question-circle info-icon" (click)="toggleModal('solar')"></i>
             </div>
+            <button type="button" class="why-toggle inter-regular" [class.open]="whyOpen.solar" (click)="toggleWhy('solar')">
+              Why {{ wattageNeeded | number }} W?
+              <i class="bi bi-chevron-down"></i>
+            </button>
           </div>
         </div>
+        @if (whyOpen.solar) {
+          <div class="why-panel fade-in">
+            <p class="why-lead inter-regular">
+              To replenish a full day of use ({{ totalWattHours | number }} Wh) during your worst
+              selected season, your panels need enough wattage to make that energy back in a typical
+              day of sun.
+            </p>
+            <div class="why-row">
+              <span class="why-label inter-regular">Daily energy to replenish</span>
+              <span class="why-value inter-medium">{{ totalWattHours | number }} Wh</span>
+            </div>
+            <div class="why-row">
+              <span class="why-label inter-regular">
+                Worst-season sun
+                @if (build.seasons.length) {
+                  ({{ build.seasons.join(', ') | titlecase }})
+                }
+              </span>
+              <span class="why-value inter-medium">{{ worstSeasonSunHours | number: '1.0-1' }} h/day</span>
+            </div>
+            <div class="why-row total">
+              <span class="why-label inter-regular">
+                {{ totalWattHours | number }} Wh ÷ {{ worstSeasonSunHours | number: '1.0-1' }} h
+              </span>
+              <span class="why-value inter-medium">{{ wattageNeeded | number }} W</span>
+            </div>
+          </div>
+        }
         <div class="row card-grid">
           @for (panel of solarPanels; track panel.id; let i = $index) {
             <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
