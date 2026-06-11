@@ -6,11 +6,24 @@ import { ModalComponent } from 'src/app/components/modal/modal.component';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
-import { INVERTER_EXPLANATION, INVERTER_EXPLANATION_TITLE } from 'src/app/content/strings';
+import {
+  INVERTER_EXPLANATION,
+  INVERTER_EXPLANATION_TITLE,
+  BATTERY_EXPLANATION,
+  BATTERY_EXPLANATION_TITLE,
+  SOLAR_EXPLANATION,
+  SOLAR_EXPLANATION_TITLE
+} from 'src/app/content/strings';
 import { BuildComponentCardComponent } from 'src/app/components/build-component-card/build-component-card.component';
 import { ProductSelectorService } from 'src/app/services/product-selector.service';
 import { Inverter, defaultInverter } from 'src/app/interfaces/Inverter';
-import { Battery, defaultBattery } from 'src/app/interfaces/Battery';
+import { Battery } from 'src/app/interfaces/Battery';
+import { PowerSource } from 'src/app/interfaces/PowerSource';
+
+// Days of usage the battery bank should cover. Surfacing this as a constant keeps the
+// (currently hardcoded) "1 day of autonomy" decision in one place for a future override UI.
+const DAYS_OF_AUTONOMY = 1;
+
 @Component({
     selector: 'app-build',
     imports: [CommonModule, CountUpDirective, ModalComponent, BuildComponentCardComponent],
@@ -20,8 +33,6 @@ import { Battery, defaultBattery } from 'src/app/interfaces/Battery';
 export class BuildComponent implements OnInit {
   public build: Build = defaultBuild;
   public buildNotFound: boolean = false;
-
-  // public inverter = inverters[0]; //debug
 
   constructor(
     private router: Router,
@@ -33,11 +44,24 @@ export class BuildComponent implements OnInit {
 
   public countUpOptions = { duration: 0.7 };
 
+  // Targets (from the build's appliances + location)
   public peakWattage: number = 0;
   public totalWattHours: number = 0;
+  public wattageNeeded: number = 0;
 
-  // Products
+  // Matching products
   public inverters: Inverter[] = [];
+  public batteries: Battery[] = [];
+  public solarPanels: PowerSource[] = [];
+
+  // Per-item quantities, keyed by catalog id
+  public batteryQuantities: Record<string, number> = {};
+  public solarQuantities: Record<string, number> = {};
+
+  // Running totals
+  public selectedBatteryCapacity: number = 0;
+  public selectedSolarWattage: number = 0;
+  public totalPrice: number = 0;
 
   // Content
   public modalContent: string = '';
@@ -45,10 +69,14 @@ export class BuildComponent implements OnInit {
 
   // Compatibility
   public isInverterCompatible: boolean = false;
+  public isBatteryCompatible: boolean = false;
+  public isSolarCompatible: boolean = false;
 
   // DOM Controllers
   public isModalOpen: boolean = false;
   public showInverterCheck: boolean = false;
+  public showBatteryCheck: boolean = false;
+  public showSolarCheck: boolean = false;
   public showStep2: boolean = false;
   public showStep3: boolean = false;
 
@@ -63,41 +91,255 @@ export class BuildComponent implements OnInit {
       this.build = existingBuild;
       this.peakWattage = this.calculationUtils.peakWattage(this.build);
       this.totalWattHours = this.calculationUtils.totalWattHours(this.build);
+      this.wattageNeeded = this.calculationUtils.wattageNeeded(this.build);
       this.inverters = this.productSelectorService.getMatchingInverters(this.build);
+      this.restoreSelections();
     });
   }
 
+  // ----- Targets -----
+
+  get batteryTarget(): number {
+    return this.totalWattHours * DAYS_OF_AUTONOMY;
+  }
+
+  // ----- Bottom-bar progress (0–100, capped) -----
+  // Drives each segment's fill bar so progress toward a target reads at a glance
+  // instead of from a value/target fraction.
+
+  get inverterProgress(): number {
+    if (!this.peakWattage) return 0;
+    return Math.min((this.build.inverter?.maxOutput ?? 0) / this.peakWattage, 1) * 100;
+  }
+
+  get batteryProgress(): number {
+    if (!this.batteryTarget) return 0;
+    return Math.min(this.selectedBatteryCapacity / this.batteryTarget, 1) * 100;
+  }
+
+  get solarProgress(): number {
+    if (!this.wattageNeeded) return 0;
+    return Math.min(this.selectedSolarWattage / this.wattageNeeded, 1) * 100;
+  }
+
+  // ----- Step 1: Inverter -----
+
   onInverterSelect(selected: boolean, inverter: Inverter) {
-    setTimeout(() => {
-      this.showStep2 = true;
-    }, this.countUpOptions.duration * 1000);
-    if (selected) {
-      this.build.inverter = inverter;
-    } else {
-      this.build.inverter = defaultInverter;
-    }
+    this.build.inverter = selected ? inverter : defaultInverter;
+
+    // The brand of the chosen inverter drives which batteries/panels match, so any
+    // downstream selections from a previous inverter are no longer valid.
+    this.build.batteries = [];
+    this.build.powerSources = [];
+    this.batteryQuantities = {};
+    this.solarQuantities = {};
+    this.showStep3 = false;
+    this.showSolarCheck = false;
+    this.showBatteryCheck = false;
+
+    this.batteries = this.productSelectorService.getMatchingBatteries(this.build);
+
+    this.recalculate();
+    this.save();
     this.confirmCompatibility('inverter');
+
+    setTimeout(() => {
+      this.showStep2 = !!this.build.inverter.maxOutput;
+      if (this.showStep2) this.scrollToStep('step2');
+    }, this.countUpOptions.duration * 1000);
+
+    // The inverter's built-in battery may already cover the day's needs, in which case the
+    // battery step is satisfied with zero added batteries — reveal solar so the user can proceed.
+    this.maybeRevealSolar();
+  }
+
+  // ----- Step 2: Batteries -----
+
+  onBatteryQuantityChange(battery: Battery, quantity: number) {
+    if (battery.id) {
+      this.batteryQuantities[battery.id] = quantity;
+    }
+    this.build.batteries = this.flatten(this.batteries, this.batteryQuantities);
+
+    this.recalculate();
+    this.save();
+    this.confirmCompatibility('battery');
+    this.maybeRevealSolar();
+  }
+
+  private maybeRevealSolar() {
+    if (!this.isBatteryCompatible) return;
+    const wasHidden = !this.showStep3;
+    this.solarPanels = this.productSelectorService.getMatchingSolarPanels(this.build);
+    setTimeout(() => {
+      this.showStep3 = true;
+      if (wasHidden) this.scrollToStep('step3');
+    }, this.countUpOptions.duration * 1000);
+  }
+
+  // Smoothly bring a freshly revealed step into view so the eye follows the flow
+  // instead of the section popping in unnoticed. Deferred a tick so the @if block
+  // has rendered before we scroll to it.
+  private scrollToStep(id: string) {
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
+  getBatteryQuantity(battery: Battery): number {
+    return battery.id ? this.batteryQuantities[battery.id] ?? 0 : 0;
+  }
+
+  // ----- Step 3: Solar panels -----
+
+  onSolarQuantityChange(panel: PowerSource, quantity: number) {
+    if (panel.id) {
+      this.solarQuantities[panel.id] = quantity;
+    }
+    this.build.powerSources = this.flatten(this.solarPanels, this.solarQuantities);
+
+    this.recalculate();
+    this.save();
+    this.confirmCompatibility('solar');
+  }
+
+  getSolarQuantity(panel: PowerSource): number {
+    return panel.id ? this.solarQuantities[panel.id] ?? 0 : 0;
+  }
+
+  // ----- Completion -----
+
+  get allComplete(): boolean {
+    return this.isInverterCompatible && this.isBatteryCompatible && this.isSolarCompatible;
+  }
+
+  finish() {
+    this.save();
+    this.router.navigate(['/builds']);
   }
 
   editAppliances() {
-    // Navigate to the "builds" page with the buildId as a query param
-    const navigationExtras = {
-      queryParams: { buildId: this.build.id }
-    };
-    this.router.navigate(['/builder'], navigationExtras);
+    this.router.navigate(['/builder'], { queryParams: { buildId: this.build.id } });
+  }
+
+  // ----- Bottom-bar row colors -----
+
+  get inverterRowClass(): string {
+    if (!this.build.inverter || !this.build.inverter.maxOutput) return 'unset';
+    return this.isInverterCompatible ? 'compatible' : 'incompatible';
+  }
+
+  get batteryRowClass(): string {
+    if (!this.selectedBatteryCapacity) return 'unset';
+    return this.isBatteryCompatible ? 'compatible' : 'incompatible';
+  }
+
+  get solarRowClass(): string {
+    if (this.isSolarCompatible) return 'compatible';
+    return this.selectedSolarWattage > 0 ? 'incompatible' : 'unset';
+  }
+
+  // ----- Shared logic -----
+
+  private recalculate() {
+    const inverterBuiltIn = this.build.inverter?.batteryCapacity ?? 0;
+    const addedCapacity = this.build.batteries.reduce(
+      (total, battery) => total + (battery.batteryCapacity ?? 0),
+      0
+    );
+    this.selectedBatteryCapacity = inverterBuiltIn + addedCapacity;
+
+    this.selectedSolarWattage = this.build.powerSources.reduce(
+      (total, panel) => total + (panel.maxOutput ?? 0),
+      0
+    );
+
+    this.isInverterCompatible =
+      !!this.build.inverter?.maxOutput && this.build.inverter.maxOutput >= this.peakWattage;
+    this.isBatteryCompatible =
+      this.isInverterCompatible && this.selectedBatteryCapacity >= this.batteryTarget;
+    this.isSolarCompatible =
+      this.isBatteryCompatible && this.selectedSolarWattage >= this.wattageNeeded;
+
+    this.totalPrice = this.computeTotalPrice();
+  }
+
+  private computeTotalPrice(): number {
+    const inverterPrice = this.build.inverter?.price ?? 0;
+    const batteryPrice = this.build.batteries.reduce((total, b) => total + (b.price ?? 0), 0);
+    const solarPrice = this.build.powerSources.reduce((total, p) => total + (p.price ?? 0), 0);
+    return inverterPrice + batteryPrice + solarPrice;
+  }
+
+  // Expands a quantity map into a flat array of duplicated catalog entries, which is how
+  // selections are persisted on the Build (keeping the Build interface unchanged).
+  private flatten<T extends { id?: string }>(
+    items: T[],
+    quantities: Record<string, number>
+  ): T[] {
+    const result: T[] = [];
+    for (const item of items) {
+      const quantity = item.id ? quantities[item.id] ?? 0 : 0;
+      for (let i = 0; i < quantity; i++) {
+        result.push(item);
+      }
+    }
+    return result;
+  }
+
+  // Rebuilds a per-id quantity map by counting duplicate entries in a persisted array.
+  private groupQuantities(list: { id?: string }[]): Record<string, number> {
+    const out: Record<string, number> = {};
+    for (const item of list) {
+      if (!item.id) continue;
+      out[item.id] = (out[item.id] ?? 0) + 1;
+    }
+    return out;
+  }
+
+  // On reload, re-derive matches, quantities, revealed steps and compatibility from the
+  // persisted Build so the user lands exactly where they left off.
+  private restoreSelections() {
+    if (this.build.inverter && this.build.inverter.maxOutput) {
+      this.batteries = this.productSelectorService.getMatchingBatteries(this.build);
+      this.batteryQuantities = this.groupQuantities(this.build.batteries);
+      this.showStep2 = true;
+    }
+
+    this.recalculate();
+
+    if (this.isBatteryCompatible) {
+      this.solarPanels = this.productSelectorService.getMatchingSolarPanels(this.build);
+      this.solarQuantities = this.groupQuantities(this.build.powerSources);
+      this.showStep3 = true;
+    }
+
+    // Surface the persisted compatibility checks without the entry animation delay.
+    this.showInverterCheck = this.isInverterCompatible;
+    this.showBatteryCheck = this.isBatteryCompatible;
+    this.showSolarCheck = this.isSolarCompatible;
+  }
+
+  private save() {
+    this.build.lastEdited = new Date();
+    this.buildService.saveBuild(this.build);
   }
 
   confirmCompatibility(device: string) {
-    if (device === 'inverter') {
-      if (this.build.inverter.maxOutput >= this.peakWattage) {
-        this.isInverterCompatible = true;
-        setTimeout(() => {
-          this.showInverterCheck = true;
-        }, this.countUpOptions.duration * 1000);
+    const reveal = (set: (value: boolean) => void, compatible: boolean) => {
+      if (compatible) {
+        setTimeout(() => set(true), this.countUpOptions.duration * 1000);
       } else {
-        this.isInverterCompatible = false;
-        this.showInverterCheck = false;
+        set(false);
       }
+    };
+
+    if (device === 'inverter') {
+      reveal(v => (this.showInverterCheck = v), this.isInverterCompatible);
+    } else if (device === 'battery') {
+      reveal(v => (this.showBatteryCheck = v), this.isBatteryCompatible);
+    } else if (device === 'solar') {
+      reveal(v => (this.showSolarCheck = v), this.isSolarCompatible);
     }
   }
 
@@ -108,6 +350,12 @@ export class BuildComponent implements OnInit {
     if (content === 'inverter') {
       this.modalContent = INVERTER_EXPLANATION;
       this.modalTitle = INVERTER_EXPLANATION_TITLE;
+    } else if (content === 'battery') {
+      this.modalContent = BATTERY_EXPLANATION;
+      this.modalTitle = BATTERY_EXPLANATION_TITLE;
+    } else if (content === 'solar') {
+      this.modalContent = SOLAR_EXPLANATION;
+      this.modalTitle = SOLAR_EXPLANATION_TITLE;
     }
   }
 }

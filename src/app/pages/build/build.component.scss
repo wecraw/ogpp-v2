@@ -41,46 +41,280 @@
   }
 }
 
+// Leave room so the last section isn't hidden behind the fixed compatibility bar.
+.container:not(.compatibility-container) {
+  padding-bottom: 200px;
+}
+
 .compatibility {
   border-top: 1px solid $divider;
   position: fixed;
-  min-height: 88px;
   width: 100%;
   bottom: 0;
   z-index: 999;
   background-color: rgba(255, 255, 255, 0.8);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
+
   .compatibility-container {
-    min-height: 88px;
     display: flex;
     align-items: center;
-    .build-stats {
-      align-self: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  // Each metric is its own discrete segment, divider-separated, so the bar reads as
+  // three glanceable cards rather than a dense stack of value/target fractions.
+  .compat-segments {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .compat-segment {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 2px 24px;
+    min-width: 132px;
+
+    &:first-child {
+      padding-left: 0;
+    }
+    & + .compat-segment {
+      border-left: 1px solid $divider;
+    }
+
+    .seg-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 16px;
+
+      .seg-label {
+        font-size: 12px;
+        letter-spacing: 0.01em;
+        color: $text-secondary;
+      }
+      .seg-check {
+        font-size: 13px;
+        line-height: 1;
+        color: $selected-blue;
+      }
+    }
+
+    .seg-value {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: $text-color-black;
+      transition: color $dur $ease-out;
+
+      .unit {
+        font-size: 13px;
+        font-weight: 500;
+        color: $text-secondary;
+      }
+    }
+
+    .seg-track {
+      height: 4px;
+      border-radius: $radius-pill;
+      background-color: rgba(0, 0, 0, 0.07);
+      overflow: hidden;
+
+      .seg-fill {
+        height: 100%;
+        width: 0;
+        border-radius: $radius-pill;
+        background-color: $grey-light;
+        transition: width $dur $ease-out, background-color $dur $ease-out;
+      }
+    }
+
+    .seg-target {
+      font-size: 11px;
+      letter-spacing: 0.01em;
+      color: $text-tertiary;
+    }
+
+    &.compatible {
+      .seg-value {
+        color: $selected-blue;
+      }
+      // Qualify with .seg-track to outweigh the base `.seg-track .seg-fill` rule,
+      // which otherwise ties on specificity and wins on source order.
+      .seg-track .seg-fill {
+        background-color: $selected-blue;
+      }
+    }
+    &.incompatible {
+      .seg-value {
+        color: $error-red;
+      }
+      .seg-track .seg-fill {
+        background-color: $error-red;
+      }
+    }
+    &.unset {
+      .seg-value {
+        color: $grey-light;
+      }
     }
   }
-  .compatibility-check {
-    font-size: 24px;
-    vertical-align: middle;
-    display: inline-block;
-    height: 40px;
-    margin-left: 10px;
-    color: $selected-blue;
-    cursor: pointer;
+
+  .compat-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
   }
-  .description {
-    font-size: 14px;
-    i {
-      color: $selected-blue;
+
+  .total-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+
+    .price-label {
+      font-size: 12px;
+      color: $text-secondary;
+    }
+    .price-value {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: $text-color-black;
+    }
+  }
+
+  .finish-button {
+    width: auto;
+    min-width: 120px;
+    padding: 0 28px;
+  }
+
+  // On narrow screens the segments + actions don't fit side by side; stack them and
+  // let the segments share one row (divider-separated) above the total and Finish.
+  @media (max-width: 600px) {
+    .compatibility-container {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    .compat-segments {
+      flex-wrap: nowrap;
+      justify-content: space-between;
+    }
+
+    .compat-segment {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 2px 14px;
+
+      .seg-value {
+        font-size: 21px;
+      }
+    }
+
+    .compat-actions {
+      justify-content: space-between;
+    }
+
+    .total-price {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 8px;
     }
   }
 }
 
 .section {
-  margin-top: 40px;
+  margin-top: 44px;
+  // Leave breathing room when a revealed step is scrolled to the top of the viewport.
+  scroll-margin-top: 28px;
 
   &.first {
     margin-top: 8px;
+  }
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+// The numbered spine turns the three steps into a guided sequence: each badge
+// counts up (1 → 2 → 3) and flips to a check once its step is satisfied.
+.step-badge {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  margin-top: 5px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-secondary;
+  background-color: $surface;
+  border: 1px solid $border-hairline;
+  box-shadow: $shadow-sm;
+  transition: background-color $dur $ease-out, border-color $dur $ease-out, color $dur $ease-out;
+
+  i {
+    font-size: 16px;
+  }
+
+  &.done {
+    background-color: $selected-blue;
+    border-color: $selected-blue;
+    color: #fff;
+  }
+}
+
+// Replace the abrupt fade-in pop with a deliberate, staggered reveal: the header
+// eases up first, then the cards rise in sequence so a new step feels like it's
+// unfolding rather than appearing out of nowhere.
+.section.revealable {
+  .section-head {
+    animation: section-reveal 0.45s $ease-out both;
+  }
+  .card-grid > * {
+    animation: card-rise 0.5s $ease-out both;
+  }
+}
+
+@keyframes section-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 

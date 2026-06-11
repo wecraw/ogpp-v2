@@ -22,6 +22,13 @@ let batteries: Battery[] = [
     icon: 'bi-battery-full',
     batteryCapacity: 2048,
     price: 949
+  },
+  {
+    name: 'Battery Pack 1000 Plus',
+    brand: 'Jackery',
+    icon: 'bi-battery-full',
+    batteryCapacity: 1264,
+    price: 699
   }
 ];
 

@@ -17,93 +17,189 @@
       </div>
     </div>
     <hr />
-    <div class="section first">
-      <div class="title-row d-flex inter-medium flex-column">
-        <div class="title">Inverter.</div>
-        <div class="subtitle">
-          Converts to AC power
-          <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
+
+    <!-- Step 1: Inverter -->
+    <div id="step1" class="section first">
+      <div class="section-head">
+        <div class="step-badge" [class.done]="isInverterCompatible">
+          @if (isInverterCompatible) {
+            <i class="bi bi-check-lg"></i>
+          } @else {
+            <span>1</span>
+          }
         </div>
-        <div class="row">
-          @for (inverter of inverters; track inverter) {
-            <div class="col-lg-5 col-xl-4">
+        <div class="title-row d-flex flex-column inter-medium">
+          <div class="title">Inverter.</div>
+          <div class="subtitle">
+            Converts to AC power
+            <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
+          </div>
+        </div>
+      </div>
+      <div class="row card-grid">
+        @for (inverter of inverters; track inverter.id) {
+          <div class="col-lg-5 col-xl-4">
+            <build-component-card
+              (onSelect)="onInverterSelect($event, inverter)"
+              [selected]="build.inverter?.id === inverter.id"
+              [buildComponent]="inverter"
+            ></build-component-card>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Step 2: Batteries -->
+    @if (showStep2) {
+      <div id="step2" class="section revealable">
+        <div class="section-head">
+          <div class="step-badge" [class.done]="isBatteryCompatible">
+            @if (isBatteryCompatible) {
+              <i class="bi bi-check-lg"></i>
+            } @else {
+              <span>2</span>
+            }
+          </div>
+          <div class="title-row d-flex flex-column inter-medium">
+            <div class="title">Batteries.</div>
+            <div class="subtitle">
+              Store energy for later
+              <i class="bi bi-question-circle info-icon" (click)="toggleModal('battery')"></i>
+            </div>
+          </div>
+        </div>
+        <div class="row card-grid">
+          @for (battery of batteries; track battery.id; let i = $index) {
+            <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
               <build-component-card
-                (onSelect)="onInverterSelect($event, inverter)"
-                [selected]="build.inverter === inverter"
-                [buildComponent]="inverter"
+                [buildComponent]="battery"
+                [quantityMode]="true"
+                [quantity]="getBatteryQuantity(battery)"
+                [maxQuantity]="build.inverter.maxBatteries"
+                (quantityChange)="onBatteryQuantityChange(battery, $event)"
               ></build-component-card>
             </div>
           }
         </div>
       </div>
-    </div>
-    @if (showStep2) {
-      <div class="section fade-in">
-        <div class="title-row d-flex inter-medium flex-column">
-          <div class="title">Batteries.</div>
-          <div class="subtitle">Store energy for future use.</div>
-          <div class="row">
-            @for (inverter of inverters; track inverter) {
-              <div class="col-lg-5 col-xl-4">
-                <build-component-card [buildComponent]="inverter"></build-component-card>
-              </div>
+    }
+
+    <!-- Step 3: Solar panels -->
+    @if (showStep3) {
+      <div id="step3" class="section revealable">
+        <div class="section-head">
+          <div class="step-badge" [class.done]="isSolarCompatible">
+            @if (isSolarCompatible) {
+              <i class="bi bi-check-lg"></i>
+            } @else {
+              <span>3</span>
             }
+          </div>
+          <div class="title-row d-flex flex-column inter-medium">
+            <div class="title">Solar panels.</div>
+            <div class="subtitle">
+              Generate renewable energy
+              <i class="bi bi-question-circle info-icon" (click)="toggleModal('solar')"></i>
+            </div>
           </div>
         </div>
-      </div>
-    }
-    @if (showStep3) {
-      <div class="section fade-in">
-        <div class="title-row d-flex inter-medium flex-column">
-          <div class="title">Solar panels.</div>
-          <div class="subtitle">Generate renewable energy.</div>
-          <div class="row">
-            @for (inverter of inverters; track inverter) {
-              <div class="col-lg-5 col-xl-4">
-                <build-component-card [buildComponent]="inverter"></build-component-card>
-              </div>
-            }
-          </div>
-          <!-- <build-component-card [buildComponent]="inverter"></build-component-card> -->
+        <div class="row card-grid">
+          @for (panel of solarPanels; track panel.id; let i = $index) {
+            <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
+              <build-component-card
+                [buildComponent]="panel"
+                [quantityMode]="true"
+                [quantity]="getSolarQuantity(panel)"
+                (quantityChange)="onSolarQuantityChange(panel, $event)"
+              ></build-component-card>
+            </div>
+          }
         </div>
       </div>
     }
   </div>
 }
+
 <div class="compatibility">
   <div class="container compatibility-container">
-    <div class="fade-in build-stats">
-      <div class="inter-medium">Peak Wattage:</div>
-
-      <div
-        class="stat"
-        [ngClass]="{
-        compatible: this.isInverterCompatible,
-        incompatible: !this.isInverterCompatible,
-        unset: build.inverter.maxOutput === 0 || !build.inverter.maxOutput,
-      }"
-        >
-        <div class="inter-medium">
-          <span [countUp]="build.inverter.maxOutput" [options]="countUpOptions" class="number"
-            >0</span
-            >
-          </div>
-          <div class="inter-medium">
-            <span class="fraction">/</span
-              ><span [countUp]="peakWattage" [options]="countUpOptions" class="number">0</span
-              ><span class="unit">W</span>
-              @if (showInverterCheck) {
-                <i class="fade-in bi-check-circle compatibility-check"></i>
-              }
-            </div>
-          </div>
+    <div class="compat-segments">
+      <!-- Inverter output -->
+      <div class="compat-segment" [ngClass]="inverterRowClass">
+        <div class="seg-head">
+          <span class="seg-label inter-regular">Output</span>
+          @if (showInverterCheck) {
+            <i class="fade-in bi bi-check-circle-fill seg-check"></i>
+          }
         </div>
+        <div class="seg-value">
+          <span [countUp]="build.inverter.maxOutput || 0" [options]="countUpOptions" class="number">0</span>
+          <span class="unit">W</span>
+        </div>
+        <div class="seg-track">
+          <div class="seg-fill" [style.width.%]="inverterProgress"></div>
+        </div>
+        <div class="seg-target inter-regular">Needs {{ peakWattage | number }} W</div>
       </div>
+
+      @if (showStep2) {
+        <div class="compat-segment fade-in" [ngClass]="batteryRowClass">
+          <div class="seg-head">
+            <span class="seg-label inter-regular">Storage</span>
+            @if (showBatteryCheck) {
+              <i class="fade-in bi bi-check-circle-fill seg-check"></i>
+            }
+          </div>
+          <div class="seg-value">
+            <span [countUp]="selectedBatteryCapacity" [options]="countUpOptions" class="number">0</span>
+            <span class="unit">Wh</span>
+          </div>
+          <div class="seg-track">
+            <div class="seg-fill" [style.width.%]="batteryProgress"></div>
+          </div>
+          <div class="seg-target inter-regular">Needs {{ batteryTarget | number }} Wh</div>
+        </div>
+      }
+
+      @if (showStep3) {
+        <div class="compat-segment fade-in" [ngClass]="solarRowClass">
+          <div class="seg-head">
+            <span class="seg-label inter-regular">Solar</span>
+            @if (showSolarCheck) {
+              <i class="fade-in bi bi-check-circle-fill seg-check"></i>
+            }
+          </div>
+          <div class="seg-value">
+            <span [countUp]="selectedSolarWattage" [options]="countUpOptions" class="number">0</span>
+            <span class="unit">W</span>
+          </div>
+          <div class="seg-track">
+            <div class="seg-fill" [style.width.%]="solarProgress"></div>
+          </div>
+          <div class="seg-target inter-regular">Needs {{ wattageNeeded | number }} W</div>
+        </div>
+      }
     </div>
-    @if (isModalOpen) {
-      <app-modal
-        [modalContent]="modalContent"
-        [modalHeader]="modalTitle"
-        (closeModal)="toggleModal()"
-      ></app-modal>
-    }
+
+    <div class="compat-actions">
+      <div class="total-price inter-medium">
+        <span class="price-label inter-regular">Total</span>
+        <span class="price-value"
+          >$<span [countUp]="totalPrice" [options]="countUpOptions">0</span></span
+        >
+      </div>
+      @if (allComplete) {
+        <button class="btn-primary finish-button fade-in inter-medium" (click)="finish()">
+          Finish
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+@if (isModalOpen) {
+  <app-modal
+    [modalContent]="modalContent"
+    [modalHeader]="modalTitle"
+    (closeModal)="toggleModal()"
+  ></app-modal>
+}

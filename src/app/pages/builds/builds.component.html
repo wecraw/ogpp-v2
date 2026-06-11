@@ -1,1 +1,123 @@
-<p>builds works!</p>
+<div class="container">
+  <div class="page-head">
+    <div class="title-row d-flex flex-column inter-medium">
+      <div class="title">Saved builds.</div>
+      <div class="subtitle">Pick up where you left off.</div>
+    </div>
+    @if (builds.length > 0) {
+      <button class="btn outlined inter-regular" (click)="createBuild()">
+        <i class="bi bi-plus-lg"></i> New build
+      </button>
+    }
+  </div>
+  <hr />
+
+  @if (builds.length === 0) {
+    <div class="empty-state fade-in">
+      <i class="bi bi-grid-1x2 empty-icon"></i>
+      <div class="empty-title inter-medium">No saved builds yet</div>
+      <div class="empty-subtitle inter-regular">
+        Build a system and it'll show up here, ready to revisit anytime.
+      </div>
+      <button class="btn-primary inter-medium" (click)="createBuild()">Create a build</button>
+    </div>
+  } @else {
+    <div class="row card-grid">
+      @for (build of builds; track build.id; let i = $index) {
+        <div class="col-lg-6 col-xl-4" [style.animation-delay.ms]="i * 55">
+          <div class="build-card">
+            <!-- Name + brand -->
+            <div class="card-head">
+              @if (editingId === build.id) {
+                <div class="rename-row">
+                  <input
+                    class="rename-input inter-regular"
+                    [(ngModel)]="draftName"
+                    (keyup.enter)="saveRename(build.id)"
+                    (keyup.escape)="cancelRename()"
+                    placeholder="Build name"
+                    autofocus
+                  />
+                  <button class="icon-btn confirm" (click)="saveRename(build.id)" aria-label="Save name">
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+                  <button class="icon-btn" (click)="cancelRename()" aria-label="Cancel rename">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+              } @else {
+                <div class="name-stack" (click)="reopen(build.id)">
+                  <div class="build-name inter-medium">{{ displayName(build) }}</div>
+                  @if (build.station) {
+                    <div class="build-brand inter-regular">{{ build.brand }} · {{ build.station }}</div>
+                  } @else {
+                    <div class="build-brand inter-regular">No station selected</div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Key specs -->
+            <div class="specs" (click)="reopen(build.id)">
+              <div class="spec">
+                <div class="spec-value inter-medium">
+                  {{ build.output | number }}<span class="spec-unit">W</span>
+                </div>
+                <div class="spec-label inter-regular">Output</div>
+              </div>
+              <div class="spec">
+                <div class="spec-value inter-medium">
+                  {{ build.capacity | number }}<span class="spec-unit">Wh</span>
+                </div>
+                <div class="spec-label inter-regular">Storage</div>
+              </div>
+              <div class="spec">
+                <div class="spec-value inter-medium">
+                  {{ build.panelWattage | number }}<span class="spec-unit">W</span>
+                </div>
+                <div class="spec-label inter-regular">Solar</div>
+              </div>
+            </div>
+
+            <!-- Meta + actions -->
+            <div class="card-foot">
+              <div class="meta inter-regular">
+                <span class="appliance-count">
+                  {{ build.applianceCount }}
+                  {{ build.applianceCount === 1 ? 'appliance' : 'appliances' }}
+                </span>
+                <span class="dot">·</span>
+                <span>Edited {{ build.lastEdited | date: 'mediumDate' }}</span>
+              </div>
+
+              @if (confirmingDeleteId === build.id) {
+                <div class="delete-confirm fade-in">
+                  <span class="confirm-text inter-regular">Delete?</span>
+                  <button class="text-btn danger inter-medium" (click)="confirmDelete(build.id)">
+                    Delete
+                  </button>
+                  <button class="text-btn inter-medium" (click)="cancelDelete()">Cancel</button>
+                </div>
+              } @else {
+                <div class="actions">
+                  <button class="action-btn primary inter-medium" (click)="reopen(build.id)">
+                    Open
+                  </button>
+                  <button class="icon-btn" (click)="startRename(build)" aria-label="Rename build" title="Rename">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="icon-btn" (click)="duplicate(build.id)" aria-label="Duplicate build" title="Duplicate">
+                    <i class="bi bi-files"></i>
+                  </button>
+                  <button class="icon-btn danger" (click)="startDelete(build.id)" aria-label="Delete build" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -11,6 +11,7 @@ let inverters: Inverter[] = [
     maxTotalInput: 7000,
     maxOutput: 4000,
     batteryCapacity: 4096,
+    maxBatteries: 3,
     price: 1999 //placeholder
   },
   {
@@ -22,6 +23,7 @@ let inverters: Inverter[] = [
     maxTotalInput: 400,
     maxOutput: 1000,
     batteryCapacity: 1070,
+    maxBatteries: 2,
     price: 799
   },
   {
@@ -33,6 +35,7 @@ let inverters: Inverter[] = [
     maxTotalInput: 1400,
     maxOutput: 2200,
     batteryCapacity: 2048,
+    maxBatteries: 2,
     price: 1199
   }
 ];

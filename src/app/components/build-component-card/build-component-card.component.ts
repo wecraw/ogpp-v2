@@ -19,17 +19,51 @@ export class BuildComponentCardComponent implements OnInit {
   @Input() selected: boolean = false;
   public isDetailMode: boolean = false;
 
+  // Quantity mode (opt-in): renders a +/- stepper instead of a single-select toggle.
+  @Input() quantityMode: boolean = false;
+  @Input() quantity: number = 0;
+  @Input() maxQuantity?: number;
+
   // Events
   @Output() onSelect: EventEmitter<boolean> = new EventEmitter();
+  @Output() quantityChange: EventEmitter<number> = new EventEmitter();
 
   // Values
   editInnerVisible: boolean = false;
 
   ngOnInit(): void {}
 
+  // In quantity mode the card's selected appearance reflects whether any units are chosen.
+  get isSelected(): boolean {
+    return this.quantityMode ? this.quantity > 0 : this.selected;
+  }
+
+  get canIncrement(): boolean {
+    return this.maxQuantity === undefined || this.quantity < this.maxQuantity;
+  }
+
   selectClicked() {
+    if (this.disabled) return;
+    if (this.quantityMode) {
+      // Body taps in quantity mode are inert; the stepper controls the count.
+      return;
+    }
     this.selected = !this.selected;
     this.onSelect.emit(this.selected);
+  }
+
+  increment(event: Event) {
+    event.stopPropagation();
+    if (this.disabled || !this.canIncrement) return;
+    this.quantity++;
+    this.quantityChange.emit(this.quantity);
+  }
+
+  decrement(event: Event) {
+    event.stopPropagation();
+    if (this.disabled || this.quantity <= 0) return;
+    this.quantity--;
+    this.quantityChange.emit(this.quantity);
   }
 
   toggleDetailMode() {
@@ -39,11 +73,11 @@ export class BuildComponentCardComponent implements OnInit {
   // Type Guards
 
   isBattery(component: Battery | Inverter | PowerSource): component is Battery {
-    return (component as Battery).batteryCapacity !== undefined;
+    return (component as Battery).batteryCapacity !== undefined && !this.isInverter(component);
   }
 
   isInverter(component: Battery | Inverter | PowerSource): component is Inverter {
-    return (component as Inverter).maxOutput !== undefined;
+    return (component as Inverter).maxOutput !== undefined && (component as Inverter).voltages !== undefined;
   }
 
   isPowerSource(component: Battery | Inverter | PowerSource): component is PowerSource {

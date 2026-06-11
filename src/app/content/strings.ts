@@ -7,3 +7,13 @@ export const INVERTER_EXPLANATION_TITLE = 'What is an inverter?';
 
 export const INVERTER_EXPLANATION =
   "Solar panels, batteries, and other types of generators typically supply DC power. However, most household appliances need AC power to run.\n\nAn inverter converts DC power from your power source into useable AC power for your appliances. Many inverters also have built-in batteries for storing the converted energy.\n\nYou'll need to choose an inverter that is capable of supplying at least as much power as your peak wattage.";
+
+export const BATTERY_EXPLANATION_TITLE = 'Why add batteries?';
+
+export const BATTERY_EXPLANATION =
+  "Batteries store energy so your appliances can keep running when the sun isn't shining — overnight, on cloudy days, or any time your panels aren't producing.\n\nYour inverter includes some built-in storage, but you'll often want to add expansion batteries to cover a full day of usage.\n\nWe recommend enough total capacity (your inverter's built-in battery plus any added batteries) to cover one day of your appliances' energy needs.";
+
+export const SOLAR_EXPLANATION_TITLE = 'How much solar do I need?';
+
+export const SOLAR_EXPLANATION =
+  "Solar panels recharge your batteries during the day. The amount you need depends on how much energy your appliances use and how much sunlight your location gets.\n\nWe size your array so it can replenish a full day of usage during an average day of sunlight in your selected seasons.\n\nAdd panels until your total solar wattage meets the recommended target.";

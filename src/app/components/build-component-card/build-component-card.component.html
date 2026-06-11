@@ -1,7 +1,7 @@
 <div
   (click)="selectClicked()"
   class="blade-container"
-  [ngClass]="{ disabled: disabled, selected: selected, detail: isDetailMode }"
+  [ngClass]="{ disabled: disabled, selected: isSelected, detail: isDetailMode, 'quantity-mode': quantityMode }"
   >
   <div class="view-row">
     <div class="edit-button" (click)="toggleDetailMode()">
@@ -14,30 +14,57 @@
     </div>
     <div class="label-container">
       <i class="main-icon bi" [ngClass]="buildComponent.icon"></i>
-      <div class="d-flex flex-column">
+      <div class="name-stack d-flex flex-column">
         <span class="name brand display inter-medium">{{ buildComponent.brand }}</span>
         <span class="name display inter-medium">{{ buildComponent.name }}</span>
       </div>
     </div>
     @if (!isDetailMode) {
       <div class="details d-flex flex-column inter-regular">
-        <!-- <div *ngIf="buildComponent.quantity > 1" class="detail">x{{ buildComponent.quantity }}</div> -->
         @if (isInverter(buildComponent)) {
           <div class="detail">
             {{ buildComponent.maxOutput }} W Output
           </div>
         }
-        @if (
-          (isInverter(buildComponent) || isBattery(buildComponent)) &&
-          buildComponent.batteryCapacity
-          ) {
-          <div
-            class="detail"
-            >
+        @if (isPowerSource(buildComponent)) {
+          <div class="detail">
+            {{ buildComponent.maxOutput }} W
+          </div>
+        }
+        @if (isInverter(buildComponent) && buildComponent.batteryCapacity) {
+          <div class="detail">
             {{ buildComponent.batteryCapacity }} Wh Capacity
           </div>
         }
+        @if (isBattery(buildComponent) && buildComponent.batteryCapacity) {
+          <div class="detail">
+            {{ buildComponent.batteryCapacity }} Wh
+          </div>
+        }
         <div class="detail">${{ buildComponent.price }}</div>
+      </div>
+    }
+    @if (quantityMode && !isDetailMode) {
+      <div class="quantity-stepper" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="step-button"
+          [disabled]="quantity <= 0"
+          (click)="decrement($event)"
+          aria-label="Remove one"
+          >
+          <i class="bi bi-dash"></i>
+        </button>
+        <span class="quantity-value inter-medium">{{ quantity }}</span>
+        <button
+          type="button"
+          class="step-button"
+          [disabled]="!canIncrement"
+          (click)="increment($event)"
+          aria-label="Add one"
+          >
+          <i class="bi bi-plus"></i>
+        </button>
       </div>
     }
   </div>
