@@ -1,9 +1,25 @@
 @import 'src/variables.scss';
 
-.appliances {
-  margin-top: 8px;
+// ============================================================
+//  Workbench layout — appliance picker + sticky summary
+// ============================================================
+.builder-layout {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 24px 80px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 372px;
+  gap: 52px;
+  align-items: start;
 }
 
+.builder-main {
+  min-width: 0;
+}
+
+// ============================================================
+//  Headings
+// ============================================================
 .title-row {
   align-self: flex-start;
   .title {
@@ -12,7 +28,6 @@
     letter-spacing: -0.022em;
     line-height: 1.1;
     color: $text-color-black;
-    margin-right: 5px;
   }
   .subtitle {
     font-size: 18px;
@@ -23,62 +38,9 @@
   }
 }
 
-.section {
-  &.zip {
-    margin-bottom: 40px;
-  }
-}
-
-.build-stats {
-  margin: 6px 0 18px;
-  display: flex;
-  .stat {
-    min-width: 150px;
-    display: flex;
-    flex-direction: column;
-    .number {
-      font-size: 40px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: $selected-blue;
-      margin-right: 3px;
-    }
-    .unit {
-      font-size: 22px;
-      font-weight: 500;
-      color: $selected-blue;
-    }
-    .description {
-      font-size: 13px;
-      color: $text-secondary;
-      margin-top: 2px;
-    }
-    &:first-of-type {
-      margin-left: 0;
-      margin-right: 48px;
-    }
-  }
-}
-
-.btn-primary {
-  margin-top: 35px;
-}
-
-.info-icon {
-  font-size: 16px;
-  margin-left: 9px;
-  margin-bottom: 3px;
-  color: $text-tertiary;
-  cursor: pointer;
-  transition: color $dur-fast $ease-out;
-  &:hover {
-    color: $selected-blue;
-  }
-}
-
 .appliance-group {
-  margin-top: 26px;
-  margin-bottom: 18px;
+  margin-top: 30px;
+  margin-bottom: 4px;
   .group-title {
     font-size: 15px;
     font-weight: 600;
@@ -88,43 +50,160 @@
   }
 }
 
+.appliance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px 18px;
+  margin-top: 4px;
+}
+
 hr {
   margin-top: 10px;
 }
 
-input {
-  width: 200px;
-  margin-top: 12px;
+// ============================================================
+//  Sticky summary panel
+// ============================================================
+.builder-summary {
+  position: sticky;
+  top: 80px;
 }
 
-mini-card {
-  width: fit-content;
+.summary-card {
+  background: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
+  padding: 22px 22px 24px;
 }
 
-.content-below-md {
-  display: none;
+.summary-eyebrow {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-tertiary;
 }
 
-.content-above-md {
-  display: flex;
+.summary-card hr {
+  margin: 18px 0;
 }
 
-@media (max-width: 767.98px) {
-  .content-below-md {
+.summary-section {
+  .summary-label {
     display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: $text-color-black;
   }
-
-  .content-above-md {
-    display: none;
+  .summary-hint {
+    font-size: 13px;
+    color: $text-tertiary;
+    margin-top: 1px;
+    margin-bottom: 10px;
+  }
+  input {
+    width: 100%;
+    margin-top: 0;
   }
 }
 
-.step2-wrapper {
-  min-height: 100vh;
+// Live running totals
+.build-stats {
+  margin-top: 14px;
+  display: flex;
+  gap: 28px;
+  .stat {
+    display: flex;
+    flex-direction: column;
+    .number {
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: $selected-blue;
+      margin-right: 2px;
+    }
+    .unit {
+      font-size: 19px;
+      font-weight: 500;
+      color: $selected-blue;
+    }
+    .description {
+      font-size: 13px;
+      color: $text-secondary;
+      margin-top: 2px;
+    }
+  }
 }
 
-.scroll-anchor {
-  height: 1px;
-  margin-bottom: 10px;
-  margin-top: 10px;
+.season-grid {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  row-gap: 4px;
+}
+
+// ============================================================
+//  Call to action
+// ============================================================
+.summary-cta {
+  margin-top: 24px;
+  .btn-primary {
+    width: 100%;
+    margin-top: 0;
+  }
+  .cta-hint {
+    margin-top: 10px;
+    font-size: 13px;
+    color: $text-tertiary;
+    text-align: center;
+  }
+  .loader {
+    margin: 14px auto 6px;
+  }
+}
+
+.info-icon {
+  font-size: 15px;
+  margin-left: 8px;
+  color: $text-tertiary;
+  cursor: pointer;
+  transition: color $dur-fast $ease-out;
+  &:hover {
+    color: $selected-blue;
+  }
+}
+
+.lookup-error {
+  margin-top: 8px;
+  color: $error-red;
+  font-size: 13px;
+}
+
+// ============================================================
+//  Responsive — collapse to a single column
+// ============================================================
+@media (max-width: 991.98px) {
+  .builder-layout {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .builder-summary {
+    position: static;
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .builder-layout {
+    padding: 8px 12px 64px;
+  }
+
+  .summary-card {
+    padding: 20px 16px 22px;
+  }
 }

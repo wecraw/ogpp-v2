@@ -9,7 +9,7 @@ import {
 import { allAppliances } from '../../content/appliances';
 import { ApplianceCardComponent } from '../../components/appliance-card/appliance-card.component';
 import { CommonModule } from '@angular/common';
-import { SunHoursService } from '../../services/sun-hours.service';
+import { SunHoursLookupError, SunHoursService } from '../../services/sun-hours.service';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { LOCATION_DISCLAIMER, LOCATION_DISCLAIMER_TITLE } from '../../content/strings';
@@ -22,6 +22,7 @@ import { CalculationUtilsService } from '../../services/calculation-utils.servic
 import { BuildService } from '../../services/build.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ActivatedRoute, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'builder',
@@ -55,20 +56,16 @@ export class BuilderComponent implements OnInit {
   public zipCode: string = '';
   public zipErrorLength: boolean = false;
   public zipErrorFormat: boolean = false;
+  public sunHoursError: string = '';
 
   // DOM controllers
   public generatingBuild: boolean = false;
-  public showStep2: boolean = false;
   public isModalOpen: boolean = false;
   public countUpOptionsPeakWattage = { duration: 1.5, startVal: 0 };
   public countUpOptionsTotalWattHours = { duration: 1.5, startVal: 0 };
 
   // Inputs
   @Input() build: Build = defaultBuild;
-
-  // Debug
-  public debug = true;
-  // public showResults: boolean = false; //debug
 
   constructor(
     private router: Router,
@@ -86,7 +83,6 @@ export class BuilderComponent implements OnInit {
         const existingBuild = this.buildService.getBuild(buildId);
         if (existingBuild) {
           this.build = existingBuild;
-          this.showStep2 = true;
           this.zipCode = this.build.zipCode;
           this.updateTotals();
 
@@ -157,66 +153,36 @@ export class BuilderComponent implements OnInit {
       this.build.seasons = this.build.seasons.filter(season => season !== selectedSeason);
   }
 
-  // Modify getSunHours to return a Promise
-  getSunHours(zip: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (this.debug) {
-        this.build.zipCode = zip;
-        this.build.monthlyGhi = {
-          jan: 1,
-          feb: 1,
-          mar: 1,
-          apr: 1,
-          may: 1,
-          jun: 1,
-          jul: 1,
-          aug: 1,
-          sep: 1,
-          oct: 1,
-          nov: 1,
-          dec: 1
-        };
-        resolve();
-        return;
-      }
+  async getSunHours(zip: string): Promise<void> {
+    this.validateZip(true);
 
-      if (this.zipErrorFormat || this.zipErrorLength) {
-        reject('Invalid ZIP code.');
-        return;
-      }
+    if (this.zipErrorFormat || this.zipErrorLength) {
+      throw new SunHoursLookupError('unknown-zip', 'Invalid ZIP code.');
+    }
 
-      if (!this.build.monthlyGhi || this.build.zipCode !== zip) {
-        this.build.zipCode = zip;
-        this.sunHoursService.getSunHoursByZip(zip).subscribe({
-          next: (response: any) => {
-            this.build.monthlyGhi = response.outputs.avg_ghi.monthly;
-            resolve();
-          },
-          error: (error: any) => {
-            console.error('Error fetching sun hours:', error);
-            reject(error);
-          }
-        });
-      } else {
-        resolve();
-      }
-    });
+    if (this.build.monthlyGhi && this.build.zipCode === zip) {
+      return;
+    }
+
+    const monthlyGhi = await firstValueFrom(this.sunHoursService.getSunHoursByZip(zip));
+    this.build.zipCode = zip;
+    this.build.monthlyGhi = monthlyGhi;
   }
 
   updateTotals() {
-    if (this.showStep2) {
-      this.countUpOptionsPeakWattage = { duration: 0.7, startVal: this.peakWattage };
-      this.countUpOptionsTotalWattHours = { duration: 0.7, startVal: this.totalWattHours };
-      this.changeDetectorRef.detectChanges();
-    }
+    // Animate the running totals up from their current value on every change.
+    this.countUpOptionsPeakWattage = { duration: 0.7, startVal: this.peakWattage };
+    this.countUpOptionsTotalWattHours = { duration: 0.7, startVal: this.totalWattHours };
+    this.changeDetectorRef.detectChanges();
 
     this.totalWattHours = this.calculationUtils.totalWattHours(this.build);
     this.peakWattage = this.calculationUtils.peakWattage(this.build);
   }
 
-  // Modify generateBuild to await the completion of getSunHours
   async generateBuild() {
     this.generatingBuild = true;
+    this.sunHoursError = '';
+
     try {
       await this.getSunHours(this.zipCode);
       this.build.id = uuidv4();
@@ -231,9 +197,7 @@ export class BuilderComponent implements OnInit {
       }, 1200);
     } catch (error) {
       this.generatingBuild = false;
-      console.error('Failed to generate build:', error);
-    } finally {
-      //
+      this.sunHoursError = this.getSunHoursErrorMessage(error);
     }
   }
 
@@ -244,28 +208,65 @@ export class BuilderComponent implements OnInit {
     if (checkLength) this.zipErrorLength = this.zipCode.length !== 5;
   }
 
+  onZipChange() {
+    this.validateZip(false);
+    this.zipErrorLength = false;
+    this.sunHoursError = '';
+  }
+
   isAnyApplianceSelected() {
     return this.build.appliances.length > 0;
   }
 
-  // DOM Helpers ============================================================
+  // Readiness ==============================================================
+  // The single summary CTA validates all three inputs at once; `ctaHint`
+  // tells the user exactly what's still missing.
 
-  enableStep2() {
-    this.showStep2 = true;
-
-    setTimeout(() => {
-      const element = document.getElementById('step2');
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'nearest'
-        });
-      }
-    }, 1);
+  private get hasZip(): boolean {
+    return this.zipCode.length === 5 && !this.zipErrorFormat;
   }
+
+  private get hasSeason(): boolean {
+    return this.build.seasons.length > 0;
+  }
+
+  get canGenerate(): boolean {
+    return this.isAnyApplianceSelected() && this.hasZip && this.hasSeason;
+  }
+
+  get ctaHint(): string {
+    const missing: string[] = [];
+    if (!this.isAnyApplianceSelected()) missing.push('an appliance');
+    if (!this.hasZip) missing.push('a ZIP code');
+    if (!this.hasSeason) missing.push('a season');
+
+    if (missing.length === 0) return '';
+    if (missing.length === 1) return `Add ${missing[0]} to continue`;
+
+    const last = missing.pop();
+    return `Add ${missing.join(', ')} and ${last} to continue`;
+  }
+
+  // DOM Helpers ============================================================
 
   toggleModal() {
     this.isModalOpen = !this.isModalOpen;
+  }
+
+  private getSunHoursErrorMessage(error: unknown): string {
+    if (error instanceof SunHoursLookupError) {
+      switch (error.code) {
+        case 'unknown-zip':
+          return "We couldn't find that ZIP code. Check it and try again.";
+        case 'timeout':
+          return 'The solar data lookup took too long. Please try again.';
+        case 'no-data':
+          return "Solar data isn't available for that ZIP code. Try a nearby ZIP code.";
+        case 'unavailable':
+          return 'The solar data service is unavailable right now. Please try again later.';
+      }
+    }
+
+    return 'We could not look up solar data right now. Please try again later.';
   }
 }
