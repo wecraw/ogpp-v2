@@ -33,6 +33,10 @@ export interface Build {
   inverter: Inverter;
   batteries: Battery[];
 
+  // Days of usage the battery bank should cover. Optional so builds persisted before this
+  // field existed still load — consumers fall back to a sensible default when it's absent.
+  daysOfAutonomy?: number;
+
   createdOn: Date;
   lastEdited: Date;
 }
