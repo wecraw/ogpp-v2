@@ -48,6 +48,19 @@ export class BuildComponent implements OnInit {
   public peakWattage: number = 0;
   public totalWattHours: number = 0;
   public wattageNeeded: number = 0;
+  // Worst-season daily sun-hours that drive the solar target — surfaced in the "why this size?"
+  // breakdowns so the user can see the number behind the recommendation.
+  public worstSeasonSunHours: number = 0;
+
+  // Exposed for the template's battery breakdown so the autonomy assumption stays in one place.
+  public readonly daysOfAutonomy = DAYS_OF_AUTONOMY;
+
+  // Which inline "why this size?" breakdown panels are expanded, keyed by step.
+  public whyOpen: { inverter: boolean; battery: boolean; solar: boolean } = {
+    inverter: false,
+    battery: false,
+    solar: false
+  };
 
   // Matching products
   public inverters: Inverter[] = [];
@@ -92,12 +105,26 @@ export class BuildComponent implements OnInit {
       this.peakWattage = this.calculationUtils.peakWattage(this.build);
       this.totalWattHours = this.calculationUtils.totalWattHours(this.build);
       this.wattageNeeded = this.calculationUtils.wattageNeeded(this.build);
+      this.worstSeasonSunHours = this.calculationUtils.getSunHoursBySeason(this.build);
       this.inverters = this.productSelectorService.getMatchingInverters(this.build);
       this.restoreSelections();
     });
   }
 
   // ----- Targets -----
+
+  get builtInBatteryCard(): Battery | null {
+    const cap = this.build.inverter?.batteryCapacity;
+    if (!cap) return null;
+    return {
+      id: 'built-in',
+      name: 'Built-in Battery',
+      brand: this.build.inverter!.brand,
+      icon: 'bi-battery-full',
+      batteryCapacity: cap,
+      price: 0
+    };
+  }
 
   get batteryTarget(): number {
     return this.totalWattHours * DAYS_OF_AUTONOMY;
@@ -142,6 +169,7 @@ export class BuildComponent implements OnInit {
     this.recalculate();
     this.save();
     this.confirmCompatibility('inverter');
+    this.confirmCompatibility('battery');
 
     setTimeout(() => {
       this.showStep2 = !!this.build.inverter.maxOutput;
@@ -341,6 +369,11 @@ export class BuildComponent implements OnInit {
     } else if (device === 'solar') {
       reveal(v => (this.showSolarCheck = v), this.isSolarCompatible);
     }
+  }
+
+  // Expand/collapse a step's inline "why this size?" math breakdown.
+  toggleWhy(step: 'inverter' | 'battery' | 'solar') {
+    this.whyOpen[step] = !this.whyOpen[step];
   }
 
   // DOM Helpers
