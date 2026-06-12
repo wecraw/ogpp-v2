@@ -1,42 +1,76 @@
 @import 'src/variables.scss';
 
+// Summary header: an accent-tinted icon tile pairs with a baseline-aligned count on
+// the left, while the edit action is pulled to the right as a quiet icon button. Reads
+// as one cohesive bar rather than a stacked stat + button.
 .build-stats {
   display: flex;
-  flex-direction: column;
-  .stat {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .stat-cluster {
     display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .appliance-chip {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    border-radius: $radius-md;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    color: $selected-blue;
+    background-color: $accent-tint;
+    border: 1px solid rgba(0, 113, 227, 0.12);
+  }
+
+  .stat-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .stat-count {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
     color: $text-color-black;
-    &.unset {
-      color: $grey-light !important;
-    }
-    &.compatible {
-      color: $selected-blue !important;
-    }
-    &.incompatible {
-      color: $error-red;
-    }
+
     .number {
-      margin-right: 3px;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
     }
-    .fraction {
-      font-weight: 300;
-      margin: 0 2px;
-    }
-    .unit {
-      font-size: 22px;
+    .count-label {
+      font-size: 16px;
       font-weight: 500;
-    }
-    .description {
-      font-size: 14px;
       color: $text-secondary;
     }
-    &.appliance-count {
-      &:first-of-type {
-        margin-right: 15px;
-      }
+  }
+
+  .stat-sub {
+    margin-top: 3px;
+    font-size: 12.5px;
+    letter-spacing: 0.005em;
+    color: $text-tertiary;
+  }
+
+  .edit-appliances {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 18px;
+    font-size: 14px;
+
+    i {
+      font-size: 14px;
     }
   }
 }
@@ -251,7 +285,7 @@
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 // The numbered spine turns the three steps into a guided sequence: each badge
@@ -335,39 +369,143 @@ build-component-card {
   }
 }
 
-// Inline "why this size?" affordance: a quiet text button under each step's subtitle
-// that toggles the math breakdown sourced from CalculationUtilsService.
-.why-toggle {
-  align-self: flex-start;
-  margin-top: 6px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 13px;
-  color: $selected-blue;
+// The sizing recommendation, surfaced inline under each step's subtitle. Reframes the
+// former context-free "Why N W?" link into an explicit, couched recommendation: a quiet
+// tinted pill that states the target up front, with a (?) affordance that toggles the
+// math breakdown sourced from CalculationUtilsService.
+.recommendation {
+  // Pulled out of the title block to sit flush with the section's left edge, so it
+  // shares one column with the why-panel it toggles and the card grid below. The
+  // bottom margin is the closed-state gap to the cards; when expanded it tightens so
+  // the open panel reads as hugging the pill (it transitions in sync with the drawer).
+  margin-bottom: 16px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 11px;
+  padding: 7px 13px 7px 15px;
+  border: 1px solid rgba(0, 113, 227, 0.16);
+  border-radius: $radius-pill;
+  background-color: $accent-tint;
+  cursor: pointer;
+  transition: background-color $dur-fast $ease-out, border-color $dur-fast $ease-out,
+    box-shadow $dur-fast $ease-out, margin-bottom 0.34s $ease-out;
 
-  i {
-    font-size: 11px;
-    transition: transform $dur-fast $ease-out;
+  &:hover {
+    background-color: rgba(0, 113, 227, 0.09);
+    border-color: rgba(0, 113, 227, 0.28);
   }
-  &.open i {
-    transform: rotate(180deg);
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px $accent-ring;
+  }
+
+  .rec-label {
+    font-size: 12.5px;
+    letter-spacing: 0.005em;
+    color: $text-secondary;
+    white-space: nowrap;
+  }
+
+  // Divider-separated figure block keeps the claim ("Recommended minimum") and the
+  // value ("3,213 W output") legible as two distinct reading beats.
+  .rec-figure {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    padding-left: 11px;
+    border-left: 1px solid rgba(0, 113, 227, 0.18);
+  }
+  .rec-value {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: $selected-blue;
+    white-space: nowrap;
+  }
+  .rec-unit {
+    font-size: 12.5px;
+    color: $text-secondary;
+  }
+
+  .rec-icon {
+    font-size: 15px;
+    line-height: 1;
+    color: $text-tertiary;
+    transition: color $dur-fast $ease-out;
+  }
+  &:hover .rec-icon {
+    color: $selected-blue;
+  }
+
+  // Expanded: the (?) reads as engaged and the pill warms to match the open breakdown.
+  &.expanded {
+    margin-bottom: 8px;
+    background-color: rgba(0, 113, 227, 0.09);
+    border-color: rgba(0, 113, 227, 0.28);
+    .rec-icon {
+      color: $selected-blue;
+    }
+  }
+
+  // On narrow screens drop the trailing unit word and tighten spacing so even a
+  // four-digit target ("8,192 Wh") never overruns the viewport. The bottom tracker
+  // already names Output/Storage/Solar, so the word is redundant here anyway.
+  @media (max-width: 600px) {
+    gap: 9px;
+    padding: 7px 12px 7px 14px;
+    max-width: 100%;
+
+    .rec-unit {
+      display: none;
+    }
+    .rec-figure {
+      padding-left: 9px;
+    }
   }
 }
 
 // The expanded breakdown reads as a small ledger: a plain-language lead line, then
 // one row per input with the resulting target emphasized at the bottom.
+// Drawer mechanism: the panel stays in the DOM and the wrapper animates its real
+// height via the grid 0fr→1fr technique, so the cards below glide down in sync with
+// the reveal instead of snapping into reserved space. The inner clips the overflow as
+// the track grows; the bottom gap lives inside it so it collapses away when closed.
+.why-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.34s $ease-out;
+
+  &.open {
+    grid-template-rows: 1fr;
+  }
+}
+
+.why-collapse-inner {
+  // overflow:hidden both clips the reveal and establishes a BFC, so the panel's bottom
+  // margin stays contained and collapses to nothing when the track is at 0fr (no
+  // padding here — padding ignores min-height:0 and would prop the closed track open).
+  overflow: hidden;
+  min-height: 0;
+}
+
 .why-panel {
-  margin: -4px 0 22px;
+  margin-bottom: 24px;
   padding: 16px 18px;
   background-color: $page-bg;
   border: 1px solid $border-hairline;
   border-radius: $radius-md;
   max-width: 520px;
+
+  // Content settles in (fade + small rise) alongside the height reveal so the panel
+  // feels like it eases out rather than just being uncovered.
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.3s $ease-out, transform 0.34s $ease-out;
+
+  .why-collapse.open & {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   .why-lead {
     margin: 0 0 12px;
@@ -414,31 +552,6 @@ build-component-card {
 
 .bi-plus {
   font-size: 24px;
-}
-
-.button-container {
-  margin-top: auto;
-  margin-bottom: auto;
-  .btn {
-    &.add {
-      padding: 0 10px;
-      padding-right: 20px;
-      width: fit-content;
-      margin: 20px 0;
-    }
-    &.outlined {
-      padding: 7px 18px;
-      font-size: 14px;
-    }
-  }
-  .button-content {
-    display: flex;
-    align-items: center;
-  }
-
-  .button-content i {
-    margin-right: 5px;
-  }
 }
 
 .title-row {

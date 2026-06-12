@@ -1,20 +1,26 @@
 @if (!buildNotFound) {
   <div class="container">
     <div class="fade-in build-stats">
-      <div class="stat appliance-count">
-        <div class="inter-medium">
-          <span [countUp]="build.appliances.length" [options]="countUpOptions" class="number">0</span>
+      <div class="stat-cluster">
+        <div class="appliance-chip">
+          <i class="bi bi-lightning-charge-fill"></i>
         </div>
-        @if (build.appliances.length > 1) {
-          <span class="description inter-regular">Appliances</span>
-        }
-        @if (build.appliances.length === 1) {
-          <span class="description inter-regular">Appliance</span>
-        }
+        <div class="stat-text">
+          <div class="stat-count inter-medium">
+            <span [countUp]="build.appliances.length" [options]="countUpOptions" class="number"
+              >0</span
+            >
+            <span class="count-label inter-regular">{{
+              build.appliances.length === 1 ? 'Appliance' : 'Appliances'
+            }}</span>
+          </div>
+          <span class="stat-sub inter-regular">in this build</span>
+        </div>
       </div>
-      <div class="button-container">
-        <button class="btn outlined inter-regular" (click)="editAppliances()">Edit appliances</button>
-      </div>
+      <button class="btn outlined inter-regular edit-appliances" (click)="editAppliances()">
+        <i class="bi bi-sliders"></i>
+        <span>Edit appliances</span>
+      </button>
     </div>
     <hr />
 
@@ -34,24 +40,35 @@
             Converts to AC power
             <i class="bi bi-question-circle info-icon" (click)="toggleModal('inverter')"></i>
           </div>
-          <button type="button" class="why-toggle inter-regular" [class.open]="whyOpen.inverter" (click)="toggleWhy('inverter')">
-            Why {{ peakWattage | number }} W?
-            <i class="bi bi-chevron-down"></i>
-          </button>
         </div>
       </div>
-      @if (whyOpen.inverter) {
-        <div class="why-panel fade-in">
-          <p class="why-lead inter-regular">
-            Your appliances draw up to <strong>{{ peakWattage | number }} W</strong> when running at the
-            same time, so your inverter must supply at least that much continuous output.
-          </p>
-          <div class="why-row">
-            <span class="why-label inter-regular">Peak draw (all appliances at once)</span>
-            <span class="why-value inter-medium">{{ peakWattage | number }} W</span>
+      <button
+        type="button"
+        class="recommendation"
+        [class.expanded]="whyOpen.inverter"
+        (click)="toggleWhy('inverter')"
+        [attr.aria-expanded]="whyOpen.inverter"
+      >
+        <span class="rec-label inter-regular">Recommended minimum</span>
+        <span class="rec-figure">
+          <span class="rec-value inter-medium">{{ peakWattage | number }} W</span>
+          <span class="rec-unit inter-regular">output</span>
+        </span>
+        <i
+          class="bi rec-icon"
+          [ngClass]="whyOpen.inverter ? 'bi-question-circle-fill' : 'bi-question-circle'"
+        ></i>
+      </button>
+      <div class="why-collapse" [class.open]="whyOpen.inverter">
+        <div class="why-collapse-inner" [attr.aria-hidden]="!whyOpen.inverter">
+          <div class="why-panel">
+            <p class="why-lead inter-regular mb-0">
+              Your appliances draw up to <strong>{{ peakWattage | number }} W</strong> when running
+              at the same time, so your inverter must supply at least that much continuous output.
+            </p>
           </div>
         </div>
-      }
+      </div>
       <div class="row card-grid">
         @for (inverter of inverters; track inverter.id) {
           <div class="col-lg-5 col-xl-4">
@@ -82,34 +99,57 @@
               Store energy for later
               <i class="bi bi-question-circle info-icon" (click)="toggleModal('battery')"></i>
             </div>
-            <button type="button" class="why-toggle inter-regular" [class.open]="whyOpen.battery" (click)="toggleWhy('battery')">
-              Why {{ batteryTarget | number }} Wh?
-              <i class="bi bi-chevron-down"></i>
-            </button>
           </div>
         </div>
-        @if (whyOpen.battery) {
-          <div class="why-panel fade-in">
-            <p class="why-lead inter-regular">
-              Your appliances use <strong>{{ totalWattHours | number }} Wh</strong> over a day. We size
-              storage to cover {{ daysOfAutonomy }} day{{ daysOfAutonomy === 1 ? '' : 's' }} of use
-              (your inverter's built-in battery counts toward this).
-            </p>
-            <div class="why-row">
-              <span class="why-label inter-regular">Daily energy use</span>
-              <span class="why-value inter-medium">{{ totalWattHours | number }} Wh/day</span>
-            </div>
-            <div class="why-row">
-              <span class="why-label inter-regular">Days of autonomy</span>
-              <span class="why-value inter-medium">× {{ daysOfAutonomy }}</span>
-            </div>
-            <div class="why-row total">
-              <span class="why-label inter-regular">Target storage</span>
-              <span class="why-value inter-medium">{{ batteryTarget | number }} Wh</span>
+        <button
+          type="button"
+          class="recommendation"
+          [class.expanded]="whyOpen.battery"
+          (click)="toggleWhy('battery')"
+          [attr.aria-expanded]="whyOpen.battery"
+        >
+          <span class="rec-label inter-regular">Recommended minimum</span>
+          <span class="rec-figure">
+            <span class="rec-value inter-medium">{{ batteryTarget | number }} Wh</span>
+            <span class="rec-unit inter-regular">storage</span>
+          </span>
+          <i
+            class="bi rec-icon"
+            [ngClass]="whyOpen.battery ? 'bi-question-circle-fill' : 'bi-question-circle'"
+          ></i>
+        </button>
+        <div class="why-collapse" [class.open]="whyOpen.battery">
+          <div class="why-collapse-inner" [attr.aria-hidden]="!whyOpen.battery">
+            <div class="why-panel">
+              <p class="why-lead inter-regular">
+                Your appliances use <strong>{{ totalWattHours | number }} Wh</strong> over a day. We
+                size storage to cover {{ daysOfAutonomy }} day{{ daysOfAutonomy === 1 ? '' : 's' }}
+                of use (your inverter's built-in battery counts toward this).
+              </p>
+              <div class="why-row">
+                <span class="why-label inter-regular">Daily energy use</span>
+                <span class="why-value inter-medium">{{ totalWattHours | number }} Wh/day</span>
+              </div>
+              <div class="why-row">
+                <span class="why-label inter-regular">Days of autonomy</span>
+                <span class="why-value inter-medium">× {{ daysOfAutonomy }}</span>
+              </div>
+              <div class="why-row total">
+                <span class="why-label inter-regular">Target storage</span>
+                <span class="why-value inter-medium">{{ batteryTarget | number }} Wh</span>
+              </div>
             </div>
           </div>
-        }
+        </div>
         <div class="row card-grid">
+          @if (builtInBatteryCard) {
+            <div class="col-lg-5 col-xl-4">
+              <build-component-card
+                [buildComponent]="builtInBatteryCard"
+                [locked]="true"
+              ></build-component-card>
+            </div>
+          }
           @for (battery of batteries; track battery.id; let i = $index) {
             <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
               <build-component-card
@@ -142,40 +182,57 @@
               Generate renewable energy
               <i class="bi bi-question-circle info-icon" (click)="toggleModal('solar')"></i>
             </div>
-            <button type="button" class="why-toggle inter-regular" [class.open]="whyOpen.solar" (click)="toggleWhy('solar')">
-              Why {{ wattageNeeded | number }} W?
-              <i class="bi bi-chevron-down"></i>
-            </button>
           </div>
         </div>
-        @if (whyOpen.solar) {
-          <div class="why-panel fade-in">
-            <p class="why-lead inter-regular">
-              To replenish a full day of use ({{ totalWattHours | number }} Wh) during your worst
-              selected season, your panels need enough wattage to make that energy back in a typical
-              day of sun.
-            </p>
-            <div class="why-row">
-              <span class="why-label inter-regular">Daily energy to replenish</span>
-              <span class="why-value inter-medium">{{ totalWattHours | number }} Wh</span>
-            </div>
-            <div class="why-row">
-              <span class="why-label inter-regular">
-                Worst-season sun
-                @if (build.seasons.length) {
-                  ({{ build.seasons.join(', ') | titlecase }})
-                }
-              </span>
-              <span class="why-value inter-medium">{{ worstSeasonSunHours | number: '1.0-1' }} h/day</span>
-            </div>
-            <div class="why-row total">
-              <span class="why-label inter-regular">
-                {{ totalWattHours | number }} Wh ÷ {{ worstSeasonSunHours | number: '1.0-1' }} h
-              </span>
-              <span class="why-value inter-medium">{{ wattageNeeded | number }} W</span>
+        <button
+          type="button"
+          class="recommendation"
+          [class.expanded]="whyOpen.solar"
+          (click)="toggleWhy('solar')"
+          [attr.aria-expanded]="whyOpen.solar"
+        >
+          <span class="rec-label inter-regular">Recommended minimum</span>
+          <span class="rec-figure">
+            <span class="rec-value inter-medium">{{ wattageNeeded | number }} W</span>
+            <span class="rec-unit inter-regular">of panels</span>
+          </span>
+          <i
+            class="bi rec-icon"
+            [ngClass]="whyOpen.solar ? 'bi-question-circle-fill' : 'bi-question-circle'"
+          ></i>
+        </button>
+        <div class="why-collapse" [class.open]="whyOpen.solar">
+          <div class="why-collapse-inner" [attr.aria-hidden]="!whyOpen.solar">
+            <div class="why-panel">
+              <p class="why-lead inter-regular">
+                To replenish a full day of use ({{ totalWattHours | number }} Wh) during your worst
+                selected season, your panels need enough wattage to make that energy back in a
+                typical day of sun.
+              </p>
+              <div class="why-row">
+                <span class="why-label inter-regular">Daily energy to replenish</span>
+                <span class="why-value inter-medium">{{ totalWattHours | number }} Wh</span>
+              </div>
+              <div class="why-row">
+                <span class="why-label inter-regular">
+                  Worst-season sun
+                  @if (build.seasons.length) {
+                    ({{ build.seasons.join(', ') | titlecase }})
+                  }
+                </span>
+                <span class="why-value inter-medium"
+                  >{{ worstSeasonSunHours | number: '1.0-1' }} h/day</span
+                >
+              </div>
+              <div class="why-row total">
+                <span class="why-label inter-regular">
+                  {{ totalWattHours | number }} Wh ÷ {{ worstSeasonSunHours | number: '1.0-1' }} h
+                </span>
+                <span class="why-value inter-medium">{{ wattageNeeded | number }} W</span>
+              </div>
             </div>
           </div>
-        }
+        </div>
         <div class="row card-grid">
           @for (panel of solarPanels; track panel.id; let i = $index) {
             <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
@@ -205,7 +262,9 @@
           }
         </div>
         <div class="seg-value">
-          <span [countUp]="build.inverter.maxOutput || 0" [options]="countUpOptions" class="number">0</span>
+          <span [countUp]="build.inverter.maxOutput || 0" [options]="countUpOptions" class="number"
+            >0</span
+          >
           <span class="unit">W</span>
         </div>
         <div class="seg-track">
@@ -223,7 +282,9 @@
             }
           </div>
           <div class="seg-value">
-            <span [countUp]="selectedBatteryCapacity" [options]="countUpOptions" class="number">0</span>
+            <span [countUp]="selectedBatteryCapacity" [options]="countUpOptions" class="number"
+              >0</span
+            >
             <span class="unit">Wh</span>
           </div>
           <div class="seg-track">
@@ -242,7 +303,9 @@
             }
           </div>
           <div class="seg-value">
-            <span [countUp]="selectedSolarWattage" [options]="countUpOptions" class="number">0</span>
+            <span [countUp]="selectedSolarWattage" [options]="countUpOptions" class="number"
+              >0</span
+            >
             <span class="unit">W</span>
           </div>
           <div class="seg-track">

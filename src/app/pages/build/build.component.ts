@@ -113,6 +113,19 @@ export class BuildComponent implements OnInit {
 
   // ----- Targets -----
 
+  get builtInBatteryCard(): Battery | null {
+    const cap = this.build.inverter?.batteryCapacity;
+    if (!cap) return null;
+    return {
+      id: 'built-in',
+      name: 'Built-in Battery',
+      brand: this.build.inverter!.brand,
+      icon: 'bi-battery-full',
+      batteryCapacity: cap,
+      price: 0
+    };
+  }
+
   get batteryTarget(): number {
     return this.totalWattHours * DAYS_OF_AUTONOMY;
   }
@@ -156,6 +169,7 @@ export class BuildComponent implements OnInit {
     this.recalculate();
     this.save();
     this.confirmCompatibility('inverter');
+    this.confirmCompatibility('battery');
 
     setTimeout(() => {
       this.showStep2 = !!this.build.inverter.maxOutput;

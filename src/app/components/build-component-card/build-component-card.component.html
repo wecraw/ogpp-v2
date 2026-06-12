@@ -1,17 +1,24 @@
 <div
   (click)="selectClicked()"
   class="blade-container"
-  [ngClass]="{ disabled: disabled, selected: isSelected, detail: isDetailMode, 'quantity-mode': quantityMode }"
+  [ngClass]="{ disabled: disabled, selected: isSelected, detail: isDetailMode, 'quantity-mode': quantityMode, locked: locked }"
   >
   <div class="view-row">
-    <div class="edit-button" (click)="toggleDetailMode()">
-      @if (!isDetailMode) {
-        <i class="bi bi-card-list"></i>
-      }
-      @if (isDetailMode) {
-        <i class="bi bi-x-lg"></i>
-      }
-    </div>
+    @if (locked) {
+      <div class="included-badge inter-medium">
+        <i class="bi bi-check-lg"></i>
+        Included
+      </div>
+    } @else {
+      <div class="edit-button" (click)="toggleDetailMode()">
+        @if (!isDetailMode) {
+          <i class="bi bi-card-list"></i>
+        }
+        @if (isDetailMode) {
+          <i class="bi bi-x-lg"></i>
+        }
+      </div>
+    }
     <div class="label-container">
       <i class="main-icon bi" [ngClass]="buildComponent.icon"></i>
       <div class="name-stack d-flex flex-column">
@@ -41,7 +48,11 @@
             {{ buildComponent.batteryCapacity }} Wh
           </div>
         }
-        <div class="detail">${{ buildComponent.price }}</div>
+        @if (locked) {
+          <div class="detail included-price inter-medium">Included</div>
+        } @else {
+          <div class="detail">${{ buildComponent.price }}</div>
+        }
       </div>
     }
     @if (quantityMode && !isDetailMode) {
