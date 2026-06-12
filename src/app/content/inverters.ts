@@ -3,6 +3,27 @@ import { assignStableIds } from './catalog-utils';
 
 let inverters: Inverter[] = [
   {
+    name: 'DELTA Pro',
+    brand: 'EcoFlow',
+    icon: 'bi-battery-charging',
+    voltages: [120],
+    maxSolarInput: 1600,
+    maxTotalInput: 6500,
+    maxOutput: 3600,
+    batteryCapacity: 3600,
+    maxBatteries: 2,
+    compatibleBatteryIds: ['ecoflow-delta-pro-smart-battery'],
+    compatiblePowerSourceIds: [
+      'ecoflow-400w-portable-solar-panel',
+      'ecoflow-220w-bifacial-panel',
+      'ecoflow-100w-portable-panel'
+    ],
+    price: 1699,
+    listPrice: 3699,
+    productUrl: 'https://us.ecoflow.com/products/delta-pro-portable-power-station',
+    dealVerifiedOn: '2026-06-12'
+  },
+  {
     name: 'DELTA Pro 3',
     brand: 'EcoFlow',
     icon: 'bi-battery-charging',
@@ -11,8 +32,17 @@ let inverters: Inverter[] = [
     maxTotalInput: 7000,
     maxOutput: 4000,
     batteryCapacity: 4096,
-    maxBatteries: 3,
-    price: 1999 //placeholder
+    maxBatteries: 2,
+    compatibleBatteryIds: ['ecoflow-delta-pro-smart-battery'],
+    compatiblePowerSourceIds: [
+      'ecoflow-400w-portable-solar-panel',
+      'ecoflow-220w-bifacial-panel',
+      'ecoflow-100w-portable-panel'
+    ],
+    price: 2599,
+    listPrice: 3699,
+    productUrl: 'https://us.ecoflow.com/products/delta-pro-3-portable-power-station',
+    dealVerifiedOn: '2026-06-12'
   },
   {
     name: 'Solar Generator 1000 v2',

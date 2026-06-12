@@ -1,12 +1,12 @@
-export interface Battery {
+import { ProductPricing } from './ProductPricing';
+
+export interface Battery extends ProductPricing {
   name: string;
   brand: string;
   id?: string;
   icon?: string;
 
   batteryCapacity: number;
-
-  price: number;
 }
 
 export const defaultBattery: Battery = {

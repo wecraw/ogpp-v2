@@ -32,6 +32,7 @@ export interface Build {
   powerSources: PowerSource[];
   inverter: Inverter;
   batteries: Battery[];
+  bundleOfferId?: string;
 
   createdOn: Date;
   lastEdited: Date;

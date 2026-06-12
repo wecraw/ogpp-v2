@@ -1,6 +1,7 @@
 import { Battery } from './Battery';
+import { ProductPricing } from './ProductPricing';
 
-export interface Inverter {
+export interface Inverter extends ProductPricing {
   name: string;
   brand: string;
   id?: string;
@@ -13,9 +14,9 @@ export interface Inverter {
 
   batteryCapacity?: number;
 
-  price: number;
-
   compatibleBatteries?: Battery[];
+  compatibleBatteryIds?: string[];
+  compatiblePowerSourceIds?: string[];
   maxBatteries?: number;
 }
 

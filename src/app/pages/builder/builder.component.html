@@ -123,12 +123,22 @@
           }
         }
         @if (generatingBuild) {
-          <div class="loader"></div>
+          <div class="cta-loading inter-regular">Sizing your system…</div>
         }
       </div>
     </div>
   </aside>
 </div>
+
+@if (generatingBuild) {
+  <div class="loading-overlay">
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <div class="loading-title inter-semibold">Building your setup</div>
+      <div class="loading-message inter-regular" [class.fading]="messageFading">{{ loadingMessage }}</div>
+    </div>
+  </div>
+}
 
 @if (isModalOpen) {
   <app-modal

@@ -1,8 +1,14 @@
 <div
   (click)="selectClicked()"
   class="blade-container"
-  [ngClass]="{ disabled: disabled, selected: isSelected, detail: isDetailMode, 'quantity-mode': quantityMode, locked: locked }"
-  >
+  [ngClass]="{
+    disabled: disabled,
+    selected: isSelected,
+    detail: isDetailMode,
+    'quantity-mode': quantityMode,
+    locked: locked
+  }"
+>
   <div class="view-row">
     @if (locked) {
       <div class="included-badge inter-medium">
@@ -51,7 +57,16 @@
         @if (locked) {
           <div class="detail included-price inter-medium">Included</div>
         } @else {
-          <div class="detail">${{ buildComponent.price }}</div>
+          <div class="detail price-detail">
+            @if (
+              buildComponent.listPrice && buildComponent.listPrice > buildComponent.price
+            ) {
+              <span class="list-price">{{
+                buildComponent.listPrice | currency: 'USD' : 'symbol' : '1.0-0'
+              }}</span>
+            }
+            <span>{{ buildComponent.price | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+          </div>
         }
       </div>
     }

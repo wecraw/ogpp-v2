@@ -63,18 +63,27 @@
         <div class="why-collapse-inner" [attr.aria-hidden]="!whyOpen.inverter">
           <div class="why-panel">
             <p class="why-lead inter-regular mb-0">
-              Your appliances draw up to <strong>{{ peakWattage | number }} W</strong> when running
-              at the same time, so your inverter must supply at least that much continuous output.
+              We size for a realistic peak of <strong>{{ peakWattage | number }} W</strong>: every
+              always-on appliance running together, plus the single largest high-draw item (like a
+              kettle or microwave). We don't assume every heavy appliance fires at the exact same
+              instant, so your inverter must supply at least this much continuous output.
             </p>
           </div>
         </div>
       </div>
+      @if (noInverterMeetsPeak) {
+        <div class="alert alert-warning inter-regular" role="alert">
+          <strong>No single station in the catalog supplies {{ peakWattage | number }} W.</strong>
+          The available models are shown below from highest to lowest output. Reduce the
+          appliances running at the same time to use one of these systems.
+        </div>
+      }
       <div class="row card-grid">
         @for (inverter of inverters; track inverter.id) {
           <div class="col-lg-5 col-xl-4">
             <build-component-card
               (onSelect)="onInverterSelect($event, inverter)"
-              [selected]="build.inverter?.id === inverter.id"
+              [selected]="build.inverter.id === inverter.id"
               [buildComponent]="inverter"
             ></build-component-card>
           </div>
@@ -318,14 +327,14 @@
 
     <div class="compat-actions">
       <div class="total-price inter-medium">
-        <span class="price-label inter-regular">Total</span>
+        <span class="price-label inter-regular">Estimated total</span>
         <span class="price-value"
           >$<span [countUp]="totalPrice" [options]="countUpOptions">0</span></span
         >
       </div>
       @if (allComplete) {
         <button class="btn-primary finish-button fade-in inter-medium" (click)="finish()">
-          Finish
+          Review deals
         </button>
       }
     </div>

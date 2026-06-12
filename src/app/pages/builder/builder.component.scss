@@ -161,8 +161,74 @@ hr {
     color: $text-tertiary;
     text-align: center;
   }
-  .loader {
-    margin: 14px auto 6px;
+  .cta-loading {
+    margin-top: 12px;
+    font-size: 13px;
+    color: $text-tertiary;
+    text-align: center;
+  }
+}
+
+// ============================================================
+//  Full-screen loading overlay (builder → build transition)
+// ============================================================
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(245, 245, 247, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in $dur $ease-out both;
+}
+
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 52px;
+  background: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  text-align: center;
+  min-width: 280px;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 2.5px solid rgba(0, 113, 227, 0.18);
+  border-top-color: $selected-blue;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: $text-color-black;
+}
+
+.loading-message {
+  font-size: 13px;
+  color: $text-tertiary;
+  min-height: 18px;
+  transition: opacity 0.25s $ease-out;
+
+  &.fading {
+    opacity: 0;
   }
 }
 

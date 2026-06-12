@@ -167,6 +167,20 @@
       font-weight: 500;
     }
   }
+
+  .price-detail {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 5px;
+  }
+
+  .list-price {
+    color: $text-tertiary;
+    font-size: 10px;
+    font-weight: 400;
+    text-decoration: line-through;
+  }
 }
 
 .quantity-stepper {
