@@ -11,6 +11,8 @@ import {
   INVERTER_EXPLANATION_TITLE,
   BATTERY_EXPLANATION,
   BATTERY_EXPLANATION_TITLE,
+  AUTONOMY_EXPLANATION,
+  AUTONOMY_EXPLANATION_TITLE,
   SOLAR_EXPLANATION,
   SOLAR_EXPLANATION_TITLE
 } from 'src/app/content/strings';
@@ -22,9 +24,11 @@ import { Inverter, defaultInverter } from 'src/app/interfaces/Inverter';
 import { Battery } from 'src/app/interfaces/Battery';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
 
-// Days of usage the battery bank should cover. Surfacing this as a constant keeps the
-// (currently hardcoded) "1 day of autonomy" decision in one place for a future override UI.
-const DAYS_OF_AUTONOMY = 1;
+// Days of usage the battery bank should cover. Now user-configurable on the Batteries step
+// (see `daysOfAutonomy`); these bound the control and seed builds that predate the field.
+const DEFAULT_DAYS_OF_AUTONOMY = 2;
+const MIN_DAYS_OF_AUTONOMY = 1;
+const MAX_DAYS_OF_AUTONOMY = 7;
 
 @Component({
     selector: 'app-build',
@@ -78,6 +82,12 @@ export class BuildComponent implements OnInit {
   public batteryQuantities: Record<string, number> = {};
   public solarQuantities: Record<string, number> = {};
 
+  // How many sunless days the battery bank should cover. User-configurable on the
+  // Batteries step; scales `batteryTarget`. Exposed bounds drive the stepper UI.
+  public daysOfAutonomy: number = DEFAULT_DAYS_OF_AUTONOMY;
+  public readonly minDays = MIN_DAYS_OF_AUTONOMY;
+  public readonly maxDays = MAX_DAYS_OF_AUTONOMY;
+
   // Running totals
   public selectedBatteryCapacity: number = 0;
   public selectedSolarWattage: number = 0;
@@ -109,6 +119,10 @@ export class BuildComponent implements OnInit {
         return;
       }
       this.build = existingBuild;
+      // Seed builds saved before days-of-autonomy was configurable, and persist the value
+      // so it round-trips on the next save.
+      this.daysOfAutonomy = existingBuild.daysOfAutonomy ?? DEFAULT_DAYS_OF_AUTONOMY;
+      this.build.daysOfAutonomy = this.daysOfAutonomy;
       this.peakWattage = this.calculationUtils.peakWattage(this.build);
       this.totalWattHours = this.calculationUtils.totalWattHours(this.build);
       this.wattageNeeded = this.calculationUtils.wattageNeeded(this.build);
@@ -134,7 +148,23 @@ export class BuildComponent implements OnInit {
   }
 
   get batteryTarget(): number {
-    return this.totalWattHours * DAYS_OF_AUTONOMY;
+    return this.totalWattHours * this.daysOfAutonomy;
+  }
+
+  // ----- Days of autonomy -----
+
+  changeDaysOfAutonomy(delta: number) {
+    const next = Math.min(this.maxDays, Math.max(this.minDays, this.daysOfAutonomy + delta));
+    if (next === this.daysOfAutonomy) return;
+    this.daysOfAutonomy = next;
+    this.build.daysOfAutonomy = next;
+
+    // Raising the target can make a previously-sufficient bank fall short (and vice versa),
+    // so re-size everything downstream and re-evaluate the revealed steps.
+    this.recalculate();
+    this.save();
+    this.confirmCompatibility('battery');
+    this.maybeRevealSolar();
   }
 
   get noInverterMeetsPeak(): boolean {
@@ -409,6 +439,9 @@ export class BuildComponent implements OnInit {
     } else if (content === 'battery') {
       this.modalContent = BATTERY_EXPLANATION;
       this.modalTitle = BATTERY_EXPLANATION_TITLE;
+    } else if (content === 'autonomy') {
+      this.modalContent = AUTONOMY_EXPLANATION;
+      this.modalTitle = AUTONOMY_EXPLANATION_TITLE;
     } else if (content === 'solar') {
       this.modalContent = SOLAR_EXPLANATION;
       this.modalTitle = SOLAR_EXPLANATION_TITLE;
