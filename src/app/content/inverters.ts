@@ -45,6 +45,27 @@ let inverters: Inverter[] = [
     dealVerifiedOn: '2026-06-12'
   },
   {
+    name: 'DELTA Pro Ultra',
+    brand: 'EcoFlow',
+    icon: 'bi-battery-charging',
+    voltages: [120, 240],
+    maxSolarInput: 5600,
+    maxTotalInput: 8800,
+    maxOutput: 7200,
+    batteryCapacity: 6144,
+    maxBatteries: 4,
+    compatibleBatteryIds: ['ecoflow-delta-pro-ultra-extra-battery'],
+    compatiblePowerSourceIds: [
+      'ecoflow-400w-portable-solar-panel',
+      'ecoflow-220w-bifacial-panel',
+      'ecoflow-100w-portable-panel'
+    ],
+    price: 4099,
+    listPrice: 6098,
+    productUrl: 'https://us.ecoflow.com/products/delta-pro-ultra',
+    dealVerifiedOn: '2026-06-11'
+  },
+  {
     name: 'Solar Generator 1000 v2',
     brand: 'Jackery',
     icon: 'bi-battery-charging',

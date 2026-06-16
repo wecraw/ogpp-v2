@@ -13,7 +13,7 @@
     @if (locked) {
       <div class="included-badge inter-medium">
         <i class="bi bi-check-lg"></i>
-        Included
+        Built-in
       </div>
     } @else {
       <div class="edit-button" (click)="toggleDetailMode()">
@@ -35,32 +35,22 @@
     @if (!isDetailMode) {
       <div class="details d-flex flex-column inter-regular">
         @if (isInverter(buildComponent)) {
-          <div class="detail">
-            {{ buildComponent.maxOutput }} W Output
-          </div>
+          <div class="detail">{{ buildComponent.maxOutput }} W Output</div>
         }
         @if (isPowerSource(buildComponent)) {
-          <div class="detail">
-            {{ buildComponent.maxOutput }} W
-          </div>
+          <div class="detail">{{ buildComponent.maxOutput }} W</div>
         }
         @if (isInverter(buildComponent) && buildComponent.batteryCapacity) {
-          <div class="detail">
-            {{ buildComponent.batteryCapacity }} Wh Capacity
-          </div>
+          <div class="detail">{{ buildComponent.batteryCapacity }} Wh Capacity</div>
         }
         @if (isBattery(buildComponent) && buildComponent.batteryCapacity) {
-          <div class="detail">
-            {{ buildComponent.batteryCapacity }} Wh
-          </div>
+          <div class="detail">{{ buildComponent.batteryCapacity }} Wh</div>
         }
         @if (locked) {
           <div class="detail included-price inter-medium">Included</div>
         } @else {
           <div class="detail price-detail">
-            @if (
-              buildComponent.listPrice && buildComponent.listPrice > buildComponent.price
-            ) {
+            @if (buildComponent.listPrice && buildComponent.listPrice > buildComponent.price) {
               <span class="list-price">{{
                 buildComponent.listPrice | currency: 'USD' : 'symbol' : '1.0-0'
               }}</span>
@@ -78,7 +68,7 @@
           [disabled]="quantity <= 0"
           (click)="decrement($event)"
           aria-label="Remove one"
-          >
+        >
           <i class="bi bi-dash"></i>
         </button>
         <span class="quantity-value inter-medium">{{ quantity }}</span>
@@ -88,7 +78,7 @@
           [disabled]="!canIncrement"
           (click)="increment($event)"
           aria-label="Add one"
-          >
+        >
           <i class="bi bi-plus"></i>
         </button>
       </div>

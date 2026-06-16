@@ -9,8 +9,20 @@
         >
       </span>
     </a>
-    <button class="menu-button" aria-label="Open menu">
-      <i class="bi bi-list"></i>
-    </button>
+    <div class="menu-wrap">
+      <button
+        class="menu-button"
+        aria-label="Open menu"
+        [attr.aria-expanded]="menuOpen"
+        (click)="toggleMenu()"
+      >
+        <i class="bi bi-list"></i>
+      </button>
+      @if (menuOpen) {
+        <div class="menu-dropdown">
+          <a class="menu-item" routerLink="/builds" (click)="closeMenu()">My Builds</a>
+        </div>
+      }
+    </div>
   </div>
 </nav>

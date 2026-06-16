@@ -14,6 +14,16 @@ let batteries: Battery[] = [
     dealVerifiedOn: '2026-06-12'
   },
   {
+    name: 'DELTA Pro Ultra Extra Battery',
+    brand: 'EcoFlow',
+    icon: 'bi-battery-full',
+    batteryCapacity: 6144,
+    price: 1600,
+    listPrice: 3299,
+    productUrl: 'https://us.ecoflow.com/products/delta-pro-ultra',
+    dealVerifiedOn: '2026-06-11'
+  },
+  {
     name: 'DELTA Max Smart Battery',
     brand: 'EcoFlow',
     icon: 'bi-battery-full',

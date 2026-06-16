@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update OGPP Products"
+  short_description: "Add verified products and vendor offers"
+  default_prompt: "Use $update-ogpp-products to add or refresh an OGPP product and its vendor deals."

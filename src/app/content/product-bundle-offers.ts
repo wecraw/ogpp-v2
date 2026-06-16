@@ -6,6 +6,8 @@ const ECOFLOW_220W_PANEL_ID = 'ecoflow-220w-bifacial-panel';
 const ECOFLOW_400W_PANEL_ID = 'ecoflow-400w-portable-solar-panel';
 const ECOFLOW_DELTA_PRO_URL =
   'https://us.ecoflow.com/products/delta-pro-portable-power-station';
+const ECOFLOW_DELTA_PRO_ULTRA_ID = 'ecoflow-delta-pro-ultra';
+const ECOFLOW_DELTA_PRO_ULTRA_URL = 'https://us.ecoflow.com/products/delta-pro-ultra-solar-generator';
 
 export const productBundleOffers: ProductBundleOffer[] = [
   {
@@ -82,6 +84,26 @@ export const productBundleOffers: ProductBundleOffer[] = [
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_PRO_URL,
     verifiedOn: '2026-06-12',
+    availability: 'check-vendor'
+  },
+  {
+    id: 'ecoflow-delta-pro-ultra-400w',
+    inverterId: ECOFLOW_DELTA_PRO_ULTRA_ID,
+    name: 'DELTA Pro Ultra Solar Generator',
+    description:
+      'Whole-home 7.2kW station with a built-in 6kWh battery, paired with a 400W solar panel.',
+    highlights: ['DELTA Pro Ultra (1 × 6kWh battery)', '1 × 400W portable solar panel'],
+    price: 4499,
+    optimizationNote:
+      'EcoFlow’s preset Solar Generator price beats buying the station and panel à la carte.',
+    compareAtPrice: 7297,
+    batteryQuantities: {},
+    powerSourceQuantities: {
+      [ECOFLOW_400W_PANEL_ID]: 1
+    },
+    vendor: 'EcoFlow',
+    vendorUrl: ECOFLOW_DELTA_PRO_ULTRA_URL,
+    verifiedOn: '2026-06-11',
     availability: 'check-vendor'
   }
 ];

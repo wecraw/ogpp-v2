@@ -31,18 +31,20 @@ Prettier enforces: single quotes, semicolons, no trailing commas, 100-char width
 `Build` (`src/app/interfaces/Build.ts`) is the single document that flows through the whole app. The user constructs one on `/builder`, it's saved to `localStorage`, then read back on `/build` for recommendations. A Build holds the user's inputs (`appliances`, `seasons`, `zipCode`, `monthlyGhi`) and their chosen gear (`powerSources`, `inverter`, `batteries`).
 
 ### Routes and the user flow
-`src/app/app.routes.ts` — three pages, default redirect to `/builder`:
+`src/app/app.routes.ts` — four routed pages (all under `src/app/pages/`), default redirect to `/builder`. (A `home` component exists under `pages/` but is not yet routed.)
 1. **`/builder`** (`BuilderComponent`) — the wizard. Step 1: pick appliances + seasons + ZIP. Computes live `peakWattage` and `totalWattHours`. On submit, fetches sun-hours, assigns a `uuid` to the build, saves it, and navigates to `/build?buildId=...`.
-2. **`/build`** (`BuildComponent`) — reads the build by `buildId` query param and walks a three-step flow (Inverter → Batteries → Solar). Each step reveals progressively, sizes the chosen gear against the build's needs, and shows live compatibility in a stacked bottom bar. Selections auto-save to `localStorage` on every change and restore on reload; a **Finish** button (gated on all three steps being compatible) routes to `/builds`.
-3. **`/builds`** (`BuildsComponent`) — intended saved-builds list; currently an empty placeholder.
+2. **`/build`** (`BuildComponent`) — reads the build by `buildId` query param and walks a three-step flow (Inverter → Batteries → Solar). Each step reveals progressively, sizes the chosen gear against the build's needs, and shows live compatibility in a stacked bottom bar. Selections auto-save to `localStorage` on every change and restore on reload; a **Finish** button (gated on all three steps being compatible) routes to `/checkout?buildId=...`.
+3. **`/builds`** (`BuildsComponent`) — the saved-builds list, fully implemented: lists builds from `localStorage` (most recently edited first) with inline **rename**, **duplicate**, **delete** (inline confirm), and **reopen** (→ `/build`).
+4. **`/checkout`** (`CheckoutComponent`) — final step. Reads the build, computes total price / savings, and shows vendor **bundle offers** (via `ProductDealsService` + the `bundle-offers` component) for the chosen inverter.
 
 Pages pass the build between each other **only via the `?buildId=` query param**, re-loading from `localStorage` on each `ngOnInit`. There is no shared in-memory build state/store.
 
 ### Services (the domain logic lives here)
-- **`BuildService`** — CRUD for builds in `localStorage`, keyed `build_<id>`.
+- **`BuildService`** — CRUD for builds in `localStorage`, keyed `build_<id>`: `saveBuild`, `getBuild`, `listBuilds` (scans all `build_` keys), `removeBuild`.
 - **`CalculationUtilsService`** — the sizing math: `peakWattage` (sum of wattage×qty), `totalWattHours` (×hours too), `getSunHoursBySeason` (maps selected seasons → months → min monthly GHI), `wattageNeeded` (wattHours ÷ sun hours).
 - **`SunHoursService`** — calls the NREL `solar_resource` API by ZIP to get `monthlyGhi`.
 - **`ProductSelectorService`** — filters the gear catalogs against a build's requirements: `getMatchingInverters` (`maxOutput >= peakWattage`), `getMatchingBatteries` and `getMatchingSolarPanels` (both brand-match the chosen inverter, falling back to the full catalog if that brand has no entries).
+- **`ProductDealsService`** — surfaces vendor bundle offers on `/checkout`: `getOffersForInverter` (reads `content/product-bundle-offers.ts`) and `getRecommendedOffer`.
 
 ### Content catalogs (hand-curated product/appliance data)
 `src/app/content/*.ts` export plain arrays: `appliances.ts`, `inverters.ts`, `batteries.ts`, `solarPanels.ts`, plus `strings.ts` for UI copy. **IDs are stable content-derived slugs** assigned at module-load time via `assignStableIds` (`catalog-utils.ts`) — e.g. an appliance's ID is `slug(applianceGroup-name)`, an inverter's is `slug(brand-name)`. Reordering/inserting/removing entries does **not** renumber the others, so builds persisted in `localStorage` keep mapping to the right item. Collisions get a numeric suffix. (Previously IDs were positional array indices — a data-integrity hazard, now removed.)
@@ -56,7 +58,6 @@ On `/build`, battery and solar quantities are persisted by pushing one entry per
 ## Current state / known gaps
 
 - **Debug bypass:** `BuilderComponent.debug = true` skips the real NREL call and stubs `monthlyGhi` to all-1s. Set to `false` to exercise real sun-hours lookups. Note this makes `getSunHoursBySeason` return 1, so `wattageNeeded` (and thus the `/build` solar target) is unrealistic while debug is on.
-- **`/builds` page is empty.** Saved builds accumulate in `localStorage` and the `/build` Finish button routes here, but there's no UI to list them yet.
 - **Battery sizing is hardcoded to 1 day of autonomy** (`DAYS_OF_AUTONOMY` in `BuildComponent`). A user-facing override UI was intentionally deferred; the constant is the single place to change it.
 - **`maxBatteries` is enforced per battery model, not as a bank total** on `/build` — fine for the current single-brand-match catalogs, but revisit if a brand gains multiple battery models.
 - The NREL API key is hardcoded in `SunHoursService` — move it out before any real deployment.
