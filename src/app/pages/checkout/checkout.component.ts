@@ -7,12 +7,26 @@ import { inverters } from 'src/app/content/inverters';
 import { solarPanels as solarPanelCatalog } from 'src/app/content/solarPanels';
 import { Battery } from 'src/app/interfaces/Battery';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
+import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
 import { BuildService } from 'src/app/services/build.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
 import { ProductDealsService } from 'src/app/services/product-deals.service';
 import { ProductSelectorService } from 'src/app/services/product-selector.service';
+
+export interface CheckoutLineItem {
+  id: string;
+  role: string;
+  icon?: string;
+  name: string;
+  brand: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  lineSavings: number;
+  productUrl?: string;
+}
 
 @Component({
   selector: 'app-checkout',
@@ -30,6 +44,7 @@ export class CheckoutComponent implements OnInit {
   public totalPrice = 0;
   public compareAtTotal = 0;
   public totalSavings = 0;
+  public lineItems: CheckoutLineItem[] = [];
 
   private batteries: Battery[] = [];
   private solarPanels: PowerSource[] = [];
@@ -154,6 +169,50 @@ export class CheckoutComponent implements OnInit {
     }
 
     this.totalSavings = Math.max(this.compareAtTotal - this.totalPrice, 0);
+    this.buildLineItems();
+  }
+
+  private buildLineItems() {
+    const items: CheckoutLineItem[] = [];
+
+    if (this.build.inverter?.id) {
+      items.push(this.toLineItem(this.build.inverter, 'Power station', 1));
+    }
+
+    for (const [id, quantity] of Object.entries(this.batteryQuantities)) {
+      if (quantity <= 0) continue;
+      const battery = this.batteries.find(item => item.id === id);
+      if (battery) items.push(this.toLineItem(battery, 'Expansion battery', quantity));
+    }
+
+    for (const [id, quantity] of Object.entries(this.solarQuantities)) {
+      if (quantity <= 0) continue;
+      const panel = this.solarPanels.find(item => item.id === id);
+      if (panel) items.push(this.toLineItem(panel, 'Solar panel', quantity));
+    }
+
+    this.lineItems = items;
+  }
+
+  private toLineItem(
+    product: Inverter | Battery | PowerSource,
+    role: string,
+    quantity: number
+  ): CheckoutLineItem {
+    const unitPrice = product.price;
+    const unitListPrice = product.listPrice ?? product.price;
+    return {
+      id: product.id ?? role,
+      role,
+      icon: product.icon,
+      name: product.name,
+      brand: product.brand,
+      quantity,
+      unitPrice,
+      lineTotal: unitPrice * quantity,
+      lineSavings: Math.max(unitListPrice - unitPrice, 0) * quantity,
+      productUrl: product.productUrl
+    };
   }
 
   private addExtraProductPrices(offer: ProductBundleOfferView) {

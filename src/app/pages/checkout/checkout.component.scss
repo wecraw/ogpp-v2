@@ -77,6 +77,152 @@
   text-transform: uppercase;
 }
 
+.parts-list {
+  margin-top: 26px;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  .parts-head {
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid $divider;
+
+    h2 {
+      margin: 0;
+      color: $text-color-black;
+      font-size: 19px;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      margin: 5px 0 0;
+      color: $text-secondary;
+      font-size: 14px;
+    }
+  }
+}
+
+.parts-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 22px;
+
+  & + .part-row {
+    border-top: 1px solid $divider;
+  }
+
+  .part-icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: $radius-md;
+    background: $page-bg;
+
+    i {
+      color: $text-secondary;
+      font-size: 20px;
+    }
+  }
+
+  .part-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+
+    strong {
+      color: $text-color-black;
+      font-size: 15px;
+    }
+  }
+
+  .part-role {
+    color: $text-tertiary;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .part-meta {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: $text-secondary;
+    font-size: 13px;
+  }
+
+  .part-savings {
+    color: #147d3f;
+    font-size: 12px;
+  }
+
+  .part-price {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+
+    strong {
+      color: $text-color-black;
+      font-size: 16px;
+    }
+  }
+
+  .buy-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: $radius-pill;
+    background: $selected-blue;
+    color: #fff;
+    font-size: 13px;
+    text-decoration: none;
+    transition: background $dur-fast $ease-out;
+
+    &:hover {
+      background: $selected-blue-hover;
+    }
+
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .buy-unavailable {
+    color: $text-tertiary;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 767px) {
+  .part-row {
+    flex-wrap: wrap;
+
+    .part-price {
+      flex-basis: 100%;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 58px;
+    }
+  }
+}
+
 .no-offers {
   display: flex;
   align-items: center;

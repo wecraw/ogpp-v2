@@ -42,6 +42,57 @@
       </div>
     </section>
 
+    @if (lineItems.length) {
+      <section class="parts-list">
+        <div class="parts-head">
+          <h2 class="inter-semibold">Your parts list</h2>
+          <p class="inter-regular">
+            Buy each part direct from the vendor. Prices shown are the latest verified deal.
+          </p>
+        </div>
+
+        <ul class="parts-rows">
+          @for (item of lineItems; track item.id) {
+            <li class="part-row">
+              <div class="part-icon">
+                <i class="bi {{ item.icon || 'bi-box' }}"></i>
+              </div>
+              <div class="part-info">
+                <span class="part-role inter-regular">{{ item.role }}</span>
+                <strong class="inter-semibold">{{ item.brand }} {{ item.name }}</strong>
+                <span class="part-meta inter-regular">
+                  {{ item.quantity }} ×
+                  {{ item.unitPrice | currency: 'USD' : 'symbol' : '1.0-0' }}
+                  @if (item.lineSavings > 0) {
+                    <span class="part-savings inter-medium">
+                      Save {{ item.lineSavings | currency: 'USD' : 'symbol' : '1.0-0' }}
+                    </span>
+                  }
+                </span>
+              </div>
+              <div class="part-price">
+                <strong class="inter-semibold">{{
+                  item.lineTotal | currency: 'USD' : 'symbol' : '1.0-0'
+                }}</strong>
+                @if (item.productUrl) {
+                  <a
+                    class="buy-link inter-medium"
+                    [href]="item.productUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Buy <i class="bi bi-box-arrow-up-right"></i>
+                  </a>
+                } @else {
+                  <span class="buy-unavailable inter-regular">No link yet</span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
     @if (offers.length) {
       <app-bundle-offers
         [offers]="offers"
