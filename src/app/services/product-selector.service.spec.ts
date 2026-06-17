@@ -35,7 +35,7 @@ describe('ProductSelectorService', () => {
         {
           id: 'oversized-load',
           name: 'Oversized Load',
-          wattage: 6000,
+          wattage: 8000,
           hours: 1,
           quantity: 1,
           applianceGroup: 'Test'
@@ -44,6 +44,46 @@ describe('ProductSelectorService', () => {
     });
 
     expect(matches.length).toBe(inverters.length);
-    expect(matches[0].maxOutput).toBe(4000);
+    // Catalog is sorted descending by maxOutput; the DELTA Pro Ultra leads at 7200W.
+    expect(matches[0].maxOutput).toBe(7200);
+  });
+
+  it('anchors on the smallest station that still covers the peak load', () => {
+    const anchor = service.getAnchorInverter({
+      ...defaultBuild,
+      appliances: [
+        {
+          id: 'mid-load',
+          name: 'Mid Load',
+          wattage: 2000,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Test'
+        }
+      ]
+    });
+
+    // Qualifying maxOutputs >= 2000 are 3600, 4000, 7200 and 2200; the best fit
+    // is the 2200W Bluetti AC200MAX, not the over-sized DELTA Pro Ultra.
+    expect(anchor?.maxOutput).toBe(2200);
+    expect(anchor?.name).toBe('AC200MAX');
+  });
+
+  it('returns undefined when no single station can cover the peak load', () => {
+    const anchor = service.getAnchorInverter({
+      ...defaultBuild,
+      appliances: [
+        {
+          id: 'oversized-load',
+          name: 'Oversized Load',
+          wattage: 8000,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Test'
+        }
+      ]
+    });
+
+    expect(anchor).toBeUndefined();
   });
 });
