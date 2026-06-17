@@ -197,6 +197,9 @@ export class BuilderComponent implements OnInit {
 
     try {
       await this.getSunHours(this.zipCode);
+      if (!this.build.name?.trim()) {
+        this.build.name = this.suggestedName;
+      }
       this.build.id = uuidv4();
       this.buildService.saveBuild(this.build);
       const navigationExtras = {
@@ -249,6 +252,20 @@ export class BuilderComponent implements OnInit {
 
   isAnyApplianceSelected() {
     return this.build.appliances.length > 0;
+  }
+
+  // A friendly default name derived from the chosen seasons. Shown as the
+  // name-field placeholder and used as the fallback name when left blank, so
+  // builds are always identifiable on /builds.
+  get suggestedName(): string {
+    const seasons = this.build.seasons;
+    if (seasons.length === 0) return 'My off-grid build';
+    if (seasons.length === 4) return 'Year-round build';
+    if (seasons.length === 1) {
+      const season = seasons[0];
+      return `${season.charAt(0).toUpperCase()}${season.slice(1)} build`;
+    }
+    return 'Multi-season build';
   }
 
   // Readiness ==============================================================

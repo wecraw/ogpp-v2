@@ -1,1 +1,80 @@
-<p>home works!</p>
+<div class="home">
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <section class="hero fade-in">
+    <span class="eyebrow inter-medium">
+      <i class="bi bi-sun-fill"></i>
+      No sign-up · Free to use
+    </span>
+
+    <h1 class="hero-title section-title">
+      Build a solar system<br />sized for your life.
+    </h1>
+
+    <p class="hero-subtitle inter-regular">
+      Tell us what you want to power off grid. We'll size the load and recommend a complete,
+      compatible all-in-one system — inverter, batteries, and panels — ready to buy.
+    </p>
+
+    <div class="hero-actions">
+      <button class="btn-primary" (click)="startBuild()">
+        {{ hasBuilds ? 'Start a new build' : 'Get started' }}
+      </button>
+      @if (hasBuilds) {
+        <button class="btn-secondary" (click)="viewAllBuilds()">My builds</button>
+      }
+    </div>
+  </section>
+
+  <!-- ── Continue where you left off ────────────────────────── -->
+  @if (hasBuilds) {
+    <section class="recent fade-in">
+      <h2 class="recent-title inter-semibold">Pick up where you left off</h2>
+
+      <div class="recent-grid">
+        @for (build of recentBuilds; track build.id) {
+          <button class="recent-card" (click)="openBuild(build.id)">
+            <div class="recent-card-body">
+              <span class="recent-name inter-semibold">{{ build.name }}</span>
+              <span class="recent-meta inter-regular">
+                @if (build.station) {
+                  {{ build.station }}
+                } @else {
+                  {{ build.applianceCount }} appliance{{ build.applianceCount === 1 ? '' : 's' }}
+                }
+              </span>
+              <span class="recent-edited inter-regular">
+                Edited {{ build.lastEdited | date: 'mediumDate' }}
+              </span>
+            </div>
+            <i class="bi bi-arrow-right recent-arrow"></i>
+          </button>
+        }
+      </div>
+
+      <button class="link-button inter-medium recent-viewall" (click)="viewAllBuilds()">
+        View all<i class="bi bi-chevron-right"></i>
+      </button>
+    </section>
+  }
+
+  <!-- ── How it works ───────────────────────────────────────── -->
+  <section class="steps fade-in">
+    <h2 class="steps-title inter-semibold">How it works</h2>
+    <div class="steps-grid">
+      @for (step of steps; track step.title; let i = $index) {
+        <div class="step-card">
+          <div class="step-icon"><i class="bi {{ step.icon }}"></i></div>
+          <span class="step-num inter-medium">Step {{ i + 1 }}</span>
+          <h3 class="step-heading inter-semibold">{{ step.title }}</h3>
+          <p class="step-body inter-regular">{{ step.body }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="steps-cta">
+      <button class="btn-primary" (click)="startBuild()">
+        {{ hasBuilds ? 'Start a new build' : 'Get started' }}
+      </button>
+    </div>
+  </section>
+</div>

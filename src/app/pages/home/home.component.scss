@@ -1,0 +1,344 @@
+@import 'src/variables.scss';
+
+// ============================================================
+//  Onboarding / landing — funnels into the builder flow
+// ============================================================
+.home {
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 8px 24px 96px;
+
+  // A soft sunrise wash anchored to the top of the viewport. It sits behind
+  // every section *and* bleeds up underneath the translucent sticky header —
+  // the header's backdrop-blur frosts over it, so the bar reads as part of the
+  // hero rather than a separate strip pinned above a flat grey gap.
+  &::before {
+    content: '';
+    position: fixed;
+    top: -160px;
+    left: 50%;
+    width: 1200px;
+    max-width: 130vw;
+    height: 720px;
+    transform: translateX(-50%);
+    background: radial-gradient(56% 52% at 50% 0%, rgba(255, 199, 107, 0.3), transparent 70%),
+      radial-gradient(46% 44% at 80% 6%, rgba(0, 113, 227, 0.12), transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Keep all real content above the wash.
+  > section {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ============================================================
+//  Hero
+// ============================================================
+.hero {
+  text-align: center;
+  padding: 40px 0 44px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  letter-spacing: 0.005em;
+  color: $selected-blue;
+  padding: 6px 13px;
+  border: 1px solid rgba(0, 113, 227, 0.18);
+  border-radius: $radius-pill;
+  background: rgba(0, 113, 227, 0.07);
+
+  .bi-sun-fill {
+    color: $selected-blue;
+    font-size: 12px;
+  }
+}
+
+.hero-title {
+  font-size: 52px;
+  letter-spacing: -0.03em;
+  color: $text-color-black;
+  margin: 22px 0 0;
+}
+
+.hero-subtitle {
+  font-size: 19px;
+  line-height: 1.5;
+  color: $text-secondary;
+  max-width: 600px;
+  margin: 18px auto 0;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+// Let the primary CTA size to its label rather than the global fixed width.
+.hero-actions .btn-primary,
+.steps-cta .btn-primary {
+  width: auto;
+  padding: 0 26px;
+}
+
+// Secondary action: shares the primary's height + corner radius so the pair
+// reads as one button family (was a full-pill outline — mismatched the rect CTA).
+.btn-secondary {
+  height: 44px;
+  padding: 0 22px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: $text-color-black;
+  background: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-sm;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: background-color $dur-fast $ease-out, border-color $dur-fast $ease-out,
+    transform $dur-fast $ease-out, box-shadow $dur-fast $ease-out;
+
+  &:hover {
+    border-color: $border-hairline-strong;
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.985);
+    box-shadow: $shadow-sm;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $selected-blue;
+    box-shadow: 0 0 0 4px $accent-ring;
+  }
+}
+
+// ============================================================
+//  Continue where you left off
+// ============================================================
+.recent {
+  margin-top: 52px;
+  text-align: center;
+}
+
+.recent-title {
+  font-size: 22px;
+  letter-spacing: -0.018em;
+  color: $text-color-black;
+  margin: 0 0 20px;
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: $selected-blue;
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: opacity $dur-fast $ease-out;
+
+  .bi {
+    font-size: 13px;
+  }
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.recent-viewall {
+  margin-top: 18px;
+}
+
+// Center the cards on the page's vertical axis (matching the hero + steps).
+// Width-capped flex items keep a single card from ballooning, while a full
+// set of three still fills the row edge-to-edge.
+.recent-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.recent-card {
+  flex: 1 1 280px;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  background: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: transform $dur-fast $ease-out, box-shadow $dur-fast $ease-out,
+    border-color $dur-fast $ease-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+    border-color: $border-hairline-strong;
+
+    .recent-arrow {
+      transform: translateX(3px);
+      color: $selected-blue;
+    }
+  }
+}
+
+.recent-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.recent-name {
+  font-size: 16px;
+  color: $text-color-black;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-meta {
+  font-size: 14px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-edited {
+  font-size: 12px;
+  color: $text-tertiary;
+  margin-top: 2px;
+}
+
+.recent-arrow {
+  font-size: 17px;
+  color: $text-tertiary;
+  flex-shrink: 0;
+  transition: transform $dur-fast $ease-out, color $dur-fast $ease-out;
+}
+
+// ============================================================
+//  How it works
+// ============================================================
+.steps {
+  margin-top: 72px;
+  text-align: center;
+}
+
+.steps-title {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: $text-color-black;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 34px;
+  text-align: left;
+}
+
+.step-card {
+  background: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: 26px 24px 28px;
+}
+
+.step-icon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  background: $accent-tint;
+  color: $selected-blue;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.step-num {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-tertiary;
+}
+
+.step-heading {
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: $text-color-black;
+  margin: 4px 0 8px;
+}
+
+.step-body {
+  font-size: 15px;
+  line-height: 1.5;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.steps-cta {
+  margin-top: 36px;
+}
+
+// ============================================================
+//  Responsive
+// ============================================================
+@media (max-width: 760px) {
+  .hero {
+    padding: 36px 0 28px;
+  }
+
+  .hero-title {
+    font-size: 38px;
+  }
+
+  .hero-subtitle {
+    font-size: 17px;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    max-width: 351px;
+  }
+}

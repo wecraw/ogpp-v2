@@ -30,6 +30,18 @@
     <div class="summary-card fade-in">
       <span class="summary-eyebrow inter-medium">Your build</span>
 
+      <div class="build-name-field">
+        <input
+          type="text"
+          class="build-name-input inter-semibold"
+          maxlength="60"
+          [(ngModel)]="build.name"
+          [placeholder]="suggestedName"
+          aria-label="Build name"
+        />
+        <i class="bi bi-pencil build-name-icon"></i>
+      </div>
+
       <div class="build-stats">
         <div class="stat">
           <div class="inter-medium">

@@ -86,6 +86,111 @@ hr {
   color: $text-tertiary;
 }
 
+// Editable build title — inline "tap-to-rename" field.
+// At rest it reads as plain title text with a faint pencil + hairline; on
+// hover a soft tinted surface lifts to signal the whole zone is editable; on
+// focus a 2px accent underline draws in from the centre. The hover/focus
+// affordance is driven from the wrapper so it overrides the global
+// `input:focus` styling (border + glow ring) cleanly.
+.build-name-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  // Bleed the interactive surface slightly past the text for a tappable zone.
+  margin: 8px -10px 0;
+  padding: 6px 10px 8px;
+  border-radius: $radius-sm;
+  cursor: text;
+  transition: background $dur $ease-out;
+
+  // Resting hairline beneath the title.
+  &::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+    height: 1px;
+    background: $border-hairline;
+    transition: opacity $dur $ease-out;
+  }
+
+  // Accent underline that scales in from the centre on focus.
+  &::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+    height: 2px;
+    background: $selected-blue;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.4s $ease-out;
+  }
+
+  &:hover,
+  &:focus-within {
+    background: $accent-tint;
+  }
+
+  &:focus-within {
+    &::before {
+      opacity: 0;
+    }
+    &::after {
+      transform: scaleX(1);
+    }
+
+    .build-name-icon {
+      opacity: 1;
+      color: $selected-blue;
+    }
+  }
+
+  &:hover .build-name-icon {
+    opacity: 1;
+  }
+}
+
+.build-name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: $text-color-black;
+
+  &::placeholder {
+    color: $text-tertiary;
+    font-weight: 600;
+  }
+
+  // Neutralise the global input hover/focus chrome (border + glow ring).
+  &:hover,
+  &:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.build-name-icon {
+  flex: none;
+  font-size: 15px;
+  color: $text-tertiary;
+  opacity: 0.55;
+  pointer-events: none;
+  transition:
+    opacity $dur $ease-out,
+    color $dur $ease-out;
+}
+
 .summary-card hr {
   margin: 18px 0;
 }
