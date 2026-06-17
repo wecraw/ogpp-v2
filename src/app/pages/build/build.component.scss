@@ -284,8 +284,83 @@
 .section-head {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 14px;
   margin-bottom: 12px;
+}
+
+// Days-of-autonomy control sits at the trailing edge of the Batteries step header,
+// dropping to its own row (label left, stepper right) on narrow screens.
+.autonomy-control {
+  margin: 6px 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+  }
+}
+
+.autonomy-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: $text-secondary;
+  white-space: nowrap;
+}
+
+.autonomy-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: $radius-pill;
+  background-color: $surface;
+  border: 1px solid $border-hairline;
+  box-shadow: $shadow-sm;
+
+  .step-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: $text-color-black;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out;
+
+    i {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: $accent-tint;
+      color: $selected-blue;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  .autonomy-value {
+    min-width: 28px;
+    text-align: center;
+    font-size: 17px;
+  }
 }
 
 // The numbered spine turns the three steps into a guided sequence: each badge
