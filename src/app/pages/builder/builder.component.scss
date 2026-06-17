@@ -61,6 +61,35 @@ hr {
   margin-top: 10px;
 }
 
+.add-custom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  padding: 12px 20px;
+  background: $surface;
+  color: $selected-blue;
+  border: 1px dashed $border-hairline-strong;
+  border-radius: $radius-lg;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color $dur-fast $ease-out, background-color $dur-fast $ease-out,
+    transform $dur-fast $ease-out;
+
+  i {
+    font-size: 15px;
+  }
+
+  &:hover {
+    border-color: $selected-blue;
+    background-color: $accent-tint;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
 // ============================================================
 //  Sticky summary panel
 // ============================================================

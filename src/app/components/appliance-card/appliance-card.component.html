@@ -18,10 +18,12 @@
     <div class="view-row">
       <div class="label-container">
         <i class="main-icon bi" [ngClass]="appliance.icon"></i>
-        <div class="d-flex flex-column">
-          <span class="name display inter-medium">{{ appliance.name }}</span>
+        <div class="text-container">
+          <span class="name display inter-medium" [attr.title]="appliance.name">{{
+            appliance.name
+          }}</span>
           @if (appliance.description) {
-            <span class="description display inter-regular">{{
+            <span class="description display inter-regular" [attr.title]="appliance.description">{{
               appliance.description
             }}</span>
           }
@@ -53,12 +55,12 @@
           @if (nameRequired) {
             <div class="error-message inter-regular">A name is required</div>
           }
-          <input
-            type="text"
+          <textarea
             placeholder="Add a description"
             class="input-description inter-regular"
+            rows="2"
             [(ngModel)]="appliance.description"
-            />
+          ></textarea>
         </div>
       </div>
 
@@ -102,10 +104,17 @@
               </div>
             </div>
           </div>
-          <a (click)="setDefaults()" class="reset-link inter-medium">
-            <i class="bi bi-arrow-counterclockwise"></i>
-            Reset defaults
-          </a>
+          @if (deletable) {
+            <a (click)="deleteClicked($event)" class="reset-link delete-link inter-medium">
+              <i class="bi bi-trash"></i>
+              Delete appliance
+            </a>
+          } @else {
+            <a (click)="setDefaults()" class="reset-link inter-medium">
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset defaults
+            </a>
+          }
         </div>
       }
     </div>

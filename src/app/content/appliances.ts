@@ -14,7 +14,7 @@ const kitchenAppliances: Appliance[] = [
   },
   {
     name: 'Microwave',
-    description: '1,000 W cooking power',
+    description: '1000 W cooking',
     wattage: 1500,
     hours: 0.2,
     quantity: 1,
@@ -24,7 +24,7 @@ const kitchenAppliances: Appliance[] = [
   },
   {
     name: 'Fridge',
-    description: '20 cu. ft., cycling',
+    description: '20 cu ft cycling',
     wattage: 353,
     hours: 4,
     quantity: 1,
@@ -33,7 +33,7 @@ const kitchenAppliances: Appliance[] = [
   },
   {
     name: 'Freezer',
-    description: '15 cu. ft. chest, cycling',
+    description: '15 cu ft chest',
     wattage: 200,
     hours: 5,
     quantity: 1,
@@ -51,8 +51,9 @@ const kitchenAppliances: Appliance[] = [
     icon: 'bi-cup-hot'
   },
   {
-    name: 'Electric Kettle',
-    description: '1.7 liter',
+    id: 'kitchen-electric-kettle',
+    name: 'Kettle',
+    description: '1.7 L electric',
     wattage: 1500,
     hours: 0.15,
     quantity: 1,
@@ -71,8 +72,9 @@ const kitchenAppliances: Appliance[] = [
     icon: 'bi-wind'
   },
   {
-    name: 'Induction Cooktop',
-    description: 'Single burner',
+    id: 'kitchen-induction-cooktop',
+    name: 'Cooktop',
+    description: 'Induction burner',
     wattage: 1800,
     hours: 1,
     quantity: 1,
@@ -82,7 +84,7 @@ const kitchenAppliances: Appliance[] = [
   },
   {
     name: 'Slow Cooker',
-    description: '6 quart on low',
+    description: '6 qt, low',
     wattage: 250,
     hours: 6,
     quantity: 1,
@@ -94,7 +96,7 @@ const kitchenAppliances: Appliance[] = [
 const entertainmentAppliances: Appliance[] = [
   {
     name: 'TV',
-    description: '55 in. LED',
+    description: '55 in LED',
     wattage: 100,
     hours: 4,
     quantity: 1,
@@ -102,7 +104,9 @@ const entertainmentAppliances: Appliance[] = [
     icon: 'bi-tv'
   },
   {
-    name: 'Router + Modem',
+    id: 'entertainment-router-modem',
+    name: 'Router/Modem',
+    description: 'Wi-Fi internet',
     wattage: 15,
     hours: 24,
     quantity: 1,
@@ -114,7 +118,7 @@ const entertainmentAppliances: Appliance[] = [
 const officeAppliances: Appliance[] = [
   {
     name: 'Laptop',
-    description: 'Typical USB-C charger',
+    description: 'USB-C charger',
     wattage: 65,
     hours: 6,
     quantity: 1,
@@ -122,8 +126,9 @@ const officeAppliances: Appliance[] = [
     icon: 'bi-laptop'
   },
   {
-    name: 'Desktop Computer',
-    description: 'Computer and monitor',
+    id: 'office-devices-desktop-computer',
+    name: 'Desktop PC',
+    description: 'PC + monitor',
     wattage: 300,
     hours: 6,
     quantity: 1,
@@ -131,8 +136,9 @@ const officeAppliances: Appliance[] = [
     icon: 'bi-pc-display'
   },
   {
-    name: 'Gaming Console',
-    description: 'Current generation',
+    id: 'office-devices-gaming-console',
+    name: 'Game Console',
+    description: 'Current-gen',
     wattage: 180,
     hours: 3,
     quantity: 1,
@@ -140,8 +146,9 @@ const officeAppliances: Appliance[] = [
     icon: 'bi-controller'
   },
   {
-    name: 'Phone / Tablet Charger',
-    description: 'USB-C fast charger',
+    id: 'office-devices-phone-tablet-charger',
+    name: 'USB-C Charger',
+    description: 'Phone/tablet',
     wattage: 20,
     hours: 2,
     quantity: 2,
@@ -152,8 +159,9 @@ const officeAppliances: Appliance[] = [
 
 const lightingAppliances: Appliance[] = [
   {
-    name: 'LED Light Bulb',
-    description: '60 W equivalent',
+    id: 'lighting-led-light-bulb',
+    name: 'LED Bulb',
+    description: '60 W equiv.',
     wattage: 10,
     hours: 5,
     quantity: 6,
@@ -161,8 +169,9 @@ const lightingAppliances: Appliance[] = [
     icon: 'bi-lightbulb'
   },
   {
-    name: 'LED String Lights',
-    description: '48 ft. outdoor strand',
+    id: 'lighting-led-string-lights',
+    name: 'String Lights',
+    description: '48 ft outdoor',
     wattage: 25,
     hours: 5,
     quantity: 1,
@@ -174,7 +183,7 @@ const lightingAppliances: Appliance[] = [
 const climateAppliances: Appliance[] = [
   {
     name: 'Box Fan',
-    description: '20 in. on medium',
+    description: '20 in medium',
     wattage: 75,
     hours: 8,
     quantity: 1,
@@ -182,7 +191,8 @@ const climateAppliances: Appliance[] = [
     icon: 'bi-fan'
   },
   {
-    name: 'Window Air Conditioner',
+    id: 'heating-cooling-window-air-conditioner',
+    name: 'Window AC',
     description: '10,000 BTU',
     wattage: 1000,
     hours: 6,
@@ -192,7 +202,7 @@ const climateAppliances: Appliance[] = [
   },
   {
     name: 'Space Heater',
-    description: 'Portable, high setting',
+    description: 'Portable, high',
     wattage: 1500,
     hours: 4,
     quantity: 1,
@@ -212,8 +222,9 @@ const climateAppliances: Appliance[] = [
 
 const laundryAppliances: Appliance[] = [
   {
-    name: 'Washing Machine',
-    description: 'One cold-water load',
+    id: 'laundry-cleaning-washing-machine',
+    name: 'Washer',
+    description: 'Cold-water load',
     wattage: 500,
     hours: 0.75,
     quantity: 1,
@@ -222,8 +233,9 @@ const laundryAppliances: Appliance[] = [
     icon: 'bi-basket'
   },
   {
-    name: 'Electric Dryer',
-    description: 'Full-size, 240 V',
+    id: 'laundry-cleaning-electric-dryer',
+    name: 'Dryer',
+    description: 'Full-size 240 V',
     wattage: 5000,
     hours: 0.75,
     quantity: 1,
@@ -232,7 +244,8 @@ const laundryAppliances: Appliance[] = [
     icon: 'bi-wind'
   },
   {
-    name: 'Vacuum Cleaner',
+    id: 'laundry-cleaning-vacuum-cleaner',
+    name: 'Vacuum',
     description: 'Upright',
     wattage: 1000,
     hours: 0.5,
@@ -242,7 +255,9 @@ const laundryAppliances: Appliance[] = [
     icon: 'bi-stars'
   },
   {
-    name: 'Clothes Iron',
+    id: 'laundry-cleaning-clothes-iron',
+    name: 'Iron',
+    description: 'Clothes',
     wattage: 1200,
     hours: 0.3,
     quantity: 1,
@@ -255,7 +270,7 @@ const laundryAppliances: Appliance[] = [
 const utilityAppliances: Appliance[] = [
   {
     name: 'Well Pump',
-    description: '1/2 HP, running draw',
+    description: '1/2 HP running',
     wattage: 1000,
     hours: 2,
     quantity: 1,
@@ -265,7 +280,7 @@ const utilityAppliances: Appliance[] = [
   },
   {
     name: 'Sump Pump',
-    description: '1/3 HP, running draw',
+    description: '1/3 HP running',
     wattage: 800,
     hours: 0.5,
     quantity: 1,
@@ -274,7 +289,8 @@ const utilityAppliances: Appliance[] = [
     icon: 'bi-water'
   },
   {
-    name: 'Shop Vacuum',
+    id: 'tools-utility-shop-vacuum',
+    name: 'Shop Vac',
     description: '12 gallon',
     wattage: 1200,
     hours: 0.5,
@@ -294,8 +310,9 @@ const utilityAppliances: Appliance[] = [
     icon: 'bi-disc'
   },
   {
-    name: 'Tool Battery Charger',
-    description: 'Dual-port rapid charger',
+    id: 'tools-utility-tool-battery-charger',
+    name: 'Tool Charger',
+    description: 'Dual-port',
     wattage: 200,
     hours: 2,
     quantity: 1,

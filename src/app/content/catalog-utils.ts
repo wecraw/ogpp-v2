@@ -31,3 +31,25 @@ export function assignStableIds<T extends { id?: string }>(
   }
   return items;
 }
+
+/**
+ * Custom appliances are created at runtime (not part of the static catalog), so
+ * they need their own ID namespace. We prefix with `custom-` so a custom ID can
+ * never collide with a catalog slug, and append a numeric suffix when the same
+ * name already exists in the build. The ID round-trips through localStorage the
+ * same way catalog slugs do, keeping the appliance mapped on reload.
+ */
+export const CUSTOM_APPLIANCE_ID_PREFIX = 'custom-';
+
+export function isCustomApplianceId(id: string | undefined): boolean {
+  return !!id && id.startsWith(CUSTOM_APPLIANCE_ID_PREFIX);
+}
+
+export function generateCustomApplianceId(name: string, existingIds: Iterable<string>): string {
+  const taken = new Set(existingIds);
+  const base = `${CUSTOM_APPLIANCE_ID_PREFIX}${slugify(name) || 'appliance'}`;
+  if (!taken.has(base)) return base;
+  let suffix = 2;
+  while (taken.has(`${base}-${suffix}`)) suffix++;
+  return `${base}-${suffix}`;
+}
