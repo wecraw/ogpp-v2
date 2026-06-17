@@ -8,6 +8,7 @@ const kitchenAppliances: Appliance[] = [
     wattage: 1200,
     hours: 0.15,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Kitchen',
     icon: 'bi-fire'
   },
@@ -17,6 +18,7 @@ const kitchenAppliances: Appliance[] = [
     wattage: 1500,
     hours: 0.2,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Kitchen',
     icon: 'bi-box-seam'
   },
@@ -44,6 +46,7 @@ const kitchenAppliances: Appliance[] = [
     wattage: 1000,
     hours: 0.25,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Kitchen',
     icon: 'bi-cup-hot'
   },
@@ -53,6 +56,7 @@ const kitchenAppliances: Appliance[] = [
     wattage: 1500,
     hours: 0.15,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Kitchen',
     icon: 'bi-lightning-charge'
   },
@@ -62,6 +66,7 @@ const kitchenAppliances: Appliance[] = [
     wattage: 1500,
     hours: 0.5,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Kitchen',
     icon: 'bi-wind'
   },
@@ -71,6 +76,7 @@ const kitchenAppliances: Appliance[] = [
     wattage: 1800,
     hours: 1,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Kitchen',
     icon: 'bi-grid-3x3-gap'
   },
@@ -211,6 +217,7 @@ const laundryAppliances: Appliance[] = [
     wattage: 500,
     hours: 0.75,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Laundry & Cleaning',
     icon: 'bi-basket'
   },
@@ -220,6 +227,7 @@ const laundryAppliances: Appliance[] = [
     wattage: 5000,
     hours: 0.75,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Laundry & Cleaning',
     icon: 'bi-wind'
   },
@@ -229,6 +237,7 @@ const laundryAppliances: Appliance[] = [
     wattage: 1000,
     hours: 0.5,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Laundry & Cleaning',
     icon: 'bi-stars'
   },
@@ -237,6 +246,7 @@ const laundryAppliances: Appliance[] = [
     wattage: 1200,
     hours: 0.3,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Laundry & Cleaning',
     icon: 'bi-triangle'
   }
@@ -249,6 +259,7 @@ const utilityAppliances: Appliance[] = [
     wattage: 1000,
     hours: 2,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Tools & Utility',
     icon: 'bi-droplet'
   },
@@ -258,6 +269,7 @@ const utilityAppliances: Appliance[] = [
     wattage: 800,
     hours: 0.5,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Tools & Utility',
     icon: 'bi-water'
   },
@@ -267,6 +279,7 @@ const utilityAppliances: Appliance[] = [
     wattage: 1200,
     hours: 0.5,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Tools & Utility',
     icon: 'bi-tools'
   },
@@ -276,6 +289,7 @@ const utilityAppliances: Appliance[] = [
     wattage: 1400,
     hours: 0.5,
     quantity: 1,
+    usageType: 'intermittent',
     applianceGroup: 'Tools & Utility',
     icon: 'bi-disc'
   },

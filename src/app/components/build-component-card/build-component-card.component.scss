@@ -19,19 +19,12 @@
   transition: height $dur $ease-out, box-shadow $dur $ease-out, border-color $dur $ease-out,
     transform $dur-fast $ease-out;
 
-  &:hover:not(.detail):not(.quantity-mode) {
+  &:hover:not(.detail) {
     box-shadow: $shadow-md;
-    transform: translateY(-2px);
   }
 
-  &:active:not(.detail):not(.quantity-mode) {
-    transform: translateY(0) scale(0.992);
-  }
-
-  // In quantity mode the card body is inert (the +/- stepper is the only
-  // control), so drop the affordances that imply the whole tile is clickable.
-  &.quantity-mode {
-    cursor: default;
+  &:active:not(.detail) {
+    transform: scale(0.992);
   }
 
   &.detail {
@@ -87,9 +80,20 @@
     }
   }
 
-  // Keep the selection ring above the hover rule's specificity.
   &.selected:hover:not(.detail) {
     box-shadow: 0 0 0 2px $selected-blue, $shadow-md;
+  }
+
+  &.locked {
+    cursor: default;
+
+    &:hover:not(.detail) {
+      box-shadow: 0 0 0 2px $selected-blue, $shadow-sm;
+    }
+
+    &:active:not(.detail) {
+      transform: none;
+    }
   }
 }
 
@@ -163,6 +167,20 @@
       font-weight: 500;
     }
   }
+
+  .price-detail {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 5px;
+  }
+
+  .list-price {
+    color: $text-tertiary;
+    font-size: 10px;
+    font-weight: 400;
+    text-decoration: line-through;
+  }
 }
 
 .quantity-stepper {
@@ -215,6 +233,31 @@
     font-size: 16px;
     color: $text-color-black;
   }
+}
+
+.included-badge {
+  position: absolute;
+  top: -12px;
+  right: -2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 7px;
+  border-radius: $radius-pill;
+  background-color: $selected-blue;
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+
+  i {
+    font-size: 11px;
+    font-weight: 700;
+  }
+}
+
+.included-price {
+  color: $selected-blue;
 }
 
 .fullscreen-mask {

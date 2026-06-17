@@ -47,6 +47,10 @@
   }
 }
 
+.menu-wrap {
+  position: relative;
+}
+
 .menu-button {
   border: none;
   background: transparent;
@@ -57,6 +61,33 @@
   border-radius: $radius-sm;
   cursor: pointer;
   transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  padding: 6px;
+  background-color: #fff;
+  border: 1px solid $divider;
+  border-radius: $radius-sm;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1001;
+}
+
+.menu-item {
+  display: block;
+  padding: 8px 12px;
+  border-radius: $radius-sm;
+  color: $text-color-black;
+  text-decoration: none;
+  font-size: 15px;
+  transition: background-color $dur-fast $ease-out;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);

@@ -1,0 +1,93 @@
+<section class="bundle-offers" aria-labelledby="bundle-offers-title">
+  <div class="bundle-heading">
+    <div>
+      <span class="eyebrow inter-medium">Current vendor offers</span>
+      <h3 id="bundle-offers-title" class="inter-semibold">EcoFlow DELTA Pro bundles</h3>
+      <p class="inter-regular">
+        We ranked these packages against this build's storage and solar targets.
+      </p>
+    </div>
+    <div class="verified inter-regular">
+      <i class="bi bi-clock-history"></i>
+      Prices checked June 12, 2026
+    </div>
+  </div>
+
+  <div class="offer-grid">
+    @for (offer of offers; track offer.id) {
+      <article
+        class="offer-card"
+        [class.recommended]="recommendedOfferId === offer.id"
+        [class.active]="activeOfferId === offer.id"
+      >
+        <div class="offer-top">
+          @if (recommendedOfferId === offer.id) {
+            <span class="offer-badge inter-semibold">Best fit for this build</span>
+          } @else if (activeOfferId === offer.id) {
+            <span class="offer-badge applied inter-semibold">Applied</span>
+          }
+          <h4 class="inter-semibold">{{ offer.name }}</h4>
+          <p class="description inter-regular">{{ offer.description }}</p>
+        </div>
+
+        <ul class="offer-items inter-regular">
+          @for (item of offer.highlights; track item) {
+            <li><i class="bi bi-check2"></i>{{ item }}</li>
+          }
+        </ul>
+
+        <div class="coverage inter-regular">
+          <span>{{ offer.batteryCapacity / 1000 | number: '1.1-1' }} kWh storage</span>
+          <span>{{ offer.solarWattage | number }} W solar</span>
+        </div>
+
+        <div class="offer-price">
+          <div>
+            <span class="current inter-semibold">
+              {{ offer.price | currency: 'USD' : 'symbol' : '1.0-0' }}
+            </span>
+            <span class="compare inter-regular">{{
+              offer.compareAtPrice | currency: 'USD' : 'symbol' : '1.0-0'
+            }}</span>
+          </div>
+          <span class="savings inter-semibold">
+            Save {{ savings(offer) | currency: 'USD' : 'symbol' : '1.0-0' }}
+          </span>
+        </div>
+        @if (offer.optimizationNote) {
+          <div class="optimization-note inter-medium">
+            <i class="bi bi-tags"></i>
+            {{ offer.optimizationNote }}
+          </div>
+        }
+
+        <button
+          type="button"
+          class="apply-button inter-medium"
+          [disabled]="activeOfferId === offer.id"
+          (click)="applyOffer.emit(offer)"
+        >
+          @if (activeOfferId === offer.id) {
+            Bundle applied
+          } @else {
+            Use this bundle
+          }
+        </button>
+        <a
+          class="vendor-link inter-regular"
+          [href]="offer.vendorUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Check price & stock at {{ offer.vendor }}
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+      </article>
+    }
+  </div>
+
+  <p class="stock-note inter-regular">
+    EcoFlow currently marks some configurations as sold out or preorder. Prices and availability
+    can change; confirm the live offer before purchasing.
+  </p>
+</section>

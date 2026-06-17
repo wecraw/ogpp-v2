@@ -1,9 +1,15 @@
 import { Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
 import { BuilderComponent } from './pages/builder/builder.component';
 import { BuildsComponent } from './pages/builds/builds.component';
 import { BuildComponent } from './pages/build/build.component';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 
 export const routes: Routes = [
+  {
+    path: 'home',
+    component: HomeComponent
+  },
   {
     path: 'builder',
     component: BuilderComponent
@@ -17,12 +23,16 @@ export const routes: Routes = [
     component: BuildComponent
   },
   {
+    path: 'checkout',
+    component: CheckoutComponent
+  },
+  {
     path: '',
-    redirectTo: '/builder',
+    redirectTo: '/home',
     pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: '/builder'
+    redirectTo: '/home'
   }
 ];

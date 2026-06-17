@@ -15,8 +15,8 @@ export function slugify(value: string): string {
 }
 
 /**
- * Assigns `item.id = slug(keyFn(item))` to every item, de-duplicating any
- * collisions with a numeric suffix so IDs stay unique and deterministic.
+ * Preserves an explicit ID when one is provided; otherwise assigns
+ * `item.id = slug(keyFn(item))`. Collisions receive a numeric suffix.
  */
 export function assignStableIds<T extends { id?: string }>(
   items: T[],
@@ -24,7 +24,7 @@ export function assignStableIds<T extends { id?: string }>(
 ): T[] {
   const seen = new Map<string, number>();
   for (const item of items) {
-    const base = slugify(keyFn(item));
+    const base = slugify(item.id ?? keyFn(item));
     const count = seen.get(base) ?? 0;
     seen.set(base, count + 1);
     item.id = count === 0 ? base : `${base}-${count + 1}`;

@@ -34,10 +34,28 @@ export class CalculationUtilsService {
     }
   }
 
+  /**
+   * Realistic peak draw using a coincident-load (diversity factor) model:
+   * sum of all continuous loads (which overlap) plus only the single largest
+   * intermittent load (since brief high-draw appliances rarely run at once).
+   * Appliances without a `usageType` are treated as continuous.
+   */
   peakWattage(build: Build): number {
-    return build.appliances.reduce((total, appliance) => {
-      return total + appliance.wattage * appliance.quantity;
-    }, 0);
+    let continuousTotal = 0;
+    let maxIntermittent = 0;
+
+    for (const appliance of build.appliances) {
+      if (appliance.usageType === 'intermittent') {
+        // One unit of the heaviest intermittent appliance — running two
+        // kettles (or a kettle and a microwave) at the same instant is the
+        // edge case we intentionally don't size for.
+        maxIntermittent = Math.max(maxIntermittent, appliance.wattage);
+      } else {
+        continuousTotal += appliance.wattage * appliance.quantity;
+      }
+    }
+
+    return continuousTotal + maxIntermittent;
   }
 
   totalWattHours(build: Build): number {

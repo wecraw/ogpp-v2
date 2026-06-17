@@ -17,6 +17,7 @@ export class BuildComponentCardComponent implements OnInit {
   // State
   @Input() disabled?: boolean = false;
   @Input() selected: boolean = false;
+  @Input() locked: boolean = false;
   public isDetailMode: boolean = false;
 
   // Quantity mode (opt-in): renders a +/- stepper instead of a single-select toggle.
@@ -34,7 +35,9 @@ export class BuildComponentCardComponent implements OnInit {
   ngOnInit(): void {}
 
   // In quantity mode the card's selected appearance reflects whether any units are chosen.
+  // Locked cards are always shown as selected.
   get isSelected(): boolean {
+    if (this.locked) return true;
     return this.quantityMode ? this.quantity > 0 : this.selected;
   }
 
@@ -43,9 +46,11 @@ export class BuildComponentCardComponent implements OnInit {
   }
 
   selectClicked() {
-    if (this.disabled) return;
+    if (this.disabled || this.locked) return;
     if (this.quantityMode) {
-      // Body taps in quantity mode are inert; the stepper controls the count.
+      const newQuantity = this.quantity > 0 ? 0 : 1;
+      this.quantity = newQuantity;
+      this.quantityChange.emit(newQuantity);
       return;
     }
     this.selected = !this.selected;
@@ -54,14 +59,14 @@ export class BuildComponentCardComponent implements OnInit {
 
   increment(event: Event) {
     event.stopPropagation();
-    if (this.disabled || !this.canIncrement) return;
+    if (this.disabled || this.locked || !this.canIncrement) return;
     this.quantity++;
     this.quantityChange.emit(this.quantity);
   }
 
   decrement(event: Event) {
     event.stopPropagation();
-    if (this.disabled || this.quantity <= 0) return;
+    if (this.disabled || this.locked || this.quantity <= 0) return;
     this.quantity--;
     this.quantityChange.emit(this.quantity);
   }

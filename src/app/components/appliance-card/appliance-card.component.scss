@@ -19,11 +19,10 @@
 
   &:hover:not(.edit) {
     box-shadow: $shadow-md;
-    transform: translateY(-2px);
   }
 
   &:active:not(.edit) {
-    transform: translateY(0) scale(0.992);
+    transform: scale(0.992);
   }
 
   &.edit {
@@ -114,6 +113,11 @@
   align-items: center;
   flex: 1;
   min-width: 0;
+
+  > div {
+    min-width: 0;
+    overflow: hidden;
+  }
 }
 
 .name {

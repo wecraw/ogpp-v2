@@ -1,0 +1,140 @@
+<div class="container checkout-page">
+  @if (buildNotFound) {
+    <div class="empty-state">
+      <i class="bi bi-exclamation-circle"></i>
+      <h1 class="inter-semibold">Build not found</h1>
+      <button class="btn-primary inter-medium" (click)="viewSavedBuilds()">
+        View saved builds
+      </button>
+    </div>
+  } @else {
+    <div class="page-head">
+      <div>
+        <span class="eyebrow inter-medium">Checkout preview</span>
+        <h1 class="inter-semibold">Compare vendor offers.</h1>
+        <p class="inter-regular">
+          Purchasing is not implemented yet. For now, choose the best package and verify its live
+          price and stock with the vendor.
+        </p>
+      </div>
+      <button class="btn outlined inter-regular" (click)="backToBuild()">
+        <i class="bi bi-arrow-left"></i>
+        Back to sizing
+      </button>
+    </div>
+
+    <section class="build-summary">
+      <div>
+        <span class="summary-label inter-regular">Selected station</span>
+        <strong class="inter-semibold">{{ build.inverter.brand }} {{ build.inverter.name }}</strong>
+      </div>
+      <div>
+        <span class="summary-label inter-regular">Output</span>
+        <strong class="inter-semibold">{{ build.inverter.maxOutput | number }} W</strong>
+      </div>
+      <div>
+        <span class="summary-label inter-regular">Storage</span>
+        <strong class="inter-semibold">{{ stationCapacity | number }} Wh</strong>
+      </div>
+      <div>
+        <span class="summary-label inter-regular">Solar</span>
+        <strong class="inter-semibold">{{ solarWattage | number }} W</strong>
+      </div>
+    </section>
+
+    @if (lineItems.length) {
+      <section class="parts-list">
+        <div class="parts-head">
+          <h2 class="inter-semibold">Your parts list</h2>
+          <p class="inter-regular">
+            Buy each part direct from the vendor. Prices shown are the latest verified deal.
+          </p>
+        </div>
+
+        <ul class="parts-rows">
+          @for (item of lineItems; track item.id) {
+            <li class="part-row">
+              <div class="part-icon">
+                <i class="bi {{ item.icon || 'bi-box' }}"></i>
+              </div>
+              <div class="part-info">
+                <span class="part-role inter-regular">{{ item.role }}</span>
+                <strong class="inter-semibold">{{ item.brand }} {{ item.name }}</strong>
+                <span class="part-meta inter-regular">
+                  {{ item.quantity }} ×
+                  {{ item.unitPrice | currency: 'USD' : 'symbol' : '1.0-0' }}
+                  @if (item.lineSavings > 0) {
+                    <span class="part-savings inter-medium">
+                      Save {{ item.lineSavings | currency: 'USD' : 'symbol' : '1.0-0' }}
+                    </span>
+                  }
+                </span>
+              </div>
+              <div class="part-price">
+                <strong class="inter-semibold">{{
+                  item.lineTotal | currency: 'USD' : 'symbol' : '1.0-0'
+                }}</strong>
+                @if (item.productUrl) {
+                  <a
+                    class="buy-link inter-medium"
+                    [href]="item.productUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Buy <i class="bi bi-box-arrow-up-right"></i>
+                  </a>
+                } @else {
+                  <span class="buy-unavailable inter-regular">No link yet</span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (offers.length) {
+      <app-bundle-offers
+        [offers]="offers"
+        [recommendedOfferId]="recommendedOfferId"
+        [activeOfferId]="activeBundleOffer?.id"
+        (applyOffer)="applyBundle($event)"
+      ></app-bundle-offers>
+    } @else {
+      <section class="no-offers">
+        <i class="bi bi-shop"></i>
+        <div>
+          <h2 class="inter-semibold">No vendor packages indexed yet</h2>
+          <p class="inter-regular">
+            This build is saved. We have not added current bundle data for
+            {{ build.inverter.brand }} {{ build.inverter.name }} yet.
+          </p>
+        </div>
+      </section>
+    }
+
+    <section class="checkout-bar">
+      <div class="price-stack">
+        <span class="summary-label inter-regular">
+          {{ activeBundleOffer ? 'Selected package' : 'Current configuration' }}
+        </span>
+        @if (totalSavings > 0) {
+          <span class="compare-price inter-regular">{{
+            compareAtTotal | currency: 'USD' : 'symbol' : '1.0-0'
+          }}</span>
+        }
+        <strong class="checkout-total inter-semibold">{{
+          totalPrice | currency: 'USD' : 'symbol' : '1.0-0'
+        }}</strong>
+        @if (totalSavings > 0) {
+          <span class="savings inter-medium">
+            Save {{ totalSavings | currency: 'USD' : 'symbol' : '1.0-0' }}
+          </span>
+        }
+      </div>
+      <button class="btn-primary inter-medium" (click)="viewSavedBuilds()">
+        Save and view builds
+      </button>
+    </section>
+  }
+</div>

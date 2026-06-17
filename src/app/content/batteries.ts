@@ -3,11 +3,25 @@ import { assignStableIds } from './catalog-utils';
 
 let batteries: Battery[] = [
   {
-    name: 'DELTA Pro Smart Battery',
+    id: 'ecoflow-delta-pro-smart-battery',
+    name: 'DELTA Pro Smart Extra Battery',
     brand: 'EcoFlow',
     icon: 'bi-battery-full',
     batteryCapacity: 3600,
-    price: 1599
+    price: 999,
+    listPrice: 2799,
+    productUrl: 'https://us.ecoflow.com/products/delta-pro-smart-extra-battery',
+    dealVerifiedOn: '2026-06-12'
+  },
+  {
+    name: 'DELTA Pro Ultra Extra Battery',
+    brand: 'EcoFlow',
+    icon: 'bi-battery-full',
+    batteryCapacity: 6144,
+    price: 1600,
+    listPrice: 3299,
+    productUrl: 'https://us.ecoflow.com/products/delta-pro-ultra',
+    dealVerifiedOn: '2026-06-11'
   },
   {
     name: 'DELTA Max Smart Battery',

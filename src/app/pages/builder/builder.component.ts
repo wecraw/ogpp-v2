@@ -64,6 +64,17 @@ export class BuilderComponent implements OnInit {
   public countUpOptionsPeakWattage = { duration: 1.5, startVal: 0 };
   public countUpOptionsTotalWattHours = { duration: 1.5, startVal: 0 };
 
+  // Loading overlay
+  private readonly loadingMessages = [
+    'Looking up solar data for your area…',
+    'Sizing your system…',
+    'Matching gear to your needs…',
+    'Almost ready…',
+  ];
+  public loadingMessage: string = this.loadingMessages[0];
+  public messageFading: boolean = false;
+  private messageIntervalId: ReturnType<typeof setInterval> | null = null;
+
   // Inputs
   @Input() build: Build = defaultBuild;
 
@@ -182,22 +193,47 @@ export class BuilderComponent implements OnInit {
   async generateBuild() {
     this.generatingBuild = true;
     this.sunHoursError = '';
+    this.startLoadingMessages();
 
     try {
       await this.getSunHours(this.zipCode);
+      if (!this.build.name?.trim()) {
+        this.build.name = this.suggestedName;
+      }
       this.build.id = uuidv4();
       this.buildService.saveBuild(this.build);
-      // Navigate to the "builds" page with the buildId as a query param
       const navigationExtras = {
         queryParams: { buildId: this.build.id }
       };
       setTimeout(() => {
-        //spoof loading time, not needed, purely ux
+        this.stopLoadingMessages();
         this.router.navigate(['/build'], navigationExtras);
       }, 1200);
     } catch (error) {
+      this.stopLoadingMessages();
       this.generatingBuild = false;
       this.sunHoursError = this.getSunHoursErrorMessage(error);
+    }
+  }
+
+  private startLoadingMessages() {
+    let index = 0;
+    this.loadingMessage = this.loadingMessages[0];
+    this.messageFading = false;
+    this.messageIntervalId = setInterval(() => {
+      this.messageFading = true;
+      setTimeout(() => {
+        index = (index + 1) % this.loadingMessages.length;
+        this.loadingMessage = this.loadingMessages[index];
+        this.messageFading = false;
+      }, 260);
+    }, 1400);
+  }
+
+  private stopLoadingMessages() {
+    if (this.messageIntervalId !== null) {
+      clearInterval(this.messageIntervalId);
+      this.messageIntervalId = null;
     }
   }
 
@@ -216,6 +252,20 @@ export class BuilderComponent implements OnInit {
 
   isAnyApplianceSelected() {
     return this.build.appliances.length > 0;
+  }
+
+  // A friendly default name derived from the chosen seasons. Shown as the
+  // name-field placeholder and used as the fallback name when left blank, so
+  // builds are always identifiable on /builds.
+  get suggestedName(): string {
+    const seasons = this.build.seasons;
+    if (seasons.length === 0) return 'My off-grid build';
+    if (seasons.length === 4) return 'Year-round build';
+    if (seasons.length === 1) {
+      const season = seasons[0];
+      return `${season.charAt(0).toUpperCase()}${season.slice(1)} build`;
+    }
+    return 'Multi-season build';
   }
 
   // Readiness ==============================================================
