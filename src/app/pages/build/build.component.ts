@@ -63,9 +63,6 @@ export class BuildComponent implements OnInit {
   // breakdowns so the user can see the number behind the recommendation.
   public worstSeasonSunHours: number = 0;
 
-  // Exposed for the template's battery breakdown so the autonomy assumption stays in one place.
-  public readonly daysOfAutonomy = DAYS_OF_AUTONOMY;
-
   // Which inline "why this size?" breakdown panels are expanded, keyed by step.
   public whyOpen: { inverter: boolean; battery: boolean; solar: boolean } = {
     inverter: false,

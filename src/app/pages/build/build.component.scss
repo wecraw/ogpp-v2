@@ -86,7 +86,7 @@
   width: 100%;
   bottom: 0;
   z-index: 999;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--scrim-bar);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 
@@ -161,7 +161,7 @@
     .seg-track {
       height: 4px;
       border-radius: $radius-pill;
-      background-color: rgba(0, 0, 0, 0.07);
+      background-color: var(--track-bg);
       overflow: hidden;
 
       .seg-fill {

@@ -3,34 +3,34 @@
 // ============================================================
 
 // --- Ink & text ---
-$text-color-black: #1d1d1f; // primary ink
-$text-secondary: #6e6e73; // Apple secondary grey
-$text-tertiary: #86868b; // muted captions
-$subtitle-color: #6e6e73; // section subtitles read grey, not blue
+$text-color-black: var(--text-color); // primary ink
+$text-secondary: var(--text-secondary); // Apple secondary grey
+$text-tertiary: var(--text-tertiary); // muted captions
+$subtitle-color: var(--subtitle-color); // section subtitles read grey, not blue
 
 // --- Accent (Apple blue) ---
-$selected-blue: #0071e3;
-$selected-blue-hover: #0077ed;
-$selected-blue-active: #006edb;
-$accent-ring: rgba(0, 113, 227, 0.45); // focus glow
-$accent-tint: rgba(0, 113, 227, 0.06); // faint selected fill
+$selected-blue: var(--selected-blue);
+$selected-blue-hover: var(--selected-blue-hover);
+$selected-blue-active: var(--selected-blue-active);
+$accent-ring: var(--accent-ring); // focus glow
+$accent-tint: var(--accent-tint); // faint selected fill
 
 $error-red: #d6322c;
 
 // --- Surfaces ---
-$page-bg: #f5f5f7; // canvas behind cards (classic Apple)
-$surface: #ffffff; // card / panel
-$surface-elevated: #ffffff;
+$page-bg: var(--page-bg); // canvas behind cards (classic Apple)
+$surface: var(--surface); // card / panel
+$surface-elevated: var(--surface-elevated);
 
 // --- Hairlines & borders (near-invisible, not heavy greys) ---
-$border-hairline: rgba(0, 0, 0, 0.1);
-$border-hairline-strong: rgba(0, 0, 0, 0.16);
-$divider: rgba(0, 0, 0, 0.08);
+$border-hairline: var(--border-hairline);
+$border-hairline-strong: var(--border-hairline-strong);
+$divider: var(--divider);
 
 // --- Legacy grey aliases (kept so existing partials still compile) ---
 $grey-secondary: $text-tertiary;
 $grey: $text-tertiary;
-$grey-light: #c7c7cc;
+$grey-light: var(--grey-light);
 $grey-hr: $divider;
 
 // --- Radii ---
@@ -41,9 +41,9 @@ $radius-xl: 22px;
 $radius-pill: 980px;
 
 // --- Elevation (soft, layered shadows) ---
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.03);
-$shadow-md: 0 2px 6px rgba(0, 0, 0, 0.05), 0 6px 20px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
 
 // --- Motion ---
 $ease-out: cubic-bezier(0.22, 1, 0.36, 1); // smooth, Apple-ish deceleration

@@ -165,7 +165,7 @@
   }
 
   .part-savings {
-    color: #147d3f;
+    color: var(--success);
     font-size: 12px;
   }
 
@@ -294,7 +294,7 @@
 
   .savings {
     grid-column: 1 / -1;
-    color: #147d3f;
+    color: var(--success);
     font-size: 12px;
   }
 }

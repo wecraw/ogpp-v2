@@ -21,6 +21,22 @@
       @if (menuOpen) {
         <div class="menu-dropdown">
           <a class="menu-item" routerLink="/builds" (click)="closeMenu()">My Builds</a>
+          <button class="menu-item menu-action" type="button" (click)="toggleThemePreference()">
+            <i
+              class="bi"
+              [class.bi-sun-fill]="themePreference === 'dark'"
+              [class.bi-moon-stars-fill]="themePreference !== 'dark'"
+            ></i>
+            <span>{{ themeToggleLabel }}</span>
+          </button>
+          <button
+            class="menu-item menu-action menu-action-subtle"
+            type="button"
+            (click)="useSystemTheme()"
+          >
+            <i class="bi bi-circle-half"></i>
+            <span>Use System Theme</span>
+          </button>
         </div>
       }
     </div>
