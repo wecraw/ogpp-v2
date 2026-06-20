@@ -19,7 +19,7 @@ $prefix: 'mo-';
   --selected-blue-hover: #0077ed;
   --selected-blue-active: #006edb;
   --accent-ring: rgba(0, 113, 227, 0.45);
-  --accent-tint: rgba(0, 113, 227, 0.08);
+  --accent-tint: rgba(0, 113, 227, 0.06);
   --page-bg: #f5f5f7;
   --surface: #ffffff;
   --surface-elevated: #ffffff;
@@ -33,6 +33,13 @@ $prefix: 'mo-';
   --nav-bg: rgba(245, 245, 247, 0.72);
   --menu-hover-bg: rgba(0, 0, 0, 0.05);
   --overlay-bg: rgba(0, 0, 0, 0.4);
+  --success: #147d3f;
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --scrim-bar: rgba(255, 255, 255, 0.8);
+  --scrim-page: rgba(245, 245, 247, 0.85);
+  --track-bg: rgba(0, 0, 0, 0.07);
+  --btn-disabled-bg: #d2d2d7;
+  --btn-disabled-text: #fafafa;
 }
 
 @mixin dark-theme-tokens {
@@ -59,6 +66,13 @@ $prefix: 'mo-';
   --nav-bg: rgba(28, 28, 30, 0.74);
   --menu-hover-bg: rgba(255, 255, 255, 0.08);
   --overlay-bg: rgba(0, 0, 0, 0.62);
+  --success: #30d158;
+  --surface-glass: rgba(44, 44, 46, 0.92);
+  --scrim-bar: rgba(28, 28, 30, 0.8);
+  --scrim-page: rgba(28, 28, 30, 0.85);
+  --track-bg: rgba(255, 255, 255, 0.12);
+  --btn-disabled-bg: #3a3a3c;
+  --btn-disabled-text: #8e8e93;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -221,8 +235,8 @@ input {
   }
 
   &:disabled {
-    background-color: #d2d2d7;
-    color: #fafafa;
+    background-color: var(--btn-disabled-bg);
+    color: var(--btn-disabled-text);
     opacity: 1;
     box-shadow: none;
     transform: none;
