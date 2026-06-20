@@ -1,0 +1,138 @@
+<div class="modal-backdrop" (click)="dismiss()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="header-text inter-medium">Add a custom appliance</span>
+      <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <form class="custom-form" (ngSubmit)="submit()">
+      <div class="field">
+        <label class="field-label inter-medium" for="custom-name">Name</label>
+        <input
+          id="custom-name"
+          type="text"
+          [maxlength]="maxNameLength"
+          [(ngModel)]="name"
+          name="name"
+          (input)="clearError('name')"
+          placeholder="e.g. Well pump"
+        />
+        @if (errors.name) {
+          <div class="input-error-message inter-regular">{{ errors.name }}</div>
+        }
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label inter-medium" for="custom-wattage">Wattage</label>
+          <input
+            id="custom-wattage"
+            type="number"
+            [(ngModel)]="wattage"
+            name="wattage"
+            min="1"
+            [max]="maxWattage"
+            (input)="onWattageInput($event)"
+            placeholder="Watts"
+          />
+          @if (errors.wattage) {
+            <div class="input-error-message inter-regular">{{ errors.wattage }}</div>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field-label inter-medium" for="custom-hours">Hours/day</label>
+          <input
+            id="custom-hours"
+            type="number"
+            [(ngModel)]="hours"
+            name="hours"
+            min="0"
+            max="24"
+            (input)="onHoursInput($event)"
+            placeholder="Hours"
+          />
+          @if (errors.hours) {
+            <div class="input-error-message inter-regular">{{ errors.hours }}</div>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field-label inter-medium" for="custom-quantity">Quantity</label>
+          <input
+            id="custom-quantity"
+            type="number"
+            [(ngModel)]="quantity"
+            name="quantity"
+            min="1"
+            (input)="onQuantityInput($event)"
+            placeholder="1"
+          />
+          @if (errors.quantity) {
+            <div class="input-error-message inter-regular">{{ errors.quantity }}</div>
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label inter-medium">Usage type</label>
+        <div class="segmented" role="group" aria-label="Usage type">
+          <button
+            type="button"
+            class="segment inter-medium"
+            [class.active]="usageType === 'continuous'"
+            (click)="usageType = 'continuous'"
+          >
+            Continuous
+          </button>
+          <button
+            type="button"
+            class="segment inter-medium"
+            [class.active]="usageType === 'intermittent'"
+            (click)="usageType = 'intermittent'"
+          >
+            Intermittent
+          </button>
+        </div>
+        <div class="field-hint inter-regular">
+          @if (usageType === 'continuous') {
+            Runs for extended stretches and overlaps with other loads (fridge, lights, fans).
+            Counted in full toward peak wattage.
+          } @else {
+            Brief, high-draw bursts that rarely stack (kettle, microwave, dryer). Only the single
+            largest intermittent load counts toward peak wattage.
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label inter-medium" for="custom-group">Group</label>
+        <select id="custom-group" [(ngModel)]="applianceGroup" name="group" class="group-select">
+          @for (group of groupOptions; track group) {
+            <option [value]="group">{{ group }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label inter-medium" for="custom-description">
+          Description <span class="optional inter-regular">(optional)</span>
+        </label>
+        <textarea
+          id="custom-description"
+          [(ngModel)]="description"
+          name="description"
+          placeholder="Add a note"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary inter-medium" (click)="dismiss()">Cancel</button>
+        <button type="submit" class="btn-primary inter-medium">Add appliance</button>
+      </div>
+    </form>
+  </div>
+</div>
