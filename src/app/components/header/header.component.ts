@@ -34,19 +34,21 @@ export class HeaderComponent implements OnInit {
   }
 
   toggleThemePreference(): void {
-    this.themePreference = this.themePreference === 'dark' ? 'light' : 'dark';
+    this.themePreference = this.isDark ? 'light' : 'dark';
     localStorage.setItem(this.themeStorageKey, this.themePreference);
     this.applyThemePreference();
   }
 
-  useSystemTheme(): void {
-    this.themePreference = 'system';
-    localStorage.removeItem(this.themeStorageKey);
-    this.applyThemePreference();
+  get isDark(): boolean {
+    if (this.themePreference === 'system') {
+      return this.prefersDarkScheme();
+    }
+
+    return this.themePreference === 'dark';
   }
 
   get themeToggleLabel(): string {
-    return this.themePreference === 'dark' ? 'Use Light Mode' : 'Use Dark Mode';
+    return this.isDark ? 'Use Light Mode' : 'Use Dark Mode';
   }
 
   private applyThemePreference(): void {
@@ -60,5 +62,13 @@ export class HeaderComponent implements OnInit {
 
   private isThemePreference(value: string | null): value is ThemePreference {
     return value === 'system' || value === 'light' || value === 'dark';
+  }
+
+  private prefersDarkScheme(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
   }
 }

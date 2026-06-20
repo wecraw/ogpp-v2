@@ -81,7 +81,9 @@
 }
 
 .menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   border-radius: $radius-sm;
   color: $text-color-black;

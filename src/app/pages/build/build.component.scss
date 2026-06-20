@@ -289,46 +289,21 @@
   margin-bottom: 12px;
 }
 
-// Days-of-autonomy control sits at the trailing edge of the Batteries step header,
-// dropping to its own row (label left, stepper right) on narrow screens.
-.autonomy-control {
-  margin: 6px 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-
-  @media (max-width: 600px) {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 14px;
-  }
-}
-
-.autonomy-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  color: $text-secondary;
-  white-space: nowrap;
-}
-
+// Days-of-autonomy stepper now lives inside the Batteries "Recommended minimum"
+// breakdown as a power-user control, replacing the static "× N" value on that row.
 .autonomy-stepper {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px;
+  gap: 6px;
+  padding: 3px;
   border-radius: $radius-pill;
   background-color: $surface;
   border: 1px solid $border-hairline;
   box-shadow: $shadow-sm;
 
   .step-button {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: none;
     background: transparent;
@@ -341,7 +316,7 @@
     transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out;
 
     i {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1;
     }
 
@@ -357,9 +332,10 @@
   }
 
   .autonomy-value {
-    min-width: 28px;
+    min-width: 34px;
     text-align: center;
-    font-size: 17px;
+    font-size: 14px;
+    color: $text-color-black;
   }
 }
 
@@ -604,6 +580,19 @@ build-component-card {
 
     & + .why-row {
       border-top: 1px solid $divider;
+    }
+
+    // The interactive autonomy row carries a stepper rather than a plain value, so
+    // center its contents (the baseline alignment used by the static rows would
+    // leave the stepper sitting awkwardly against the label).
+    &.why-row-control {
+      align-items: center;
+      padding: 4px 0;
+
+      .info-icon {
+        height: auto;
+        font-size: 14px;
+      }
     }
 
     .why-label {
