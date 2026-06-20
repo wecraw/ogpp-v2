@@ -7,6 +7,75 @@ $prefix: 'mo-';
 @import './variables.scss';
 
 // ============================================================
+//  Theme tokens
+// ============================================================
+:root {
+  color-scheme: light;
+  --text-color: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --subtitle-color: #6e6e73;
+  --selected-blue: #0071e3;
+  --selected-blue-hover: #0077ed;
+  --selected-blue-active: #006edb;
+  --accent-ring: rgba(0, 113, 227, 0.45);
+  --accent-tint: rgba(0, 113, 227, 0.08);
+  --page-bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --border-hairline: rgba(0, 0, 0, 0.1);
+  --border-hairline-strong: rgba(0, 0, 0, 0.16);
+  --divider: rgba(0, 0, 0, 0.08);
+  --grey-light: #c7c7cc;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.05), 0 6px 20px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --nav-bg: rgba(245, 245, 247, 0.72);
+  --menu-hover-bg: rgba(0, 0, 0, 0.05);
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+}
+
+@mixin dark-theme-tokens {
+  color-scheme: dark;
+  --text-color: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #86868b;
+  --subtitle-color: #a1a1a6;
+  --selected-blue: #0a84ff;
+  --selected-blue-hover: #409cff;
+  --selected-blue-active: #0071e3;
+  --accent-ring: rgba(10, 132, 255, 0.42);
+  --accent-tint: rgba(10, 132, 255, 0.16);
+  --page-bg: #000000;
+  --surface: #1c1c1e;
+  --surface-elevated: #2c2c2e;
+  --border-hairline: rgba(255, 255, 255, 0.12);
+  --border-hairline-strong: rgba(255, 255, 255, 0.2);
+  --divider: rgba(255, 255, 255, 0.1);
+  --grey-light: #48484a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45), 0 1px 1px rgba(0, 0, 0, 0.32);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.58), 0 6px 18px rgba(0, 0, 0, 0.42);
+  --nav-bg: rgba(28, 28, 30, 0.74);
+  --menu-hover-bg: rgba(255, 255, 255, 0.08);
+  --overlay-bg: rgba(0, 0, 0, 0.62);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    @include dark-theme-tokens;
+  }
+}
+
+:root[data-theme='dark'] {
+  @include dark-theme-tokens;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+// ============================================================
 //  Base canvas
 // ============================================================
 html,
