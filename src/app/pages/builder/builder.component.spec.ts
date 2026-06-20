@@ -2,8 +2,10 @@ import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { Build, defaultBuild, MonthlyGhi } from '../../interfaces/Build';
+import { Appliance } from '../../interfaces/Appliance';
 import { BuildService } from '../../services/build.service';
 import { SunHoursLookupError, SunHoursService } from '../../services/sun-hours.service';
+import { isCustomApplianceId } from '../../content/catalog-utils';
 import { BuilderComponent } from './builder.component';
 
 const MONTHLY_GHI: MonthlyGhi = {
@@ -87,6 +89,112 @@ describe('BuilderComponent', () => {
     expect(buildService.saveBuild).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
   }));
+
+  describe('custom appliances', () => {
+    const customDraft = (overrides: Partial<Appliance> = {}): Appliance => ({
+      name: 'Well pump',
+      wattage: 800,
+      hours: 2,
+      quantity: 1,
+      usageType: 'continuous',
+      applianceGroup: 'Custom',
+      ...overrides
+    });
+
+    it('adds a custom appliance: rendered, auto-selected, counted, with a custom id', () => {
+      component.addCustomAppliance(customDraft());
+
+      const added = component.allAppliances.find(a => a.name === 'Well pump');
+      expect(added).toBeTruthy();
+      expect(isCustomApplianceId(added!.id)).toBeTrue();
+      expect(component.isApplianceSelected(added!.id!)).toBeTrue();
+      expect(component.applianceGroups).toContain('Custom');
+      // 800 W continuous contributes in full to peak wattage.
+      expect(component.peakWattage).toBe(800);
+      expect(component.totalWattHours).toBe(800 * 2);
+    });
+
+    it('respects usageType in the coincident-load calc for customs', () => {
+      component.addCustomAppliance(customDraft({ name: 'Fan', wattage: 60 }));
+      component.addCustomAppliance(
+        customDraft({ name: 'Kettle', wattage: 1500, usageType: 'intermittent' })
+      );
+
+      // 60 W continuous + single largest intermittent (1500 W).
+      expect(component.peakWattage).toBe(60 + 1500);
+    });
+
+    it('gives duplicate-named customs distinct ids', () => {
+      component.addCustomAppliance(customDraft({ name: 'Pump' }));
+      component.addCustomAppliance(customDraft({ name: 'Pump' }));
+
+      const ids = component.allAppliances.filter(a => a.name === 'Pump').map(a => a.id);
+      expect(new Set(ids).size).toBe(2);
+    });
+
+    it('deletes a custom appliance from the catalog, build and totals', () => {
+      component.addCustomAppliance(customDraft());
+      const added = component.allAppliances.find(a => a.name === 'Well pump')!;
+
+      component.deleteAppliance(added);
+
+      expect(component.allAppliances.some(a => a.id === added.id)).toBeFalse();
+      expect(component.build.appliances.some(a => a.id === added.id)).toBeFalse();
+      expect(component.applianceGroups).not.toContain('Custom');
+      expect(component.peakWattage).toBe(0);
+      expect(component.totalWattHours).toBe(0);
+    });
+  });
+});
+
+describe('BuilderComponent reload reconciliation', () => {
+  it('re-injects a saved custom appliance so it renders and stays selected', () => {
+    const custom: Appliance = {
+      id: 'custom-well-pump',
+      name: 'Well pump',
+      wattage: 800,
+      hours: 2,
+      quantity: 1,
+      usageType: 'continuous',
+      applianceGroup: 'Custom'
+    };
+    const savedBuild: Build = {
+      ...createBuild(),
+      id: 'build-1',
+      appliances: [custom]
+    };
+
+    const sunHoursService = jasmine.createSpyObj<SunHoursService>('SunHoursService', [
+      'getSunHoursByZip'
+    ]);
+    const buildService = jasmine.createSpyObj<BuildService>('BuildService', [
+      'getBuild',
+      'saveBuild'
+    ]);
+    const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    buildService.getBuild.and.returnValue(savedBuild);
+
+    TestBed.configureTestingModule({
+      imports: [BuilderComponent],
+      providers: [
+        { provide: ActivatedRoute, useValue: { queryParams: of({ buildId: 'build-1' }) } },
+        { provide: Router, useValue: router },
+        { provide: SunHoursService, useValue: sunHoursService },
+        { provide: BuildService, useValue: buildService }
+      ]
+    });
+
+    const fixture = TestBed.createComponent(BuilderComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+
+    const reloaded = component.allAppliances.find(a => a.id === 'custom-well-pump');
+    expect(reloaded).toBeTruthy();
+    expect(reloaded!.name).toBe('Well pump');
+    expect(component.applianceGroups).toContain('Custom');
+    expect(component.isApplianceSelected('custom-well-pump')).toBeTrue();
+    expect(component.getAppliancesByGroup('Custom').length).toBe(1);
+  });
 });
 
 function createBuild(): Build {

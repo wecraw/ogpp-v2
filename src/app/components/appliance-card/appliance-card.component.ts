@@ -17,6 +17,9 @@ export class ApplianceCardComponent implements OnInit {
   @Input() disabled?: boolean = false;
   @Input() selected: boolean = false;
   @Input() originalAppliance?: Appliance | undefined;
+  // Custom appliances have no catalog default to reset to; they're removed
+  // entirely instead. Toggles the edit-panel footer from "Reset" to "Delete".
+  @Input() deletable: boolean = false;
   public defaultAppliance!: Appliance;
   public isEditMode: boolean = false;
   public nameRequired: boolean = false;
@@ -24,6 +27,7 @@ export class ApplianceCardComponent implements OnInit {
   // Events
   @Output() onEdit: EventEmitter<any> = new EventEmitter();
   @Output() onSelect: EventEmitter<boolean> = new EventEmitter();
+  @Output() onDelete: EventEmitter<void> = new EventEmitter();
 
   // Values
   editInnerVisible: boolean = false;
@@ -106,5 +110,10 @@ export class ApplianceCardComponent implements OnInit {
 
   clearNameError() {
     this.nameRequired = false;
+  }
+
+  deleteClicked(event: MouseEvent) {
+    event.stopPropagation();
+    this.onDelete.emit();
   }
 }

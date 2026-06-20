@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
+      providers: [provideRouter([])]
     }).compileComponents();
   });
 
@@ -20,10 +22,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('ogpp-v2');
   });
 
-  it('should render title', () => {
+  it('renders the application shell', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ogpp-v2');
+    expect(compiled.querySelector('app-header')).not.toBeNull();
   });
 });
