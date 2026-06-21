@@ -120,6 +120,7 @@ let inverters: Inverter[] = [
     batteryCapacity: 3840,
     maxBatteries: 6,
     compatibleBatteryIds: ['anker-solix-bp3800-expansion-battery'],
+    compatiblePowerSourceIds: ['anker-solix-ps400-panel'],
     price: 1799,
     listPrice: 1999,
     productUrl: 'https://www.ankersolix.com/products/f3800',

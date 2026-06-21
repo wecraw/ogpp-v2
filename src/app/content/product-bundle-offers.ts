@@ -16,6 +16,13 @@ const ECOFLOW_DELTA_2_MAX_ID = 'ecoflow-delta-2-max';
 const ECOFLOW_DELTA_2_MAX_URL =
   'https://us.ecoflow.com/products/delta-2-max-portable-power-station';
 
+const ANKER_F3800_ID = 'anker-solix-f3800';
+const ANKER_BP3800_BATTERY_ID = 'anker-solix-bp3800-expansion-battery';
+const ANKER_PS400_PANEL_ID = 'anker-solix-ps400-panel';
+const ANKER_F3800_PANEL_URL =
+  'https://www.ankersolix.com/products/f3800-400w-portable-solar-panel-1';
+const ANKER_F3800_BATTERY_URL = 'https://www.ankersolix.com/products/f3800-expansion-battery';
+
 export const productBundleOffers: ProductBundleOffer[] = [
   {
     id: 'ecoflow-delta-pro-2x220w',
@@ -159,5 +166,67 @@ export const productBundleOffers: ProductBundleOffer[] = [
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_2_MAX_URL,
     verifiedOn: '2026-06-20'
+  },
+  {
+    id: 'anker-solix-f3800-400w',
+    inverterId: ANKER_F3800_ID,
+    name: 'Solar starter',
+    description:
+      'The 6000W F3800 split-phase station paired with a 400W panel — the cheapest way into Anker solar.',
+    highlights: ['Anker SOLIX F3800 (3.84kWh)', '1 × 400W portable solar panel'],
+    price: 1999,
+    optimizationNote:
+      'Anker’s preset F3800 + 400W bundle ($1,999) beats buying the station and panel à la carte.',
+    compareAtPrice: 2399,
+    batteryQuantities: {},
+    powerSourceQuantities: {
+      [ANKER_PS400_PANEL_ID]: 1
+    },
+    vendor: 'Anker',
+    vendorUrl: ANKER_F3800_PANEL_URL,
+    verifiedOn: '2026-06-21'
+  },
+  {
+    id: 'anker-solix-f3800-extra-battery',
+    inverterId: ANKER_F3800_ID,
+    name: 'Extended runtime',
+    description: 'Doubles storage to 7.68kWh for whole-day loads that outlast the built-in battery.',
+    highlights: ['Anker SOLIX F3800 (3.84kWh)', '1 × 3.84kWh BP3800 expansion battery'],
+    price: 3298,
+    optimizationNote:
+      'Anker’s preset F3800 + expansion battery bundle ($3,298) beats buying the two separately.',
+    compareAtPrice: 3498,
+    batteryQuantities: {
+      [ANKER_BP3800_BATTERY_ID]: 1
+    },
+    powerSourceQuantities: {},
+    vendor: 'Anker',
+    vendorUrl: ANKER_F3800_BATTERY_URL,
+    verifiedOn: '2026-06-21'
+  },
+  {
+    id: 'anker-solix-f3800-complete',
+    inverterId: ANKER_F3800_ID,
+    name: 'Complete solar backup',
+    description:
+      'Adds both a full 3.84kWh expansion battery and a 400W panel for off-grid days of autonomy.',
+    highlights: [
+      'Anker SOLIX F3800 (3.84kWh)',
+      '1 × 3.84kWh BP3800 expansion battery',
+      '1 × 400W portable solar panel'
+    ],
+    price: 3897,
+    optimizationNote:
+      'Pairing Anker’s F3800 + expansion battery bundle ($3,298) with an add-on 400W panel ($599) is $100 less than buying all three à la carte.',
+    compareAtPrice: 4197,
+    batteryQuantities: {
+      [ANKER_BP3800_BATTERY_ID]: 1
+    },
+    powerSourceQuantities: {
+      [ANKER_PS400_PANEL_ID]: 1
+    },
+    vendor: 'Anker',
+    vendorUrl: ANKER_F3800_BATTERY_URL,
+    verifiedOn: '2026-06-21'
   }
 ];

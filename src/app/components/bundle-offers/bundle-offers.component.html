@@ -61,9 +61,18 @@
           </div>
         }
 
+        <a
+          class="vendor-link inter-medium"
+          [href]="vendorLink(offer)"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Check price & stock at {{ offer.vendor }}
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
         <button
           type="button"
-          class="apply-button inter-medium"
+          class="apply-button inter-regular"
           [disabled]="activeOfferId === offer.id"
           (click)="applyOffer.emit(offer)"
         >
@@ -73,15 +82,6 @@
             {{ applyLabel }}
           }
         </button>
-        <a
-          class="vendor-link inter-regular"
-          [href]="vendorLink(offer)"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Check price & stock at {{ offer.vendor }}
-          <i class="bi bi-box-arrow-up-right"></i>
-        </a>
       </article>
     }
   </div>

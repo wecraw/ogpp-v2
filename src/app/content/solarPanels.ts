@@ -31,6 +31,19 @@ let solarPanels: PowerSource[] = [
     price: 199
   },
   {
+    // Verified in-browser on the official US PS400 page (price renders via JS).
+    // $599.99 sale via auto-applied code (ends ~2026-06-22); $699.99 list.
+    id: 'anker-solix-ps400-panel',
+    name: 'SOLIX PS400 Portable Solar Panel',
+    brand: 'Anker',
+    icon: 'bi-bounding-box',
+    maxOutput: 400,
+    price: 599,
+    listPrice: 699,
+    productUrl: 'https://www.ankersolix.com/products/400w-portable-solar-panel',
+    dealVerifiedOn: '2026-06-21'
+  },
+  {
     name: 'PV200 Solar Panel',
     brand: 'Bluetti',
     icon: 'bi-bounding-box',

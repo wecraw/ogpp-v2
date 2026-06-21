@@ -1,0 +1,13 @@
+<div class="legal">
+  <header class="legal-header fade-in">
+    <a class="legal-back link-button inter-medium" routerLink="/home">
+      <i class="bi bi-chevron-left"></i> Back home
+    </a>
+    <h1 class="legal-title section-title">{{ title }}</h1>
+    <p class="legal-updated inter-regular">Last updated {{ lastUpdated }}</p>
+  </header>
+
+  <div class="legal-body fade-in">
+    <ng-content></ng-content>
+  </div>
+</div>

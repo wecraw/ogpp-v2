@@ -22,8 +22,11 @@ describe('ResultsComponent', () => {
     dec: 5
   };
 
-  // A 3000 W continuous load: covered by the DELTA Pro (3600 W) but not the
-  // smaller Bluetti/Jackery stations, so the anchor pick is deterministic.
+  // A 3000 W load that runs for 1 hour: the 3000 W peak is covered by the DELTA
+  // Pro (3600 W) but not the smaller Bluetti/Jackery stations, and the modest
+  // storage/solar targets it implies stay within the DELTA Pro's caps. The
+  // targets-aware anchor therefore lands on the DELTA Pro — the smallest
+  // qualifying station that also meets the targets — so the pick is deterministic.
   const build: Build = {
     name: 'Test build',
     id: 'build-1',
@@ -32,7 +35,7 @@ describe('ResultsComponent', () => {
         id: 'space-heater',
         name: 'Space heater',
         wattage: 3000,
-        hours: 4,
+        hours: 1,
         quantity: 1,
         applianceGroup: 'Climate'
       }

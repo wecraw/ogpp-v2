@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
 import { inverters } from 'src/app/content/inverters';
 import { Battery } from 'src/app/interfaces/Battery';
@@ -29,7 +29,7 @@ export interface CheckoutLineItem {
 
 @Component({
   selector: 'app-checkout',
-  imports: [CommonModule, BundleOffersComponent],
+  imports: [CommonModule, BundleOffersComponent, RouterLink],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
