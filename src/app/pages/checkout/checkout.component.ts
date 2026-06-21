@@ -2,9 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
-import { batteries as batteryCatalog } from 'src/app/content/batteries';
 import { inverters } from 'src/app/content/inverters';
-import { solarPanels as solarPanelCatalog } from 'src/app/content/solarPanels';
 import { Battery } from 'src/app/interfaces/Battery';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
@@ -85,7 +83,7 @@ export class CheckoutComponent implements OnInit {
     const offer = this.offers.find(item => item.id === this.build.bundleOfferId);
     if (
       !offer ||
-      !this.productDealsService.isOfferSatisfied(
+      !this.productDealsService.isOfferExact(
         offer,
         this.batteryQuantities,
         this.solarQuantities
@@ -116,6 +114,11 @@ export class CheckoutComponent implements OnInit {
     );
     this.batteryQuantities = this.groupQuantities(this.build.batteries);
     this.solarQuantities = this.groupQuantities(this.build.powerSources);
+    // Applying a bundle merges its gear on top of whatever the build already
+    // holds, so leftover extras can make the result no longer an exact SKU
+    // match. Drop the stale bundle id before saving so we never persist a
+    // fixed-SKU bundle that checkout has already priced as à-la-carte.
+    this.validateBundleSelection();
     this.computePricing();
     this.save();
   }
@@ -144,7 +147,13 @@ export class CheckoutComponent implements OnInit {
   private computePricing() {
     const offer = this.activeBundleOffer;
 
-    if (!offer) {
+    // A bundle is a fixed SKU, so its pricing is all-or-nothing: when the build
+    // matches a bundle exactly we show the bundle price alone, otherwise we show
+    // the pure à-la-carte sum. The two are never mixed.
+    if (offer) {
+      this.totalPrice = offer.price;
+      this.compareAtTotal = offer.compareAtPrice;
+    } else {
       this.totalPrice =
         (this.build.inverter?.price ?? 0) +
         this.build.batteries.reduce((total, battery) => total + battery.price, 0) +
@@ -159,10 +168,6 @@ export class CheckoutComponent implements OnInit {
           (total, panel) => total + (panel.listPrice ?? panel.price),
           0
         );
-    } else {
-      this.totalPrice = offer.price;
-      this.compareAtTotal = offer.compareAtPrice;
-      this.addExtraProductPrices(offer);
     }
 
     this.totalSavings = Math.max(this.compareAtTotal - this.totalPrice, 0);
@@ -210,30 +215,6 @@ export class CheckoutComponent implements OnInit {
       lineSavings: Math.max(unitListPrice - unitPrice, 0) * quantity,
       productUrl: product.productUrl
     };
-  }
-
-  private addExtraProductPrices(offer: ProductBundleOfferView) {
-    for (const battery of batteryCatalog) {
-      if (!battery.id) continue;
-      const extras = Math.max(
-        (this.batteryQuantities[battery.id] ?? 0) -
-          (offer.batteryQuantities[battery.id] ?? 0),
-        0
-      );
-      this.totalPrice += extras * battery.price;
-      this.compareAtTotal += extras * (battery.listPrice ?? battery.price);
-    }
-
-    for (const panel of solarPanelCatalog) {
-      if (!panel.id) continue;
-      const extras = Math.max(
-        (this.solarQuantities[panel.id] ?? 0) -
-          (offer.powerSourceQuantities[panel.id] ?? 0),
-        0
-      );
-      this.totalPrice += extras * panel.price;
-      this.compareAtTotal += extras * (panel.listPrice ?? panel.price);
-    }
   }
 
   private validateBundleSelection() {

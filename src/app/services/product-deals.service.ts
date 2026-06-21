@@ -53,14 +53,18 @@ export class ProductDealsService {
     return ranked[0];
   }
 
-  isOfferSatisfied(
+  // A vendor bundle is a fixed SKU: it is only "active" when the build's gear
+  // matches the bundle's quantities exactly. Any deviation (extra battery, a
+  // missing panel, a different model) means the build can no longer be bought at
+  // the bundle price, so callers fall back to à-la-carte pricing.
+  isOfferExact(
     offer: ProductBundleOffer,
     batteryQuantities: Record<string, number>,
     powerSourceQuantities: Record<string, number>
   ): boolean {
     return (
-      this.includesRequiredQuantities(offer.batteryQuantities, batteryQuantities) &&
-      this.includesRequiredQuantities(offer.powerSourceQuantities, powerSourceQuantities)
+      this.quantitiesMatchExactly(offer.batteryQuantities, batteryQuantities) &&
+      this.quantitiesMatchExactly(offer.powerSourceQuantities, powerSourceQuantities)
     );
   }
 
@@ -164,13 +168,15 @@ export class ProductDealsService {
     return batteryCoverage + solarCoverage;
   }
 
-  private includesRequiredQuantities(
+  private quantitiesMatchExactly(
     required: Record<string, number>,
     selected: Record<string, number>
   ): boolean {
-    return Object.entries(required).every(
-      ([id, quantity]) => (selected[id] ?? 0) >= quantity
-    );
+    const ids = new Set([...Object.keys(required), ...Object.keys(selected)]);
+    for (const id of ids) {
+      if ((required[id] ?? 0) !== (selected[id] ?? 0)) return false;
+    }
+    return true;
   }
 
   private mergeRequiredQuantities(

@@ -44,18 +44,51 @@ describe('ProductDealsService', () => {
     expect(offer.presetPrice).toBe(3498);
   });
 
-  it('keeps an applied offer valid when extra products are added', () => {
+  it('treats a bundle as active only when quantities match exactly', () => {
     const offer = service
       .getOffersForInverter('ecoflow-delta-pro')
       .find(item => item.id === 'ecoflow-delta-pro-complete')!;
 
     expect(
-      service.isOfferSatisfied(
+      service.isOfferExact(
         offer,
-        { 'ecoflow-delta-pro-smart-battery': 2 },
-        { 'ecoflow-220w-bifacial-panel': 3 }
+        { 'ecoflow-delta-pro-smart-battery': 1 },
+        { 'ecoflow-220w-bifacial-panel': 2 }
       )
     ).toBeTrue();
+  });
+
+  it('falls back from a bundle when any quantity deviates', () => {
+    const offer = service
+      .getOffersForInverter('ecoflow-delta-pro')
+      .find(item => item.id === 'ecoflow-delta-pro-complete')!;
+
+    // One extra battery beyond the fixed SKU — no longer the bundle.
+    expect(
+      service.isOfferExact(
+        offer,
+        { 'ecoflow-delta-pro-smart-battery': 2 },
+        { 'ecoflow-220w-bifacial-panel': 2 }
+      )
+    ).toBeFalse();
+
+    // A panel the bundle does not include.
+    expect(
+      service.isOfferExact(
+        offer,
+        { 'ecoflow-delta-pro-smart-battery': 1 },
+        { 'ecoflow-220w-bifacial-panel': 2, 'ecoflow-400w-portable-solar-panel': 1 }
+      )
+    ).toBeFalse();
+
+    // A missing required panel.
+    expect(
+      service.isOfferExact(
+        offer,
+        { 'ecoflow-delta-pro-smart-battery': 1 },
+        { 'ecoflow-220w-bifacial-panel': 1 }
+      )
+    ).toBeFalse();
   });
 
   it('sums à-la-carte price and compare-at price across station and components', () => {

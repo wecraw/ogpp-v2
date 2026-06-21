@@ -84,7 +84,32 @@ describe('CheckoutComponent', () => {
     expect(fixture.componentInstance.offers.length).toBe(4);
   });
 
-  it('preserves existing panels when applying a bundle', () => {
+  it('prices an exact bundle match at the bundle price only', () => {
+    // A build whose gear matches a fixed-SKU bundle exactly should show the
+    // bundle price (and its compare-at), never a mixed total.
+    TestBed.overrideProvider(BuildService, {
+      useValue: {
+        getBuild: () =>
+          structuredClone({ ...build, powerSources: [], batteries: [] }),
+        saveBuild
+      }
+    });
+    const fixture = TestBed.createComponent(CheckoutComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const offer = component.offers.find(item => item.id === 'ecoflow-delta-pro-2x220w')!;
+
+    component.applyBundle(offer);
+
+    expect(component.activeBundleOffer?.id).toBe('ecoflow-delta-pro-2x220w');
+    expect(component.totalPrice).toBe(offer.price);
+    expect(component.compareAtTotal).toBe(offer.compareAtPrice);
+  });
+
+  it('falls back to à-la-carte pricing when the build deviates from a bundle', () => {
+    // The build already holds a 400W panel, so applying the complete bundle
+    // (which has no 400W panel) is no longer an exact match. Pricing must be the
+    // pure à-la-carte sum with no bundle active and no mixed totals.
     const fixture = TestBed.createComponent(CheckoutComponent);
     fixture.detectChanges();
     const component = fixture.componentInstance;
@@ -94,7 +119,13 @@ describe('CheckoutComponent', () => {
 
     expect(component.solarWattage).toBe(840);
     expect(component.build.batteries.length).toBe(1);
+    expect(component.activeBundleOffer).toBeUndefined();
+    // 1699 station + 999 battery + 469 (400W) + 2 × 249 (220W) = 3665 à la carte.
     expect(component.totalPrice).toBe(3665);
     expect(saveBuild).toHaveBeenCalled();
+    // The build was priced à-la-carte, so it must not persist a fixed-SKU
+    // bundle id that no longer matches its gear.
+    expect(component.build.bundleOfferId).toBeUndefined();
+    expect(saveBuild.calls.mostRecent().args[0].bundleOfferId).toBeUndefined();
   });
 });
