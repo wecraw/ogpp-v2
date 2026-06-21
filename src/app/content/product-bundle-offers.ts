@@ -16,11 +16,6 @@ const ECOFLOW_DELTA_2_MAX_ID = 'ecoflow-delta-2-max';
 const ECOFLOW_DELTA_2_MAX_URL =
   'https://us.ecoflow.com/products/delta-2-max-portable-power-station';
 
-const GOAL_ZERO_YETI_1500X_ID = 'goal-zero-yeti-1500x';
-const GOAL_ZERO_BOULDER_200_ID = 'goal-zero-boulder-200-briefcase';
-const GOAL_ZERO_YETI_1500X_URL =
-  'https://goalzero.com/products/goal-zero-yeti-1500x-portable-power-station';
-
 export const productBundleOffers: ProductBundleOffer[] = [
   {
     id: 'ecoflow-delta-pro-2x220w',
@@ -36,8 +31,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     },
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_PRO_URL,
-    verifiedOn: '2026-06-12',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-12'
   },
   {
     id: 'ecoflow-delta-pro-400w',
@@ -55,8 +49,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     },
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_PRO_URL,
-    verifiedOn: '2026-06-12',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-12'
   },
   {
     id: 'ecoflow-delta-pro-extra-battery',
@@ -74,8 +67,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     powerSourceQuantities: {},
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_PRO_URL,
-    verifiedOn: '2026-06-12',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-12'
   },
   {
     id: 'ecoflow-delta-pro-complete',
@@ -95,8 +87,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     },
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_PRO_URL,
-    verifiedOn: '2026-06-12',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-12'
   },
   {
     id: 'ecoflow-delta-pro-ultra-400w',
@@ -115,8 +106,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     },
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_PRO_ULTRA_URL,
-    verifiedOn: '2026-06-11',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-11'
   },
   {
     id: 'ecoflow-delta-2-2x220w',
@@ -132,8 +122,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     },
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_2_URL,
-    verifiedOn: '2026-06-20',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-20'
   },
   {
     id: 'ecoflow-delta-2-extra-battery',
@@ -151,8 +140,7 @@ export const productBundleOffers: ProductBundleOffer[] = [
     powerSourceQuantities: {},
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_2_URL,
-    verifiedOn: '2026-06-20',
-    availability: 'check-vendor'
+    verifiedOn: '2026-06-20'
   },
   {
     id: 'ecoflow-delta-2-max-2x220w',
@@ -170,26 +158,6 @@ export const productBundleOffers: ProductBundleOffer[] = [
     },
     vendor: 'EcoFlow',
     vendorUrl: ECOFLOW_DELTA_2_MAX_URL,
-    verifiedOn: '2026-06-20',
-    // Station's buy button showed "UNAVAILABLE" at verification — don't claim in-stock.
-    availability: 'check-vendor'
-  },
-  {
-    id: 'goal-zero-yeti-1500x-boulder-200',
-    inverterId: GOAL_ZERO_YETI_1500X_ID,
-    name: 'Solar generator',
-    description: 'Yeti 1500X with a 200W Boulder briefcase panel for portable off-grid charging.',
-    highlights: ['Yeti 1500X (1.5kWh)', '1 × 200W Boulder briefcase panel'],
-    price: 1724.84,
-    compareAtPrice: 2099.9,
-    batteryQuantities: {},
-    powerSourceQuantities: {
-      [GOAL_ZERO_BOULDER_200_ID]: 1
-    },
-    vendor: 'Goal Zero',
-    vendorUrl: GOAL_ZERO_YETI_1500X_URL,
-    verifiedOn: '2026-06-20',
-    // Yeti 1500X shows "No longer available" on the official page at verification.
-    availability: 'sold-out'
+    verifiedOn: '2026-06-20'
   }
 ];

@@ -102,8 +102,8 @@ export class ProductDealsService {
   // no more than their current effective price, and improves on it in at least one
   // dimension. This is a different lens than `getRecommendedOffer` (best fit vs the
   // build's targets) — here we compare against what the user already has and pays,
-  // surfacing "more for the same or less." Skips the already-active offer and any
-  // sold-out SKU. Ranks by lowest price (biggest saving), then most coverage.
+  // surfacing "more for the same or less." Skips the already-active offer. Ranks by
+  // lowest price (biggest saving), then most coverage.
   getBetterBundle(
     offers: ProductBundleOfferView[],
     currentStorage: number,
@@ -112,7 +112,7 @@ export class ProductDealsService {
     activeOfferId?: string
   ): ProductBundleOfferView | undefined {
     const upgrades = offers.filter(offer => {
-      if (offer.id === activeOfferId || offer.availability === 'sold-out') return false;
+      if (offer.id === activeOfferId) return false;
       const coversStorage = offer.batteryCapacity >= currentStorage;
       const coversSolar = offer.solarWattage >= currentSolar;
       const costsNoMore = offer.price <= currentPrice;

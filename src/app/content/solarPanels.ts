@@ -57,15 +57,6 @@ let solarPanels: PowerSource[] = [
     icon: 'bi-bounding-box',
     maxOutput: 100,
     price: 249
-  },
-  {
-    name: 'Boulder 200 Briefcase',
-    brand: 'Goal Zero',
-    icon: 'bi-bounding-box',
-    maxOutput: 200,
-    price: 599.95,
-    productUrl: 'https://goalzero.com/products/boulder-200-solar-panel-briefcase',
-    dealVerifiedOn: '2026-06-20'
   }
 ];
 

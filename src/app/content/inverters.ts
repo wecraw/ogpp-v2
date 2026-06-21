@@ -126,22 +126,6 @@ let inverters: Inverter[] = [
     dealVerifiedOn: '2026-06-20'
   },
   {
-    name: 'Yeti 1500X',
-    brand: 'Goal Zero',
-    icon: 'bi-battery-charging',
-    voltages: [120],
-    maxSolarInput: 600,
-    maxTotalInput: 600,
-    maxOutput: 2000,
-    batteryCapacity: 1516,
-    maxBatteries: 0,
-    compatiblePowerSourceIds: ['goal-zero-boulder-200-briefcase'],
-    price: 1124.89,
-    listPrice: 1499.95,
-    productUrl: 'https://goalzero.com/products/goal-zero-yeti-1500x-portable-power-station',
-    dealVerifiedOn: '2026-06-20'
-  },
-  {
     name: 'Solar Generator 1000 v2',
     brand: 'Jackery',
     icon: 'bi-battery-charging',
