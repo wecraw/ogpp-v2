@@ -1,0 +1,56 @@
+@import '../../../variables.scss';
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 14px 16px;
+  text-align: left;
+  background: $surface;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: box-shadow $dur $ease-out, border-color $dur $ease-out,
+    transform $dur-fast $ease-out;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  &.selected,
+  &.selected:hover {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px $selected-blue, $shadow-md;
+
+    .preset-icon {
+      color: $selected-blue;
+    }
+  }
+}
+
+.preset-icon {
+  font-size: 22px;
+  color: $text-secondary;
+  transition: color $dur $ease-out;
+}
+
+.preset-name {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: $text-color-black;
+}
+
+.preset-description {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: $text-tertiary;
+}

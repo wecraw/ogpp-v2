@@ -1,0 +1,11 @@
+<button
+  type="button"
+  class="preset-card"
+  [ngClass]="{ selected: selected }"
+  (click)="selectClicked()"
+  [attr.aria-pressed]="selected"
+>
+  <i class="bi preset-icon" [ngClass]="preset.icon ?? 'bi-stars'"></i>
+  <span class="preset-name inter-semibold">{{ preset.name }}</span>
+  <span class="preset-description inter-regular">{{ preset.description }}</span>
+</button>

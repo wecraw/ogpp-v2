@@ -7,7 +7,10 @@ import {
   ViewChildren
 } from '@angular/core';
 import { allAppliances } from '../../content/appliances';
+import { appliancePresets } from '../../content/appliancePresets';
+import { AppliancePreset } from '../../interfaces/AppliancePreset';
 import { ApplianceCardComponent } from '../../components/appliance-card/appliance-card.component';
+import { PresetCardComponent } from '../../components/preset-card/preset-card.component';
 import { CommonModule } from '@angular/common';
 import { SunHoursLookupError, SunHoursService } from '../../services/sun-hours.service';
 import { FormsModule } from '@angular/forms';
@@ -40,7 +43,8 @@ import { firstValueFrom } from 'rxjs';
         ModalComponent,
         MiniCardComponent,
         CountUpDirective,
-        CustomApplianceFormComponent
+        CustomApplianceFormComponent,
+        PresetCardComponent
     ],
     templateUrl: './builder.component.html',
     styleUrls: ['./builder.component.scss']
@@ -52,6 +56,7 @@ export class BuilderComponent implements OnInit {
   // Deep-clone the catalog so in-card edits never mutate the shared module arrays.
   public allAppliances: Appliance[] = allAppliances.map(appliance => ({ ...appliance }));
   public originalAppliances: Appliance[] = allAppliances.map(appliance => ({ ...appliance }));
+  public appliancePresets: AppliancePreset[] = appliancePresets;
   public applianceGroups: string[] = [];
   public modalContent: string = LOCATION_DISCLAIMER;
   public modalTitle: string = LOCATION_DISCLAIMER_TITLE;
@@ -70,6 +75,11 @@ export class BuilderComponent implements OnInit {
   public generatingBuild: boolean = false;
   public isModalOpen: boolean = false;
   public isCustomFormOpen: boolean = false;
+
+  // A preset click against a non-empty selection parks the choice here until the
+  // user confirms the replace; `'scratch'` represents the "Start from scratch"
+  // clear action through the same confirm dialog.
+  public pendingPreset: AppliancePreset | 'scratch' | null = null;
   public countUpOptionsPeakWattage = { duration: 1.5, startVal: 0 };
   public countUpOptionsTotalWattHours = { duration: 1.5, startVal: 0 };
 
@@ -160,6 +170,7 @@ export class BuilderComponent implements OnInit {
 
     this.allAppliances.push(custom);
     this.build.appliances.push(custom);
+    this.build.appliancePresetId = undefined;
     this.refreshGroups();
     this.isCustomFormOpen = false;
     this.updateTotals();
@@ -170,6 +181,7 @@ export class BuilderComponent implements OnInit {
   deleteAppliance(appliance: Appliance): void {
     this.allAppliances = this.allAppliances.filter(item => item.id !== appliance.id);
     this.build.appliances = this.build.appliances.filter(item => item.id !== appliance.id);
+    this.build.appliancePresetId = undefined;
     this.refreshGroups();
     this.updateTotals();
   }
@@ -195,6 +207,7 @@ export class BuilderComponent implements OnInit {
       };
     }
 
+    this.build.appliancePresetId = undefined;
     this.updateTotals();
   }
 
@@ -211,6 +224,78 @@ export class BuilderComponent implements OnInit {
       }
     }
 
+    this.build.appliancePresetId = undefined;
+    this.updateTotals();
+  }
+
+  // Presets =================================================================
+
+  isPresetActive(preset: AppliancePreset): boolean {
+    return !!preset.id && this.build.appliancePresetId === preset.id;
+  }
+
+  // Clicking a preset replaces the current selection. If the user has already
+  // chosen appliances, confirm before wiping their work.
+  onPresetSelect(preset: AppliancePreset): void {
+    if (this.isAnyApplianceSelected()) {
+      this.pendingPreset = preset;
+      return;
+    }
+    this.applyPreset(preset);
+  }
+
+  onStartFromScratch(): void {
+    if (!this.isAnyApplianceSelected()) return;
+    this.pendingPreset = 'scratch';
+  }
+
+  confirmPendingPreset(): void {
+    const pending = this.pendingPreset;
+    this.pendingPreset = null;
+    if (pending === 'scratch') {
+      this.clearSelection();
+    } else if (pending) {
+      this.applyPreset(pending);
+    }
+  }
+
+  cancelPendingPreset(): void {
+    this.pendingPreset = null;
+  }
+
+  get pendingPresetName(): string {
+    return this.pendingPreset && this.pendingPreset !== 'scratch' ? this.pendingPreset.name : '';
+  }
+
+  // Reset the selection to empty, restoring catalog appliances to their defaults
+  // so a previously-applied preset's overrides don't linger on the cards. Custom
+  // appliances (no catalog default) are kept rendered, just deselected.
+  private clearSelection(): void {
+    this.build.appliances = [];
+    this.allAppliances = this.allAppliances.map(appliance => {
+      const original = this.originalAppliances.find(item => item.id === appliance.id);
+      return original ? { ...original } : appliance;
+    });
+    this.build.appliancePresetId = undefined;
+    this.refreshGroups();
+    this.updateTotals();
+  }
+
+  // Populate the selection from a preset: clear what's there, then select each
+  // referenced catalog appliance, applying any quantity/hours overrides. Unknown
+  // ids are skipped at runtime (a unit test guards against them at build time).
+  applyPreset(preset: AppliancePreset): void {
+    this.clearSelection();
+    for (const item of preset.items) {
+      const index = this.allAppliances.findIndex(appliance => appliance.id === item.applianceId);
+      if (index === -1) continue;
+      const merged: Appliance = { ...this.allAppliances[index] };
+      if (item.quantity !== undefined) merged.quantity = item.quantity;
+      if (item.hours !== undefined) merged.hours = item.hours;
+      this.allAppliances[index] = merged;
+      this.build.appliances.push(merged);
+    }
+    this.build.appliancePresetId = preset.id;
     this.updateTotals();
   }
 

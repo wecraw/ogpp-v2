@@ -6,6 +6,35 @@
       <div class="subtitle">Choose what you'll run off grid.</div>
     </div>
 
+    <!-- ── Preset starting points ──────────────────────────────── -->
+    <div class="presets-section">
+      <div class="presets-header">
+        <div>
+          <div class="presets-title inter-medium">Start with a preset</div>
+          <div class="presets-hint inter-regular">
+            Pick a common setup, then tweak the appliances below.
+          </div>
+        </div>
+        <button
+          type="button"
+          class="start-scratch-btn inter-medium"
+          [disabled]="!isAnyApplianceSelected()"
+          (click)="onStartFromScratch()"
+        >
+          Start from scratch
+        </button>
+      </div>
+      <div class="presets-grid">
+        @for (preset of appliancePresets; track preset.id) {
+          <preset-card
+            [preset]="preset"
+            [selected]="isPresetActive(preset)"
+            (onSelect)="onPresetSelect($event)"
+          ></preset-card>
+        }
+      </div>
+    </div>
+
     @for (group of applianceGroups; track group) {
       <div class="appliance-group">
         <div class="group-title inter-medium">{{ group }}</div>
@@ -165,6 +194,30 @@
     modalHeader="Why we collect location data"
     (closeModal)="toggleModal()"
   ></app-modal>
+}
+
+@if (pendingPreset) {
+  <div class="modal-backdrop" (click)="cancelPendingPreset()">
+    <div class="confirm-card" (click)="$event.stopPropagation()">
+      <div class="confirm-title inter-semibold">Replace your appliances?</div>
+      <div class="confirm-body inter-regular">
+        @if (pendingPresetName) {
+          Applying the <strong>{{ pendingPresetName }}</strong> preset will replace your current
+          appliance selection. Your location and seasons are kept.
+        } @else {
+          This will clear your current appliance selection. Your location and seasons are kept.
+        }
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-secondary inter-medium" (click)="cancelPendingPreset()">
+          Cancel
+        </button>
+        <button type="button" class="btn-primary inter-medium" (click)="confirmPendingPreset()">
+          {{ pendingPresetName ? 'Replace' : 'Clear' }}
+        </button>
+      </div>
+    </div>
+  </div>
 }
 
 @if (isCustomFormOpen) {
