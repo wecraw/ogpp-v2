@@ -123,5 +123,9 @@ describe('CheckoutComponent', () => {
     // 1699 station + 999 battery + 469 (400W) + 2 × 249 (220W) = 3665 à la carte.
     expect(component.totalPrice).toBe(3665);
     expect(saveBuild).toHaveBeenCalled();
+    // The build was priced à-la-carte, so it must not persist a fixed-SKU
+    // bundle id that no longer matches its gear.
+    expect(component.build.bundleOfferId).toBeUndefined();
+    expect(saveBuild.calls.mostRecent().args[0].bundleOfferId).toBeUndefined();
   });
 });

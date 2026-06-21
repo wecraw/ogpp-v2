@@ -114,6 +114,11 @@ export class CheckoutComponent implements OnInit {
     );
     this.batteryQuantities = this.groupQuantities(this.build.batteries);
     this.solarQuantities = this.groupQuantities(this.build.powerSources);
+    // Applying a bundle merges its gear on top of whatever the build already
+    // holds, so leftover extras can make the result no longer an exact SKU
+    // match. Drop the stale bundle id before saving so we never persist a
+    // fixed-SKU bundle that checkout has already priced as à-la-carte.
+    this.validateBundleSelection();
     this.computePricing();
     this.save();
   }
