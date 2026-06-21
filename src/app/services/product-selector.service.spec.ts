@@ -105,6 +105,52 @@ describe('ProductSelectorService', () => {
     expect(anchor).toBeUndefined();
   });
 
+  it('steps up to the next station whose solar input clears the target', () => {
+    const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: deltaPro },
+      5000, // within DELTA Pro's 10,800 Wh max bank
+      2000 // exceeds DELTA Pro's 1,600 W solar input
+    );
+
+    // DELTA Pro 3 (2,600 W solar) is the smallest larger sibling that fits.
+    expect(stepUp?.id).toBe('ecoflow-delta-pro-3');
+  });
+
+  it('steps up to a station whose full battery bank clears the storage target', () => {
+    const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: deltaPro },
+      15000, // exceeds DELTA Pro (10,800) and DELTA Pro 3 (11,296) max banks
+      1000
+    );
+
+    // Only the DELTA Pro Ultra (30,720 Wh max bank) can reach 15,000 Wh.
+    expect(stepUp?.id).toBe('ecoflow-delta-pro-ultra');
+  });
+
+  it('returns undefined when the anchor already reaches both targets', () => {
+    const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: deltaPro },
+      5000,
+      1000
+    );
+
+    expect(stepUp).toBeUndefined();
+  });
+
+  it('returns undefined when no larger same-brand station can reach the targets', () => {
+    const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: deltaPro },
+      50000, // beyond every EcoFlow station's max bank
+      1000
+    );
+
+    expect(stepUp).toBeUndefined();
+  });
+
   it('uses exact battery compatibility before brand matching', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const matches = service.getMatchingBatteries({
@@ -176,6 +222,24 @@ describe('ProductSelectorService', () => {
     }
   );
 });
+
+// A small load every EcoFlow station covers, so step-up choices turn purely on the
+// battery/solar caps rather than the peak-output filter.
+function lightLoadBuild() {
+  return {
+    ...defaultBuild,
+    appliances: [
+      {
+        id: 'light-load',
+        name: 'Light Load',
+        wattage: 800,
+        hours: 1,
+        quantity: 1,
+        applianceGroup: 'Test'
+      }
+    ]
+  };
+}
 
 function sortedInverterIds(): (string | undefined)[] {
   return [...inverters]

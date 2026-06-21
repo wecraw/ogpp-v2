@@ -176,6 +176,19 @@
             </div>
           </div>
         </div>
+        @if (batteryNeedsStepUp) {
+          <div class="alert alert-warning step-up inter-regular" role="alert">
+            <div class="step-up-text">
+              <strong>{{ stepUpTitle }}</strong>
+              {{ stepUpMessage }}
+            </div>
+            <button class="btn outlined inter-medium" (click)="selectStepUpInverter()">
+              Switch to {{ stepUpInverter?.name }}
+            </button>
+          </div>
+        } @else if (atBatteryLimit) {
+          <div class="alert alert-warning inter-regular" role="alert">{{ batteryLimitMessage }}</div>
+        }
         <div class="row card-grid">
           @if (builtInBatteryCard) {
             <div class="col-lg-5 col-xl-4">
@@ -191,7 +204,7 @@
                 [buildComponent]="battery"
                 [quantityMode]="true"
                 [quantity]="getBatteryQuantity(battery)"
-                [maxQuantity]="build.inverter.maxBatteries"
+                [maxQuantity]="getBatteryMaxQuantity(battery)"
                 (quantityChange)="onBatteryQuantityChange(battery, $event)"
               ></build-component-card>
             </div>
@@ -268,6 +281,19 @@
             </div>
           </div>
         </div>
+        @if (solarNeedsStepUp) {
+          <div class="alert alert-warning step-up inter-regular" role="alert">
+            <div class="step-up-text">
+              <strong>{{ stepUpTitle }}</strong>
+              {{ stepUpMessage }}
+            </div>
+            <button class="btn outlined inter-medium" (click)="selectStepUpInverter()">
+              Switch to {{ stepUpInverter?.name }}
+            </button>
+          </div>
+        } @else if (atSolarLimit) {
+          <div class="alert alert-warning inter-regular" role="alert">{{ solarLimitMessage }}</div>
+        }
         <div class="row card-grid">
           @for (panel of solarPanels; track panel.id; let i = $index) {
             <div class="col-lg-5 col-xl-4" [style.animation-delay.ms]="i * 55">
@@ -275,6 +301,7 @@
                 [buildComponent]="panel"
                 [quantityMode]="true"
                 [quantity]="getSolarQuantity(panel)"
+                [maxQuantity]="getSolarMaxQuantity(panel)"
                 (quantityChange)="onSolarQuantityChange(panel, $event)"
               ></build-component-card>
             </div>
