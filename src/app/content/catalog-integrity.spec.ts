@@ -3,6 +3,7 @@ import { inverters } from './inverters';
 import { solarPanels } from './solarPanels';
 import { productBundleOffers } from './product-bundle-offers';
 import { slugify } from './catalog-utils';
+import { environment } from 'src/environments/environment';
 
 /**
  * Referential-integrity guard for the hand-curated catalogs.
@@ -168,6 +169,33 @@ describe('catalog integrity', () => {
         .filter(offer => offer.presetPrice !== undefined && offer.presetPrice < offer.price)
         .map(offer => `${offer.id}: preset ${offer.presetPrice} < price ${offer.price}`);
       expect(bad).withContext('offers with a preset price below the charged price').toEqual([]);
+    });
+  });
+
+  // Outbound product/offer links are decorated by AffiliateLinkService, keyed on
+  // the product `brand` / offer `vendor` string. A brand with no entry in the
+  // vendor map still links out, but carries no affiliate `ref` — money left on
+  // the table. This catches a new brand (or a renamed one) before it ships.
+  describe('affiliate vendor coverage', () => {
+    const vendorKeys = new Set(Object.keys(environment.affiliate.vendors));
+
+    it('every catalog brand has an affiliate vendor entry', () => {
+      const brands = new Set([
+        ...inverters.map(item => item.brand),
+        ...batteries.map(item => item.brand),
+        ...solarPanels.map(item => item.brand)
+      ]);
+      const missing = [...brands].filter(brand => !vendorKeys.has(brand));
+      expect(missing).withContext('catalog brands with no affiliate vendor entry').toEqual([]);
+    });
+
+    it('every offer vendor has an affiliate vendor entry', () => {
+      const missing = productBundleOffers
+        .map(offer => offer.vendor)
+        .filter(vendor => !vendorKeys.has(vendor));
+      expect([...new Set(missing)])
+        .withContext('offer vendors with no affiliate vendor entry')
+        .toEqual([]);
     });
   });
 });

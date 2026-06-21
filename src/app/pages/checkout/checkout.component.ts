@@ -8,6 +8,7 @@ import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
+import { AffiliateLinkService } from 'src/app/services/affiliate-link.service';
 import { BuildService } from 'src/app/services/build.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
 import { ProductDealsService } from 'src/app/services/product-deals.service';
@@ -53,7 +54,8 @@ export class CheckoutComponent implements OnInit {
     private buildService: BuildService,
     private calculationUtils: CalculationUtilsService,
     private productDealsService: ProductDealsService,
-    private productSelectorService: ProductSelectorService
+    private productSelectorService: ProductSelectorService,
+    private affiliateLink: AffiliateLinkService
   ) {}
 
   ngOnInit() {
@@ -247,6 +249,8 @@ export class CheckoutComponent implements OnInit {
       lineTotal: unitPrice * quantity,
       lineSavings: Math.max(unitListPrice - unitPrice, 0) * quantity,
       productUrl: product.productUrl
+        ? this.affiliateLink.decorate(product.productUrl, product.brand)
+        : undefined
     };
   }
 
