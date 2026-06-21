@@ -618,6 +618,22 @@ build-component-card {
   font-size: 24px;
 }
 
+.alert.step-up {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .step-up-text {
+    flex: 1 1 240px;
+  }
+
+  .btn {
+    white-space: nowrap;
+  }
+}
+
 .title-row {
   align-self: flex-start;
   .title {

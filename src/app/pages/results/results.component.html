@@ -66,6 +66,19 @@
           <p class="why-body inter-regular">{{ whyExplanation }}</p>
         }
       </section>
+
+      @if (stepUpInverter) {
+        <section class="step-up-card">
+          <i class="bi bi-arrow-up-circle"></i>
+          <div class="step-up-body">
+            <h2 class="inter-semibold">{{ stepUpTitle }}</h2>
+            <p class="inter-regular">{{ stepUpMessage }}</p>
+          </div>
+          <button class="btn-primary inter-medium" (click)="useStepUp()">
+            Switch to {{ stepUpInverter.name }}
+          </button>
+        </section>
+      }
     }
 
     @if (offers.length) {

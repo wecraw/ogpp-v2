@@ -6,7 +6,9 @@ import { batteries as batteryCatalog } from 'src/app/content/batteries';
 import { solarPanels as solarPanelCatalog } from 'src/app/content/solarPanels';
 import {
   INVERTER_EXPLANATION,
-  INVERTER_EXPLANATION_TITLE
+  INVERTER_EXPLANATION_TITLE,
+  STEP_UP_TITLE,
+  STEP_UP_NOTICE
 } from 'src/app/content/strings';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
@@ -45,8 +47,13 @@ export class ResultsComponent implements OnInit {
   public noAnchorInverter = false;
   public whyExpanded = false;
 
+  // The next larger same-brand station to recommend when the auto-picked anchor can't
+  // reach the storage/solar targets within its caps. Surfaced as a re-anchor card.
+  public stepUpInverter?: Inverter;
+
   public readonly whyTitle = INVERTER_EXPLANATION_TITLE;
   public readonly whyExplanation = INVERTER_EXPLANATION;
+  public readonly stepUpTitle = STEP_UP_TITLE;
 
   constructor(
     private route: ActivatedRoute,
@@ -93,12 +100,12 @@ export class ResultsComponent implements OnInit {
       this.build.daysOfAutonomy = this.daysOfAutonomy;
       this.save();
 
-      this.offers = this.productDealsService.getOffersForInverter(anchor.id);
-      this.recommendedOfferId = this.productDealsService.getRecommendedOffer(
-        this.offers,
+      this.loadOffers(anchor);
+      this.stepUpInverter = this.productSelectorService.getStepUpInverter(
+        this.build,
         this.batteryTarget,
         this.solarTarget
-      )?.id;
+      );
     });
   }
 
@@ -106,8 +113,38 @@ export class ResultsComponent implements OnInit {
     return this.build.inverter;
   }
 
+  get stepUpMessage(): string {
+    if (!this.stepUpInverter) return '';
+    return STEP_UP_NOTICE(this.stepUpInverter.brand, this.stepUpInverter.name);
+  }
+
   toggleWhy() {
     this.whyExpanded = !this.whyExpanded;
+  }
+
+  // Re-anchor onto the recommended larger station: persist it, reload its bundle offers,
+  // and clear the step-up prompt (the new anchor reaches the targets).
+  useStepUp() {
+    const stepUp = this.stepUpInverter;
+    if (!stepUp) return;
+    this.build.inverter = stepUp;
+    this.build.bundleOfferId = undefined;
+    this.save();
+    this.loadOffers(stepUp);
+    this.stepUpInverter = this.productSelectorService.getStepUpInverter(
+      this.build,
+      this.batteryTarget,
+      this.solarTarget
+    );
+  }
+
+  private loadOffers(inverter: Inverter) {
+    this.offers = this.productDealsService.getOffersForInverter(inverter.id);
+    this.recommendedOfferId = this.productDealsService.getRecommendedOffer(
+      this.offers,
+      this.batteryTarget,
+      this.solarTarget
+    )?.id;
   }
 
   // Pre-seed the build with the chosen bundle's gear and hand off to the manual

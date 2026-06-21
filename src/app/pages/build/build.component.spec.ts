@@ -34,6 +34,40 @@ describe('BuildComponent', () => {
       'bluetti-ac200max'
     ]);
   });
+
+  it('caps battery quantity to the bank total across models', async () => {
+    const { component, fixture } = await setup(createBuild());
+
+    fixture.detectChanges();
+
+    // DELTA Pro accepts a 2-battery bank. From a cold start the whole bank is open.
+    const battery = component.batteries[0];
+    expect(component.remainingBatterySlots).toBe(2);
+    expect(component.getBatteryMaxQuantity(battery)).toBe(2);
+
+    // The cap is a bank total, not per-model: two slots filled (even across models)
+    // leave no room, so a model already holding one can't be raised.
+    component.batteryQuantities = { [battery.id!]: 1, 'another-model': 1 };
+    expect(component.totalBatteryQuantity).toBe(2);
+    expect(component.remainingBatterySlots).toBe(0);
+    expect(component.getBatteryMaxQuantity(battery)).toBe(1);
+  });
+
+  it('caps solar quantity to the station maxSolarInput headroom', async () => {
+    const { component, fixture } = await setup(createBuild());
+
+    fixture.detectChanges();
+
+    // DELTA Pro accepts 1,600 W of solar; a 400 W panel fits four times from empty.
+    const panel = component.solarPanels.find(item => item.maxOutput === 400)!;
+    expect(component.getSolarMaxQuantity(panel)).toBe(4);
+
+    // Three panels (1,200 W) leave 400 W of headroom — exactly one more 400 W panel.
+    component.onSolarQuantityChange(panel, 3);
+    expect(component.selectedSolarWattage).toBe(1200);
+    expect(component.remainingSolarInput).toBe(400);
+    expect(component.getSolarMaxQuantity(panel)).toBe(4);
+  });
 });
 
 async function setup(savedBuild: Build | null): Promise<{

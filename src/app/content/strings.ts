@@ -22,3 +22,20 @@ export const SOLAR_EXPLANATION_TITLE = 'How much solar do I need?';
 
 export const SOLAR_EXPLANATION =
   "Solar panels recharge your batteries during the day. The amount you need depends on how much energy your appliances use and how much sunlight your location gets.\n\nWe size your array so it can replenish a full day of usage during an average day of sunlight in your selected seasons.\n\nAdd panels until your total solar wattage meets the recommended target.";
+
+// Realtime cap notices shown when the chosen station hits a hardware limit. Kept as
+// builders so the live numbers stay in the copy rather than the template.
+export const BATTERY_LIMIT_NOTICE = (maxBatteries: number): string =>
+  `This station supports up to ${maxBatteries} expansion ${
+    maxBatteries === 1 ? 'battery' : 'batteries'
+  }. You've reached its limit.`;
+
+export const SOLAR_LIMIT_NOTICE = (maxSolarInput: number, usedWatts: number): string =>
+  `This station accepts up to ${maxSolarInput.toLocaleString()} W of solar (${usedWatts.toLocaleString()} W used). You've reached its limit.`;
+
+// Step-up banner/card copy: the anchor station can't reach the build's targets within
+// its caps, so we point to the next larger same-brand station that can.
+export const STEP_UP_TITLE = 'A larger station fits your needs';
+
+export const STEP_UP_NOTICE = (brand: string, name: string): string =>
+  `Your targets exceed this station's limits. Step up to the ${brand} ${name} to reach them with a single station.`;

@@ -14,7 +14,11 @@ import {
   AUTONOMY_EXPLANATION,
   AUTONOMY_EXPLANATION_TITLE,
   SOLAR_EXPLANATION,
-  SOLAR_EXPLANATION_TITLE
+  SOLAR_EXPLANATION_TITLE,
+  BATTERY_LIMIT_NOTICE,
+  SOLAR_LIMIT_NOTICE,
+  STEP_UP_TITLE,
+  STEP_UP_NOTICE
 } from 'src/app/content/strings';
 import {
   BuildComponentCardComponent
@@ -89,6 +93,14 @@ export class BuildComponent implements OnInit {
   public selectedBatteryCapacity: number = 0;
   public selectedSolarWattage: number = 0;
   public totalPrice: number = 0;
+
+  // Hardware-cap state, recomputed in `recalculate()`. `atBatteryLimit`/`atSolarLimit`
+  // gate the inline cap notices; `stepUpInverter` is the next larger same-brand station
+  // to recommend when the chosen one can't reach the build's targets within its caps.
+  public atBatteryLimit: boolean = false;
+  public atSolarLimit: boolean = false;
+  public stepUpInverter?: Inverter;
+  public readonly stepUpTitle = STEP_UP_TITLE;
 
   // Content
   public modalContent: string = '';
@@ -280,6 +292,86 @@ export class BuildComponent implements OnInit {
     return panel.id ? this.solarQuantities[panel.id] ?? 0 : 0;
   }
 
+  // ----- Hardware caps -----
+  // `maxBatteries` is a bank total, so each card's ceiling is its own current quantity
+  // plus whatever bank slots are still free. The built-in battery is shown as a locked
+  // card and excluded here — the caps cover expansion batteries only.
+
+  get totalBatteryQuantity(): number {
+    return Object.values(this.batteryQuantities).reduce((sum, quantity) => sum + (quantity ?? 0), 0);
+  }
+
+  get remainingBatterySlots(): number {
+    const max = this.build.inverter?.maxBatteries ?? 0;
+    return Math.max(0, max - this.totalBatteryQuantity);
+  }
+
+  getBatteryMaxQuantity(battery: Battery): number {
+    return this.getBatteryQuantity(battery) + this.remainingBatterySlots;
+  }
+
+  // Solar is capped by the station's `maxSolarInput` (watts), not a unit count, so each
+  // panel's ceiling is its current quantity plus however many more fit in the headroom.
+  get remainingSolarInput(): number {
+    const max = this.build.inverter?.maxSolarInput ?? 0;
+    return Math.max(0, max - this.selectedSolarWattage);
+  }
+
+  getSolarMaxQuantity(panel: PowerSource): number {
+    const perPanel = panel.maxOutput ?? 0;
+    if (perPanel <= 0) return this.getSolarQuantity(panel);
+    return this.getSolarQuantity(panel) + Math.floor(this.remainingSolarInput / perPanel);
+  }
+
+  // Smallest panel currently on offer — used to decide when solar headroom is exhausted
+  // (no panel could still be added without exceeding the cap).
+  private get smallestSolarWattage(): number {
+    return this.solarPanels.reduce(
+      (smallest, panel) => Math.min(smallest, panel.maxOutput ?? Infinity),
+      Infinity
+    );
+  }
+
+  get batteryLimitMessage(): string {
+    return BATTERY_LIMIT_NOTICE(this.build.inverter?.maxBatteries ?? 0);
+  }
+
+  get solarLimitMessage(): string {
+    return SOLAR_LIMIT_NOTICE(this.build.inverter?.maxSolarInput ?? 0, this.selectedSolarWattage);
+  }
+
+  get stepUpMessage(): string {
+    if (!this.stepUpInverter) return '';
+    return STEP_UP_NOTICE(this.stepUpInverter.brand, this.stepUpInverter.name);
+  }
+
+  // The most storage the chosen station could ever hold (built-in + a full bank of its
+  // largest expansion battery). When this is below the target, no amount of batteries
+  // closes the gap — that's when the step-up banner appears on the battery step.
+  private get anchorMaxStorage(): number {
+    const builtIn = this.build.inverter?.batteryCapacity ?? 0;
+    const maxBatteries = this.build.inverter?.maxBatteries ?? 0;
+    const largestBattery = this.batteries.reduce(
+      (largest, battery) => Math.max(largest, battery.batteryCapacity ?? 0),
+      0
+    );
+    return builtIn + maxBatteries * largestBattery;
+  }
+
+  get batteryNeedsStepUp(): boolean {
+    return !!this.stepUpInverter && this.anchorMaxStorage < this.batteryTarget;
+  }
+
+  get solarNeedsStepUp(): boolean {
+    return !!this.stepUpInverter && (this.build.inverter?.maxSolarInput ?? 0) < this.wattageNeeded;
+  }
+
+  // Re-anchor onto the recommended larger station, reusing the inverter-select flow so
+  // downstream selections reset and resize exactly as a manual pick would.
+  selectStepUpInverter() {
+    if (this.stepUpInverter) this.onInverterSelect(true, this.stepUpInverter);
+  }
+
   // ----- Completion -----
 
   get allComplete(): boolean {
@@ -338,6 +430,23 @@ export class BuildComponent implements OnInit {
       (this.build.inverter?.price ?? 0) +
       this.build.batteries.reduce((total, battery) => total + battery.price, 0) +
       this.build.powerSources.reduce((total, panel) => total + panel.price, 0);
+
+    const maxBatteries = this.build.inverter?.maxBatteries ?? 0;
+    this.atBatteryLimit = maxBatteries > 0 && this.totalBatteryQuantity >= maxBatteries;
+
+    const maxSolarInput = this.build.inverter?.maxSolarInput ?? 0;
+    this.atSolarLimit =
+      maxSolarInput > 0 &&
+      this.selectedSolarWattage > 0 &&
+      this.remainingSolarInput < this.smallestSolarWattage;
+
+    this.stepUpInverter = this.build.inverter?.maxOutput
+      ? this.productSelectorService.getStepUpInverter(
+          this.build,
+          this.batteryTarget,
+          this.wattageNeeded
+        )
+      : undefined;
   }
 
   // Expands a quantity map into a flat array of duplicated catalog entries, which is how

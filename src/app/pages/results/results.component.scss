@@ -145,6 +145,45 @@ app-bundle-offers {
   }
 }
 
+.step-up-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 18px 22px;
+  border: 1px solid $selected-blue;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-sm;
+
+  > i {
+    font-size: 26px;
+    color: $selected-blue;
+  }
+
+  .step-up-body {
+    flex: 1 1 auto;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 17px;
+    color: $text-color-black;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: $text-secondary;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .btn-primary {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
 .no-offers {
   display: flex;
   align-items: flex-start;
