@@ -9,6 +9,7 @@ import {
   INVERTER_EXPLANATION_TITLE
 } from 'src/app/content/strings';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
+import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 import { BuildService } from 'src/app/services/build.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
@@ -78,13 +79,21 @@ export class ResultsComponent implements OnInit {
       // and persists it so /build (and /checkout) reload a fully sized build.
       const anchor = this.productSelectorService.getAnchorInverter(this.build);
       this.noAnchorInverter = !anchor;
-      if (anchor) {
-        this.build.inverter = anchor;
-        this.build.daysOfAutonomy = this.daysOfAutonomy;
-        this.save();
+      if (!anchor) {
+        // No catalog station covers the peak draw (e.g. a saved build whose load
+        // was raised above every unit). Drop the stale inverter so we never offer
+        // or customize bundles for a station that can't actually run the load.
+        this.build.inverter = {} as Inverter;
+        this.offers = [];
+        this.recommendedOfferId = undefined;
+        return;
       }
 
-      this.offers = this.productDealsService.getOffersForInverter(this.build.inverter?.id);
+      this.build.inverter = anchor;
+      this.build.daysOfAutonomy = this.daysOfAutonomy;
+      this.save();
+
+      this.offers = this.productDealsService.getOffersForInverter(anchor.id);
       this.recommendedOfferId = this.productDealsService.getRecommendedOffer(
         this.offers,
         this.batteryTarget,

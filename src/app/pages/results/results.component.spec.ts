@@ -118,4 +118,36 @@ describe('ResultsComponent', () => {
       queryParams: { buildId: 'build-1' }
     });
   });
+
+  it('clears the stale inverter and offers no bundles when no station qualifies', () => {
+    // A peak draw above every catalog station (e.g. a saved build edited up past
+    // what any unit covers) while still carrying a previously-chosen inverter.
+    const oversized: Build = {
+      ...structuredClone(build),
+      appliances: [
+        {
+          id: 'arc-welder',
+          name: 'Arc welder',
+          wattage: 99000,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Tools'
+        }
+      ],
+      inverter: { id: 'ecoflow-delta-pro' } as Inverter
+    };
+
+    TestBed.overrideProvider(BuildService, {
+      useValue: { getBuild: () => structuredClone(oversized), saveBuild }
+    });
+
+    const fixture = TestBed.createComponent(ResultsComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+
+    expect(component.noAnchorInverter).toBeTrue();
+    expect(component.build.inverter.id).toBeUndefined();
+    expect(component.offers.length).toBe(0);
+    expect(component.recommendedOfferId).toBeUndefined();
+  });
 });

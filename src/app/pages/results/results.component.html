@@ -86,6 +86,19 @@
           <i class="bi bi-sliders"></i>
         </button>
       </section>
+    } @else if (noAnchorInverter) {
+      <section class="no-offers">
+        <i class="bi bi-shop"></i>
+        <div>
+          <h2 class="inter-semibold">No single station fits this load</h2>
+          <p class="inter-regular">
+            Open the manual builder to combine units, or trim your peak appliances.
+          </p>
+          <button class="btn-primary inter-medium" (click)="customizeManual()">
+            Open the manual builder
+          </button>
+        </div>
+      </section>
     } @else {
       <section class="no-offers">
         <i class="bi bi-shop"></i>
