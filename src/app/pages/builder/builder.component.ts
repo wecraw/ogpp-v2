@@ -263,7 +263,7 @@ export class BuilderComponent implements OnInit {
       };
       setTimeout(() => {
         this.stopLoadingMessages();
-        this.router.navigate(['/build'], navigationExtras);
+        this.router.navigate(['/results'], navigationExtras);
       }, 1200);
     } catch (error) {
       this.stopLoadingMessages();
