@@ -68,14 +68,14 @@
           (click)="applyOffer.emit(offer)"
         >
           @if (activeOfferId === offer.id) {
-            Bundle applied
+            {{ appliedLabel }}
           } @else {
-            Use this bundle
+            {{ applyLabel }}
           }
         </button>
         <a
           class="vendor-link inter-regular"
-          [href]="offer.vendorUrl"
+          [href]="vendorLink(offer)"
           target="_blank"
           rel="noopener noreferrer"
         >

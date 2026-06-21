@@ -1,0 +1,118 @@
+<div class="container results-page">
+  @if (buildNotFound) {
+    <div class="empty-state">
+      <i class="bi bi-exclamation-circle"></i>
+      <h1 class="inter-semibold">Build not found</h1>
+      <button class="btn-primary inter-medium" (click)="viewSavedBuilds()">
+        View saved builds
+      </button>
+    </div>
+  } @else {
+    <div class="page-head">
+      <div>
+        <span class="eyebrow inter-medium">Recommended kits</span>
+        <h1 class="inter-semibold">Power kits for {{ build.name }}.</h1>
+        @if (!noAnchorInverter) {
+          <p class="inter-regular">
+            Based on your appliances we picked the
+            <strong>{{ anchorInverter.brand }} {{ anchorInverter.name }}</strong>
+            — the smallest station that covers your
+            {{ peakWattage | number }} W peak draw. These vendor kits pair it with
+            storage and solar for your usage.
+          </p>
+        } @else {
+          <p class="inter-regular">
+            None of our single stations can cover your
+            {{ peakWattage | number }} W peak draw on their own. Try the manual
+            builder to combine units, or trim your peak appliances.
+          </p>
+        }
+      </div>
+    </div>
+
+    @if (!noAnchorInverter) {
+      <section class="demand-summary">
+        <div>
+          <span class="summary-label inter-regular">Peak draw</span>
+          <strong class="inter-semibold">{{ peakWattage | number }} W</strong>
+        </div>
+        <div>
+          <span class="summary-label inter-regular">Daily usage</span>
+          <strong class="inter-semibold">{{ totalWattHours | number }} Wh</strong>
+        </div>
+        <div>
+          <span class="summary-label inter-regular">Storage target</span>
+          <strong class="inter-semibold">{{ batteryTarget | number }} Wh</strong>
+          <span class="summary-sub inter-regular">{{ daysOfAutonomy }}-day autonomy</span>
+        </div>
+        <div>
+          <span class="summary-label inter-regular">Solar target</span>
+          <strong class="inter-semibold">{{ solarTarget | number }} W</strong>
+        </div>
+      </section>
+
+      <section class="why-this-size">
+        <button
+          type="button"
+          class="why-toggle inter-medium"
+          [attr.aria-expanded]="whyExpanded"
+          (click)="toggleWhy()"
+        >
+          <i class="bi bi-info-circle"></i>
+          {{ whyTitle }}
+          <i class="bi" [class.bi-chevron-down]="!whyExpanded" [class.bi-chevron-up]="whyExpanded"></i>
+        </button>
+        @if (whyExpanded) {
+          <p class="why-body inter-regular">{{ whyExplanation }}</p>
+        }
+      </section>
+    }
+
+    @if (offers.length) {
+      <app-bundle-offers
+        [offers]="offers"
+        [recommendedOfferId]="recommendedOfferId"
+        applyLabel="Customize this kit"
+        (applyOffer)="customize($event)"
+      ></app-bundle-offers>
+
+      <section class="diy-bar">
+        <div>
+          <strong class="inter-semibold">Want to fine-tune the parts?</strong>
+          <span class="inter-regular">Start from the recommended station and adjust each piece.</span>
+        </div>
+        <button class="btn outlined inter-medium" (click)="customizeManual()">
+          Build it yourself
+          <i class="bi bi-sliders"></i>
+        </button>
+      </section>
+    } @else if (noAnchorInverter) {
+      <section class="no-offers">
+        <i class="bi bi-shop"></i>
+        <div>
+          <h2 class="inter-semibold">No single station fits this load</h2>
+          <p class="inter-regular">
+            Open the manual builder to combine units, or trim your peak appliances.
+          </p>
+          <button class="btn-primary inter-medium" (click)="customizeManual()">
+            Open the manual builder
+          </button>
+        </div>
+      </section>
+    } @else {
+      <section class="no-offers">
+        <i class="bi bi-shop"></i>
+        <div>
+          <h2 class="inter-semibold">No vendor kits indexed yet</h2>
+          <p class="inter-regular">
+            We haven't added current bundle data for your recommended station yet.
+            You can still size this build by hand.
+          </p>
+          <button class="btn-primary inter-medium" (click)="customizeManual()">
+            Build it yourself
+          </button>
+        </div>
+      </section>
+    }
+  }
+</div>
