@@ -20,7 +20,18 @@
       </button>
       @if (menuOpen) {
         <div class="menu-dropdown">
-          <a class="menu-item" routerLink="/builds" (click)="closeMenu()">My Builds</a>
+          <a class="menu-item" routerLink="/builds" (click)="closeMenu()">
+            <i class="bi bi-collection"></i>
+            <span>My Builds</span>
+          </a>
+          <button class="menu-item menu-action" type="button" (click)="toggleThemePreference()">
+            <i
+              class="bi"
+              [class.bi-sun-fill]="isDark"
+              [class.bi-moon-stars-fill]="!isDark"
+            ></i>
+            <span>{{ themeToggleLabel }}</span>
+          </button>
         </div>
       }
     </div>

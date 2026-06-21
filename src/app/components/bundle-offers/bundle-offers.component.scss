@@ -61,7 +61,7 @@
   padding: 18px;
   border: 1px solid $border-hairline;
   border-radius: $radius-lg;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-glass);
   box-shadow: $shadow-sm;
   transition: border-color $dur-fast $ease-out, box-shadow $dur-fast $ease-out,
     transform $dur-fast $ease-out;
@@ -171,7 +171,7 @@
   }
 
   .savings {
-    color: #147d3f;
+    color: var(--success);
     font-size: 12px;
     white-space: nowrap;
   }
@@ -182,7 +182,7 @@
   align-items: flex-start;
   gap: 6px;
   margin-top: 9px;
-  color: #147d3f;
+  color: var(--success);
   font-size: 11px;
   line-height: 1.4;
 }

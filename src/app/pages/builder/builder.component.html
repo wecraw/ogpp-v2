@@ -16,13 +16,20 @@
               [appliance]="appliance"
               [originalAppliance]="getOriginalApplianceById(appliance.id!)"
               [selected]="isApplianceSelected(appliance.id!)"
+              [deletable]="isCustom(appliance)"
               (onEdit)="onApplianceValueChange($event, appliance)"
               (onSelect)="onApplianceSelect(appliance.id!)"
+              (onDelete)="deleteAppliance(appliance)"
             ></appliance-card>
           }
         </div>
       </div>
     }
+
+    <button type="button" class="add-custom-btn inter-medium" (click)="openCustomForm()">
+      <i class="bi bi-plus-lg"></i>
+      Add custom appliance
+    </button>
   </main>
 
   <!-- ── Right: sticky running summary ──────────────────────── -->
@@ -158,4 +165,12 @@
     modalHeader="Why we collect location data"
     (closeModal)="toggleModal()"
   ></app-modal>
+}
+
+@if (isCustomFormOpen) {
+  <custom-appliance-form
+    [groups]="applianceGroups"
+    (save)="addCustomAppliance($event)"
+    (cancel)="closeCustomForm()"
+  ></custom-appliance-form>
 }

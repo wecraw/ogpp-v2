@@ -109,33 +109,6 @@
               <i class="bi bi-question-circle info-icon" (click)="toggleModal('battery')"></i>
             </div>
           </div>
-          <div class="autonomy-control">
-            <span class="autonomy-label inter-regular">
-              Days of autonomy
-              <i class="bi bi-question-circle info-icon" (click)="toggleModal('autonomy')"></i>
-            </span>
-            <div class="autonomy-stepper">
-              <button
-                type="button"
-                class="step-button"
-                [disabled]="daysOfAutonomy <= minDays"
-                (click)="changeDaysOfAutonomy(-1)"
-                aria-label="Fewer days of autonomy"
-              >
-                <i class="bi bi-dash"></i>
-              </button>
-              <span class="autonomy-value inter-medium">{{ daysOfAutonomy }}</span>
-              <button
-                type="button"
-                class="step-button"
-                [disabled]="daysOfAutonomy >= maxDays"
-                (click)="changeDaysOfAutonomy(1)"
-                aria-label="More days of autonomy"
-              >
-                <i class="bi bi-plus"></i>
-              </button>
-            </div>
-          </div>
         </div>
         <button
           type="button"
@@ -166,9 +139,35 @@
                 <span class="why-label inter-regular">Daily energy use</span>
                 <span class="why-value inter-medium">{{ totalWattHours | number }} Wh/day</span>
               </div>
-              <div class="why-row">
-                <span class="why-label inter-regular">Days of autonomy</span>
-                <span class="why-value inter-medium">× {{ daysOfAutonomy }}</span>
+              <div class="why-row why-row-control">
+                <span class="why-label inter-regular">
+                  Days of autonomy
+                  <i
+                    class="bi bi-question-circle info-icon"
+                    (click)="toggleModal('autonomy')"
+                  ></i>
+                </span>
+                <div class="autonomy-stepper">
+                  <button
+                    type="button"
+                    class="step-button"
+                    [disabled]="daysOfAutonomy <= minDays"
+                    (click)="changeDaysOfAutonomy(-1)"
+                    aria-label="Fewer days of autonomy"
+                  >
+                    <i class="bi bi-dash"></i>
+                  </button>
+                  <span class="autonomy-value inter-medium">× {{ daysOfAutonomy }}</span>
+                  <button
+                    type="button"
+                    class="step-button"
+                    [disabled]="daysOfAutonomy >= maxDays"
+                    (click)="changeDaysOfAutonomy(1)"
+                    aria-label="More days of autonomy"
+                  >
+                    <i class="bi bi-plus"></i>
+                  </button>
+                </div>
               </div>
               <div class="why-row total">
                 <span class="why-label inter-regular">Target storage</span>

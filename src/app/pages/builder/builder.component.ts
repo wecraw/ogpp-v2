@@ -20,6 +20,13 @@ import { CountUpDirective } from '../../directives/count-up.directive';
 import { Build, defaultBuild } from '../../interfaces/Build';
 import { CalculationUtilsService } from '../../services/calculation-utils.service';
 import { BuildService } from '../../services/build.service';
+import {
+  CustomApplianceFormComponent
+} from '../../components/custom-appliance-form/custom-appliance-form.component';
+import {
+  generateCustomApplianceId,
+  isCustomApplianceId
+} from '../../content/catalog-utils';
 import { v4 as uuidv4 } from 'uuid';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -32,7 +39,8 @@ import { firstValueFrom } from 'rxjs';
         FormsModule,
         ModalComponent,
         MiniCardComponent,
-        CountUpDirective
+        CountUpDirective,
+        CustomApplianceFormComponent
     ],
     templateUrl: './builder.component.html',
     styleUrls: ['./builder.component.scss']
@@ -61,6 +69,7 @@ export class BuilderComponent implements OnInit {
   // DOM controllers
   public generatingBuild: boolean = false;
   public isModalOpen: boolean = false;
+  public isCustomFormOpen: boolean = false;
   public countUpOptionsPeakWattage = { duration: 1.5, startVal: 0 };
   public countUpOptionsTotalWattHours = { duration: 1.5, startVal: 0 };
 
@@ -97,7 +106,9 @@ export class BuilderComponent implements OnInit {
           this.zipCode = this.build.zipCode;
           this.updateTotals();
 
-          // Update appliance properties based on the loaded build
+          // Reconcile saved appliances with the catalog. Catalog items are
+          // merged onto their clone; custom appliances (no catalog match) are
+          // re-injected so they render as selectable/editable cards on reload.
           this.build.appliances.forEach(buildAppliance => {
             const applianceIndex = this.allAppliances.findIndex(
               appliance => appliance.id === buildAppliance.id
@@ -107,15 +118,60 @@ export class BuilderComponent implements OnInit {
                 ...this.allAppliances[applianceIndex],
                 ...buildAppliance
               };
+            } else {
+              this.allAppliances.push({ ...buildAppliance });
             }
           });
         }
       }
     });
 
+    this.refreshGroups();
+  }
+
+  // Derive the rendered group list from the live appliance set so a custom
+  // group appears when its first custom is added and disappears when emptied.
+  private refreshGroups(): void {
     this.applianceGroups = [
       ...new Set(this.allAppliances.map(appliance => appliance.applianceGroup))
     ];
+  }
+
+  isCustom(appliance: Appliance): boolean {
+    return isCustomApplianceId(appliance.id);
+  }
+
+  openCustomForm(): void {
+    this.isCustomFormOpen = true;
+  }
+
+  closeCustomForm(): void {
+    this.isCustomFormOpen = false;
+  }
+
+  // Assign a collision-safe runtime ID, render the appliance as a card, select
+  // it into the build, and recompute totals — identical to a catalog pick.
+  addCustomAppliance(appliance: Appliance): void {
+    const id = generateCustomApplianceId(
+      appliance.name,
+      this.allAppliances.map(existing => existing.id!).filter(Boolean)
+    );
+    const custom: Appliance = { ...appliance, id };
+
+    this.allAppliances.push(custom);
+    this.build.appliances.push(custom);
+    this.refreshGroups();
+    this.isCustomFormOpen = false;
+    this.updateTotals();
+  }
+
+  // Fully remove a custom appliance: it has no catalog default to fall back to,
+  // so it's dropped from both the rendered set and the build.
+  deleteAppliance(appliance: Appliance): void {
+    this.allAppliances = this.allAppliances.filter(item => item.id !== appliance.id);
+    this.build.appliances = this.build.appliances.filter(item => item.id !== appliance.id);
+    this.refreshGroups();
+    this.updateTotals();
   }
 
   getOriginalApplianceById(id: string): Appliance | undefined {
