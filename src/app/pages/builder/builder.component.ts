@@ -219,6 +219,9 @@ export class BuilderComponent implements OnInit {
       );
       if (index !== -1) {
         this.build.appliances.splice(index, 1);
+        // Revert the deselected card to its catalog default so any lingering
+        // preset override (or manual edit) doesn't carry into a later re-select.
+        this.restoreCatalogDefault(selectedAppliance.id!);
       } else {
         this.build.appliances.push(selectedAppliance);
       }
@@ -226,6 +229,16 @@ export class BuilderComponent implements OnInit {
 
     this.build.appliancePresetId = undefined;
     this.updateTotals();
+  }
+
+  // Reset a single catalog appliance in `allAppliances` back to its original
+  // values. Custom appliances have no catalog default, so they're left as-is.
+  private restoreCatalogDefault(id: string): void {
+    const index = this.allAppliances.findIndex(appliance => appliance.id === id);
+    const original = this.originalAppliances.find(appliance => appliance.id === id);
+    if (index !== -1 && original) {
+      this.allAppliances[index] = { ...original };
+    }
   }
 
   // Presets =================================================================
@@ -272,10 +285,7 @@ export class BuilderComponent implements OnInit {
   // appliances (no catalog default) are kept rendered, just deselected.
   private clearSelection(): void {
     this.build.appliances = [];
-    this.allAppliances = this.allAppliances.map(appliance => {
-      const original = this.originalAppliances.find(item => item.id === appliance.id);
-      return original ? { ...original } : appliance;
-    });
+    this.allAppliances.forEach(appliance => this.restoreCatalogDefault(appliance.id!));
     this.build.appliancePresetId = undefined;
     this.refreshGroups();
     this.updateTotals();
