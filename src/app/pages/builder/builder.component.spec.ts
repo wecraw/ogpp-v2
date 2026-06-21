@@ -70,7 +70,7 @@ describe('BuilderComponent', () => {
     expect(buildService.saveBuild).toHaveBeenCalledWith(component.build);
 
     tick(1200);
-    expect(router.navigate).toHaveBeenCalledWith(['/build'], {
+    expect(router.navigate).toHaveBeenCalledWith(['/results'], {
       queryParams: { buildId: component.build.id }
     });
   }));
@@ -194,6 +194,64 @@ describe('BuilderComponent reload reconciliation', () => {
     expect(component.applianceGroups).toContain('Custom');
     expect(component.isApplianceSelected('custom-well-pump')).toBeTrue();
     expect(component.getAppliancesByGroup('Custom').length).toBe(1);
+  });
+});
+
+describe('BuilderComponent preset overrides', () => {
+  let component: BuilderComponent;
+
+  beforeEach(async () => {
+    const sunHoursService = jasmine.createSpyObj<SunHoursService>('SunHoursService', [
+      'getSunHoursByZip'
+    ]);
+    const buildService = jasmine.createSpyObj<BuildService>('BuildService', [
+      'getBuild',
+      'saveBuild'
+    ]);
+    const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    buildService.getBuild.and.returnValue(null);
+
+    await TestBed.configureTestingModule({
+      imports: [BuilderComponent],
+      providers: [
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
+        { provide: Router, useValue: router },
+        { provide: SunHoursService, useValue: sunHoursService },
+        { provide: BuildService, useValue: buildService }
+      ]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(BuilderComponent);
+    component = fixture.componentInstance;
+    component.build = createBuild();
+    fixture.detectChanges();
+  });
+
+  it('reverts a deselected appliance to its catalog default so overrides do not linger', () => {
+    const preset = component.appliancePresets[0];
+    // Target an item the preset overrides via quantity, so a lingering value
+    // would visibly differ from the catalog default.
+    const item = preset.items.find(i => i.quantity !== undefined)!;
+    const overrideQty = item.quantity!;
+    const original = component.getOriginalApplianceById(item.applianceId)!;
+    expect(overrideQty).not.toBe(original.quantity); // guard against a vacuous test
+
+    component.applyPreset(preset);
+    expect(
+      component.build.appliances.find(a => a.id === item.applianceId)!.quantity
+    ).toBe(overrideQty);
+
+    // Manually deselect every appliance the preset added, emptying the selection
+    // (the path that previously left stale override values behind).
+    for (const presetItem of preset.items) {
+      component.onApplianceSelect(presetItem.applianceId);
+    }
+    expect(component.isAnyApplianceSelected()).toBeFalse();
+
+    // Re-selecting must pick up the catalog default, not the preset override.
+    component.onApplianceSelect(item.applianceId);
+    const reselected = component.build.appliances.find(a => a.id === item.applianceId)!;
+    expect(reselected.quantity).toBe(original.quantity);
   });
 });
 

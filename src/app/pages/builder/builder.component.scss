@@ -38,6 +38,133 @@
   }
 }
 
+// ============================================================
+//  Preset starting points
+// ============================================================
+.presets-section {
+  margin-top: 24px;
+}
+
+.presets-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  .presets-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: $text-secondary;
+  }
+  .presets-hint {
+    font-size: 13px;
+    color: $text-tertiary;
+    margin-top: 1px;
+  }
+}
+
+.start-scratch-btn {
+  flex: none;
+  padding: 7px 14px;
+  background: $surface;
+  color: $text-secondary;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-pill;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color $dur-fast $ease-out, background-color $dur-fast $ease-out,
+    color $dur-fast $ease-out;
+
+  &:hover:not(:disabled) {
+    border-color: $border-hairline-strong;
+    color: $text-color-black;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+// ============================================================
+//  Confirm dialog (replace selection)
+// ============================================================
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 1050;
+  animation: fade-in $dur-fast $ease-out both;
+}
+
+.confirm-card {
+  background: $surface;
+  padding: 28px;
+  border-radius: $radius-xl;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: $shadow-lg;
+
+  .confirm-title {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: $text-color-black;
+  }
+  .confirm-body {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: $text-secondary;
+  }
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+
+  .btn-primary {
+    width: auto;
+    padding: 0 22px;
+  }
+
+  .btn-secondary {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    border: 1px solid $border-hairline;
+    border-radius: $radius-sm;
+    height: 44px;
+    padding: 0 22px;
+    color: $text-color-black;
+    background-color: $surface;
+    cursor: pointer;
+    transition: background-color $dur-fast $ease-out, border-color $dur-fast $ease-out;
+
+    &:hover {
+      background-color: $page-bg;
+      border-color: $border-hairline-strong;
+    }
+  }
+}
+
 .appliance-group {
   margin-top: 30px;
   margin-bottom: 4px;

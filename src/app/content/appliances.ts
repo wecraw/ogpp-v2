@@ -180,6 +180,19 @@ const lightingAppliances: Appliance[] = [
   }
 ];
 
+const medicalAppliances: Appliance[] = [
+  {
+    id: 'health-medical-cpap-machine',
+    name: 'CPAP Machine',
+    description: 'With humidifier off',
+    wattage: 40,
+    hours: 8,
+    quantity: 1,
+    applianceGroup: 'Health & Medical',
+    icon: 'bi-lungs'
+  }
+];
+
 const climateAppliances: Appliance[] = [
   {
     name: 'Box Fan',
@@ -326,6 +339,7 @@ const allAppliances: Appliance[] = [
   ...entertainmentAppliances,
   ...officeAppliances,
   ...lightingAppliances,
+  ...medicalAppliances,
   ...climateAppliances,
   ...laundryAppliances,
   ...utilityAppliances
