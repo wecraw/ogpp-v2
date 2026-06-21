@@ -31,6 +31,23 @@ export class ProductSelectorService {
     return matches.length > 0 ? matches : availableInverters;
   }
 
+  // The recommendation anchor: the smallest single station that still covers the
+  // build's peak load. `getMatchingInverters` returns qualifying units sorted
+  // descending by `maxOutput`, so the best fit is the last qualifying element.
+  // Returns undefined when no single station can meet the load (the matcher then
+  // falls back to the full catalog, none of which qualifies).
+  getAnchorInverter(build: Build): Inverter | undefined {
+    const peakWattage = this.calculationUtils.peakWattage(build);
+    const matches = this.getMatchingInverters(build);
+
+    const qualifying =
+      Number.isFinite(peakWattage) && peakWattage > 0
+        ? matches.filter(inverter => inverter.maxOutput >= peakWattage)
+        : matches;
+
+    return qualifying.length > 0 ? qualifying[qualifying.length - 1] : undefined;
+  }
+
   // Batteries are matched to the chosen inverter by brand. If the inverter's brand
   // has no batteries in the catalog, fall back to the full list so the flow never
   // dead-ends.

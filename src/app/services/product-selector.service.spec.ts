@@ -66,6 +66,45 @@ describe('ProductSelectorService', () => {
     expect(matches.map(inverter => inverter.id)).toEqual(sortedInverterIds());
   });
 
+  it('anchors on the smallest station that still covers the peak load', () => {
+    const anchor = service.getAnchorInverter({
+      ...defaultBuild,
+      appliances: [
+        {
+          id: 'mid-load',
+          name: 'Mid Load',
+          wattage: 2000,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Test'
+        }
+      ]
+    });
+
+    // Qualifying maxOutputs >= 2000 are 3600, 4000, 7200 and 2200; the best fit
+    // is the 2200W Bluetti AC200MAX, not the over-sized DELTA Pro Ultra.
+    expect(anchor?.maxOutput).toBe(2200);
+    expect(anchor?.name).toBe('AC200MAX');
+  });
+
+  it('returns undefined when no single station can cover the peak load', () => {
+    const anchor = service.getAnchorInverter({
+      ...defaultBuild,
+      appliances: [
+        {
+          id: 'oversized-load',
+          name: 'Oversized Load',
+          wattage: 8000,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Test'
+        }
+      ]
+    });
+
+    expect(anchor).toBeUndefined();
+  });
+
   it('uses exact battery compatibility before brand matching', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const matches = service.getMatchingBatteries({

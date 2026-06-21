@@ -108,17 +108,14 @@ export class CheckoutComponent implements OnInit {
   }
 
   applyBundle(offer: ProductBundleOfferView) {
-    this.build.bundleOfferId = offer.id;
-    this.batteryQuantities = this.mergeRequiredQuantities(
-      this.batteryQuantities,
-      offer.batteryQuantities
+    this.productDealsService.applyOfferToBuild(
+      this.build,
+      offer,
+      this.batteries,
+      this.solarPanels
     );
-    this.solarQuantities = this.mergeRequiredQuantities(
-      this.solarQuantities,
-      offer.powerSourceQuantities
-    );
-    this.build.batteries = this.flatten(this.batteries, this.batteryQuantities);
-    this.build.powerSources = this.flatten(this.solarPanels, this.solarQuantities);
+    this.batteryQuantities = this.groupQuantities(this.build.batteries);
+    this.solarQuantities = this.groupQuantities(this.build.powerSources);
     this.computePricing();
     this.save();
   }
@@ -266,17 +263,6 @@ export class CheckoutComponent implements OnInit {
       quantities[item.id] = (quantities[item.id] ?? 0) + 1;
     }
     return quantities;
-  }
-
-  private mergeRequiredQuantities(
-    selected: Record<string, number>,
-    required: Record<string, number>
-  ): Record<string, number> {
-    const merged = { ...selected };
-    for (const [id, quantity] of Object.entries(required)) {
-      merged[id] = Math.max(merged[id] ?? 0, quantity);
-    }
-    return merged;
   }
 
   private save() {
