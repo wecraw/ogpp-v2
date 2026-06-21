@@ -48,6 +48,9 @@ export class BuildComponentCardComponent implements OnInit {
   selectClicked() {
     if (this.disabled || this.locked) return;
     if (this.quantityMode) {
+      // Card-body toggle must respect the same hardware cap as the + button:
+      // never bring an unselected card up to 1 when there's no headroom.
+      if (this.quantity === 0 && !this.canIncrement) return;
       const newQuantity = this.quantity > 0 ? 0 : 1;
       this.quantity = newQuantity;
       this.quantityChange.emit(newQuantity);

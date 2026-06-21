@@ -51,6 +51,18 @@ describe('BuildComponentCardComponent', () => {
     expect(component.quantityChange.emit).toHaveBeenCalledOnceWith(2);
   });
 
+  it('does not toggle quantity from the card body when there is no headroom', () => {
+    spyOn(component.quantityChange, 'emit');
+    component.quantityMode = true;
+    component.quantity = 0;
+    component.maxQuantity = 0;
+
+    component.selectClicked();
+
+    expect(component.quantity).toBe(0);
+    expect(component.quantityChange.emit).not.toHaveBeenCalled();
+  });
+
   it('treats locked cards as selected and ignores clicks', () => {
     spyOn(component.onSelect, 'emit');
     component.locked = true;
