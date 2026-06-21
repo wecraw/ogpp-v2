@@ -27,12 +27,14 @@ describe('BuildComponent', () => {
     expect(component.totalWattHours).toBe(4200);
     expect(component.worstSeasonSunHours).toBe(5);
     expect(component.wattageNeeded).toBe(840);
-    expect(component.inverters.map(inverter => inverter.id)).toEqual([
-      'ecoflow-delta-pro-ultra',
-      'ecoflow-delta-pro-3',
-      'ecoflow-delta-pro',
-      'bluetti-ac200max'
-    ]);
+    // Every station clearing the 2200 W peak, highest output first — derived from
+    // the catalog so adding stations doesn't make this assertion brittle.
+    const expectedInverterIds = [...inverters]
+      .filter(inverter => inverter.maxOutput >= 2200)
+      .sort((first, second) => second.maxOutput - first.maxOutput)
+      .map(inverter => inverter.id);
+    expect(expectedInverterIds.length).toBeGreaterThan(1);
+    expect(component.inverters.map(inverter => inverter.id)).toEqual(expectedInverterIds);
   });
 
   it('caps battery quantity to the bank total across models', async () => {

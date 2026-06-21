@@ -211,24 +211,6 @@
     gap: 18px;
   }
 
-  .total-price {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    line-height: 1.2;
-
-    .price-label {
-      font-size: 12px;
-      color: $text-secondary;
-    }
-    .price-value {
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: $text-color-black;
-    }
-  }
-
   .finish-button {
     width: auto;
     min-width: 120px;
@@ -261,12 +243,6 @@
 
     .compat-actions {
       justify-content: space-between;
-    }
-
-    .total-price {
-      flex-direction: row;
-      align-items: baseline;
-      gap: 8px;
     }
   }
 }

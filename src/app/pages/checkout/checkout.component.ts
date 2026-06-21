@@ -105,12 +105,45 @@ export class CheckoutComponent implements OnInit {
     return this.build.powerSources.reduce((total, panel) => total + panel.maxOutput, 0);
   }
 
-  applyBundle(offer: ProductBundleOfferView) {
+  // A package that beats the user's current build — at least as much storage and
+  // solar for no more than they're paying now. Drives the "better package" banner.
+  get betterBundle(): ProductBundleOfferView | undefined {
+    return this.productDealsService.getBetterBundle(
+      this.offers,
+      this.stationCapacity,
+      this.solarWattage,
+      this.totalPrice,
+      this.activeBundleOffer?.id
+    );
+  }
+
+  // How much the better bundle adds over the current build, for the banner copy.
+  get betterBundleExtraStorage(): number {
+    return Math.max((this.betterBundle?.batteryCapacity ?? 0) - this.stationCapacity, 0);
+  }
+
+  get betterBundleExtraSolar(): number {
+    return Math.max((this.betterBundle?.solarWattage ?? 0) - this.solarWattage, 0);
+  }
+
+  get betterBundleSavings(): number {
+    return Math.max(this.totalPrice - (this.betterBundle?.price ?? 0), 0);
+  }
+
+  // Switch the build to the recommended package outright (replace, not merge), so
+  // the result is exactly the vendor SKU rather than the bundle stacked on top of
+  // the user's existing extras.
+  switchToBetterBundle(offer: ProductBundleOfferView) {
+    this.applyBundle(offer, 'replace');
+  }
+
+  applyBundle(offer: ProductBundleOfferView, mode: 'merge' | 'replace' = 'merge') {
     this.productDealsService.applyOfferToBuild(
       this.build,
       offer,
       this.batteries,
-      this.solarPanels
+      this.solarPanels,
+      mode
     );
     this.batteryQuantities = this.groupQuantities(this.build.batteries);
     this.solarQuantities = this.groupQuantities(this.build.powerSources);

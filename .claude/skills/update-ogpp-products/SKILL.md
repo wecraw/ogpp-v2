@@ -85,6 +85,16 @@ Rules:
 Run from the repo root. Match the existing project conventions (Prettier: single quotes,
 semicolons, 100-col, no trailing commas).
 
+- **Catalog integrity (run this first, every time):**
+  `ng test --watch=false --browsers=ChromeHeadless --include='**/catalog-integrity.spec.ts'`
+  This is the automated guard for the failure modes that matter most here. It fails when any
+  `compatibleBatteryIds` / `compatiblePowerSourceIds` entry, offer `inverterId`, or offer
+  `batteryQuantities` / `powerSourceQuantities` key references an ID that doesn't exist; when two
+  records derive the same brand+name slug (an unintended `-2` suffix that breaks the slug you
+  predicted); on duplicate IDs; and on basic pricing inversions (`listPrice < price`,
+  offer `price > compareAtPrice`, `presetPrice < price`). If it passes, your ID wiring is sound —
+  you no longer have to eyeball every reference by hand. If you add a genuinely new invariant,
+  add a case there too.
 - Build: `npm run build` (or `ng build`).
 - Targeted tests for anything you touched, headless:
   `ng test --watch=false --browsers=ChromeHeadless --include='**/product-selector.service.spec.ts'`

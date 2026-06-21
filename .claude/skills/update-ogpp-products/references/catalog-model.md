@@ -11,6 +11,7 @@ Verified against the codebase. Field names and behaviors below are exact.
 | Solar panels (`PowerSource`) | `src/app/content/solarPanels.ts` |
 | Vendor bundle offers | `src/app/content/product-bundle-offers.ts` |
 | Stable-ID assignment | `src/app/content/catalog-utils.ts` |
+| Referential-integrity guard (run after any edit) | `src/app/content/catalog-integrity.spec.ts` |
 | Shared pricing fields | `src/app/interfaces/ProductPricing.ts` |
 | Power station schema | `src/app/interfaces/Inverter.ts` |
 | Battery schema | `src/app/interfaces/Battery.ts` |

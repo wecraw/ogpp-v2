@@ -16,9 +16,9 @@
           <p class="inter-regular">
             Based on your appliances we picked the
             <strong>{{ anchorInverter.brand }} {{ anchorInverter.name }}</strong>
-            — the smallest station that covers your
-            {{ peakWattage | number }} W peak draw. These vendor kits pair it with
-            storage and solar for your usage.
+            — the smallest station that fits your {{ peakWattage | number }} W peak
+            draw and target storage and solar. These vendor kits pair it with storage
+            and solar for your usage.
           </p>
         } @else {
           <p class="inter-regular">
@@ -66,19 +66,6 @@
           <p class="why-body inter-regular">{{ whyExplanation }}</p>
         }
       </section>
-
-      @if (stepUpInverter) {
-        <section class="step-up-card">
-          <i class="bi bi-arrow-up-circle"></i>
-          <div class="step-up-body">
-            <h2 class="inter-semibold">{{ stepUpTitle }}</h2>
-            <p class="inter-regular">{{ stepUpMessage }}</p>
-          </div>
-          <button class="btn-primary inter-medium" (click)="useStepUp()">
-            Switch to {{ stepUpInverter.name }}
-          </button>
-        </section>
-      }
     }
 
     @if (offers.length) {

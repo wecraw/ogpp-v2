@@ -97,24 +97,69 @@ export class ProductDealsService {
     return { price, compareAtPrice };
   }
 
-  // Pre-seeds a build with an offer's required gear: merges the offer's required
-  // quantities into whatever the build already holds (never reducing below the
-  // user's existing picks), then flattens back into the duplicate-entry arrays
-  // the Build interface stores. Shared by checkout and the results page.
+  // The best bundle to recommend as an *upgrade over the user's current build*:
+  // one that holds at least as much storage and solar as they've configured, costs
+  // no more than their current effective price, and improves on it in at least one
+  // dimension. This is a different lens than `getRecommendedOffer` (best fit vs the
+  // build's targets) — here we compare against what the user already has and pays,
+  // surfacing "more for the same or less." Skips the already-active offer and any
+  // sold-out SKU. Ranks by lowest price (biggest saving), then most coverage.
+  getBetterBundle(
+    offers: ProductBundleOfferView[],
+    currentStorage: number,
+    currentSolar: number,
+    currentPrice: number,
+    activeOfferId?: string
+  ): ProductBundleOfferView | undefined {
+    const upgrades = offers.filter(offer => {
+      if (offer.id === activeOfferId || offer.availability === 'sold-out') return false;
+      const coversStorage = offer.batteryCapacity >= currentStorage;
+      const coversSolar = offer.solarWattage >= currentSolar;
+      const costsNoMore = offer.price <= currentPrice;
+      if (!coversStorage || !coversSolar || !costsNoMore) return false;
+      // Require a real improvement so we never nag with an identical package.
+      return (
+        offer.batteryCapacity > currentStorage ||
+        offer.solarWattage > currentSolar ||
+        offer.price < currentPrice
+      );
+    });
+
+    return upgrades.sort((a, b) => {
+      if (a.price !== b.price) return a.price - b.price;
+      if (a.batteryCapacity !== b.batteryCapacity) return b.batteryCapacity - a.batteryCapacity;
+      return b.solarWattage - a.solarWattage;
+    })[0];
+  }
+
+  // Pre-seeds a build with an offer's required gear, then flattens back into the
+  // duplicate-entry arrays the Build interface stores. Shared by checkout and the
+  // results page. By default `merge`s the offer's quantities on top of whatever the
+  // build already holds (never reducing the user's picks); pass `replace` to set the
+  // build's gear to exactly the offer's SKU — used when switching to a recommended
+  // package, so the result is a vendor-valid config (no over-stacked extras that
+  // could blow past `maxBatteries`).
   applyOfferToBuild(
     build: Build,
     offer: ProductBundleOfferView,
     batteryCatalog: Battery[],
-    solarCatalog: PowerSource[]
+    solarCatalog: PowerSource[],
+    mode: 'merge' | 'replace' = 'merge'
   ): Build {
-    const batteryQuantities = this.mergeRequiredQuantities(
-      this.groupQuantities(build.batteries ?? []),
-      offer.batteryQuantities
-    );
-    const solarQuantities = this.mergeRequiredQuantities(
-      this.groupQuantities(build.powerSources ?? []),
-      offer.powerSourceQuantities
-    );
+    const batteryQuantities =
+      mode === 'replace'
+        ? { ...offer.batteryQuantities }
+        : this.mergeRequiredQuantities(
+            this.groupQuantities(build.batteries ?? []),
+            offer.batteryQuantities
+          );
+    const solarQuantities =
+      mode === 'replace'
+        ? { ...offer.powerSourceQuantities }
+        : this.mergeRequiredQuantities(
+            this.groupQuantities(build.powerSources ?? []),
+            offer.powerSourceQuantities
+          );
 
     build.bundleOfferId = offer.id;
     build.batteries = this.flatten(batteryCatalog, batteryQuantities);

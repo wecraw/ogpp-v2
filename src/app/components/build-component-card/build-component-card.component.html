@@ -49,13 +49,13 @@
         @if (locked) {
           <div class="detail included-price inter-medium">Included</div>
         } @else {
+          <!-- Customizer shows list price (MSRP). Per-product deal savings are revealed
+               later at checkout; the only discount surfaced here is a bundle upsell. -->
           <div class="detail price-detail">
-            @if (buildComponent.listPrice && buildComponent.listPrice > buildComponent.price) {
-              <span class="list-price">{{
-                buildComponent.listPrice | currency: 'USD' : 'symbol' : '1.0-0'
-              }}</span>
-            }
-            <span>{{ buildComponent.price | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+            <span>{{
+              (buildComponent.listPrice ?? buildComponent.price)
+                | currency: 'USD' : 'symbol' : '1.0-0'
+            }}</span>
           </div>
         }
       </div>

@@ -4,10 +4,22 @@ const ECOFLOW_DELTA_PRO_ID = 'ecoflow-delta-pro';
 const ECOFLOW_DELTA_PRO_BATTERY_ID = 'ecoflow-delta-pro-smart-battery';
 const ECOFLOW_220W_PANEL_ID = 'ecoflow-220w-bifacial-panel';
 const ECOFLOW_400W_PANEL_ID = 'ecoflow-400w-portable-solar-panel';
-const ECOFLOW_DELTA_PRO_URL =
-  'https://us.ecoflow.com/products/delta-pro-portable-power-station';
+const ECOFLOW_DELTA_PRO_URL = 'https://us.ecoflow.com/products/delta-pro-portable-power-station';
 const ECOFLOW_DELTA_PRO_ULTRA_ID = 'ecoflow-delta-pro-ultra';
-const ECOFLOW_DELTA_PRO_ULTRA_URL = 'https://us.ecoflow.com/products/delta-pro-ultra-solar-generator';
+const ECOFLOW_DELTA_PRO_ULTRA_URL =
+  'https://us.ecoflow.com/products/delta-pro-ultra-solar-generator';
+
+const ECOFLOW_DELTA_2_ID = 'ecoflow-delta-2';
+const ECOFLOW_DELTA_2_BATTERY_ID = 'ecoflow-delta-2-smart-extra-battery';
+const ECOFLOW_DELTA_2_URL = 'https://us.ecoflow.com/products/delta-2-portable-power-station';
+const ECOFLOW_DELTA_2_MAX_ID = 'ecoflow-delta-2-max';
+const ECOFLOW_DELTA_2_MAX_URL =
+  'https://us.ecoflow.com/products/delta-2-max-portable-power-station';
+
+const GOAL_ZERO_YETI_1500X_ID = 'goal-zero-yeti-1500x';
+const GOAL_ZERO_BOULDER_200_ID = 'goal-zero-boulder-200-briefcase';
+const GOAL_ZERO_YETI_1500X_URL =
+  'https://goalzero.com/products/goal-zero-yeti-1500x-portable-power-station';
 
 export const productBundleOffers: ProductBundleOffer[] = [
   {
@@ -105,5 +117,79 @@ export const productBundleOffers: ProductBundleOffer[] = [
     vendorUrl: ECOFLOW_DELTA_PRO_ULTRA_URL,
     verifiedOn: '2026-06-11',
     availability: 'check-vendor'
+  },
+  {
+    id: 'ecoflow-delta-2-2x220w',
+    inverterId: ECOFLOW_DELTA_2_ID,
+    name: 'Solar starter',
+    description: 'The budget DELTA 2 paired with 440W of bifacial solar for small off-grid loads.',
+    highlights: ['DELTA 2 (1kWh)', '2 × 220W bifacial solar panels'],
+    price: 1182,
+    compareAtPrice: 2946,
+    batteryQuantities: {},
+    powerSourceQuantities: {
+      [ECOFLOW_220W_PANEL_ID]: 2
+    },
+    vendor: 'EcoFlow',
+    vendorUrl: ECOFLOW_DELTA_2_URL,
+    verifiedOn: '2026-06-20',
+    availability: 'check-vendor'
+  },
+  {
+    id: 'ecoflow-delta-2-extra-battery',
+    inverterId: ECOFLOW_DELTA_2_ID,
+    name: 'Extended runtime',
+    description: 'Doubles DELTA 2 storage to ~2kWh for overnight loads.',
+    highlights: ['DELTA 2 (1kWh)', '1 × 1kWh smart extra battery'],
+    price: 799,
+    optimizationNote:
+      'EcoFlow’s preset station + battery bundle ($799) beats buying the two separately.',
+    compareAtPrice: 1798,
+    batteryQuantities: {
+      [ECOFLOW_DELTA_2_BATTERY_ID]: 1
+    },
+    powerSourceQuantities: {},
+    vendor: 'EcoFlow',
+    vendorUrl: ECOFLOW_DELTA_2_URL,
+    verifiedOn: '2026-06-20',
+    availability: 'check-vendor'
+  },
+  {
+    id: 'ecoflow-delta-2-max-2x220w',
+    inverterId: ECOFLOW_DELTA_2_MAX_ID,
+    name: 'Solar starter',
+    description: 'DELTA 2 Max with 440W of bifacial solar — 2kWh and 2400W of continuous output.',
+    highlights: ['DELTA 2 Max (2kWh)', '2 × 220W bifacial solar panels'],
+    price: 1299,
+    optimizationNote:
+      'EcoFlow’s preset DELTA 2 Max + 2×220W bundle ($1,299) beats buying the parts separately.',
+    compareAtPrice: 3197,
+    batteryQuantities: {},
+    powerSourceQuantities: {
+      [ECOFLOW_220W_PANEL_ID]: 2
+    },
+    vendor: 'EcoFlow',
+    vendorUrl: ECOFLOW_DELTA_2_MAX_URL,
+    verifiedOn: '2026-06-20',
+    // Station's buy button showed "UNAVAILABLE" at verification — don't claim in-stock.
+    availability: 'check-vendor'
+  },
+  {
+    id: 'goal-zero-yeti-1500x-boulder-200',
+    inverterId: GOAL_ZERO_YETI_1500X_ID,
+    name: 'Solar generator',
+    description: 'Yeti 1500X with a 200W Boulder briefcase panel for portable off-grid charging.',
+    highlights: ['Yeti 1500X (1.5kWh)', '1 × 200W Boulder briefcase panel'],
+    price: 1724.84,
+    compareAtPrice: 2099.9,
+    batteryQuantities: {},
+    powerSourceQuantities: {
+      [GOAL_ZERO_BOULDER_200_ID]: 1
+    },
+    vendor: 'Goal Zero',
+    vendorUrl: GOAL_ZERO_YETI_1500X_URL,
+    verifiedOn: '2026-06-20',
+    // Yeti 1500X shows "No longer available" on the official page at verification.
+    availability: 'sold-out'
   }
 ];
