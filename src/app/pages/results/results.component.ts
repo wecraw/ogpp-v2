@@ -110,6 +110,22 @@ export class ResultsComponent implements OnInit {
 
   private loadOffers(inverter: Inverter) {
     this.offers = this.productDealsService.getOffersForInverter(inverter.id);
+
+    // The empty state is reserved for builds no single station can run. When a
+    // station fits but we have no curated vendor bundle for it, synthesize a kit
+    // from the catalog (right-sized storage + solar within the station's caps) so
+    // we still recommend a complete package instead of dead-ending the user.
+    if (this.offers.length === 0) {
+      const autoKit = this.productDealsService.buildAutoKit(
+        inverter,
+        this.batteryTarget,
+        this.solarTarget,
+        this.productSelectorService.getMatchingBatteries(this.build),
+        this.productSelectorService.getMatchingSolarPanels(this.build)
+      );
+      if (autoKit) this.offers = [autoKit];
+    }
+
     this.recommendedOfferId = this.productDealsService.getRecommendedOffer(
       this.offers,
       this.batteryTarget,
