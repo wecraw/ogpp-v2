@@ -4,12 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
 import { batteries as batteryCatalog } from 'src/app/content/batteries';
 import { solarPanels as solarPanelCatalog } from 'src/app/content/solarPanels';
-import {
-  INVERTER_EXPLANATION,
-  INVERTER_EXPLANATION_TITLE,
-  STEP_UP_TITLE,
-  STEP_UP_NOTICE
-} from 'src/app/content/strings';
+import { INVERTER_EXPLANATION, INVERTER_EXPLANATION_TITLE } from 'src/app/content/strings';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
@@ -47,13 +42,8 @@ export class ResultsComponent implements OnInit {
   public noAnchorInverter = false;
   public whyExpanded = false;
 
-  // The next larger same-brand station to recommend when the auto-picked anchor can't
-  // reach the storage/solar targets within its caps. Surfaced as a re-anchor card.
-  public stepUpInverter?: Inverter;
-
   public readonly whyTitle = INVERTER_EXPLANATION_TITLE;
   public readonly whyExplanation = INVERTER_EXPLANATION;
-  public readonly stepUpTitle = STEP_UP_TITLE;
 
   constructor(
     private route: ActivatedRoute,
@@ -83,8 +73,14 @@ export class ResultsComponent implements OnInit {
       this.batteryTarget = this.totalWattHours * this.daysOfAutonomy;
 
       // The builder stays demand-only; the results page picks the anchor station
-      // and persists it so /build (and /checkout) reload a fully sized build.
-      const anchor = this.productSelectorService.getAnchorInverter(this.build);
+      // and persists it so /build (and /checkout) reload a fully sized build. We pass
+      // the storage/solar targets so the engine lands on a station that already
+      // reaches them — no immediate "step up to a larger station" prompt on arrival.
+      const anchor = this.productSelectorService.getAnchorInverter(
+        this.build,
+        this.batteryTarget,
+        this.solarTarget
+      );
       this.noAnchorInverter = !anchor;
       if (!anchor) {
         // No catalog station covers the peak draw (e.g. a saved build whose load
@@ -101,11 +97,6 @@ export class ResultsComponent implements OnInit {
       this.save();
 
       this.loadOffers(anchor);
-      this.stepUpInverter = this.productSelectorService.getStepUpInverter(
-        this.build,
-        this.batteryTarget,
-        this.solarTarget
-      );
     });
   }
 
@@ -113,33 +104,28 @@ export class ResultsComponent implements OnInit {
     return this.build.inverter;
   }
 
-  get stepUpMessage(): string {
-    if (!this.stepUpInverter) return '';
-    return STEP_UP_NOTICE(this.stepUpInverter.brand, this.stepUpInverter.name);
-  }
-
   toggleWhy() {
     this.whyExpanded = !this.whyExpanded;
   }
 
-  // Re-anchor onto the recommended larger station: persist it, reload its bundle offers,
-  // and clear the step-up prompt (the new anchor reaches the targets).
-  useStepUp() {
-    const stepUp = this.stepUpInverter;
-    if (!stepUp) return;
-    this.build.inverter = stepUp;
-    this.build.bundleOfferId = undefined;
-    this.save();
-    this.loadOffers(stepUp);
-    this.stepUpInverter = this.productSelectorService.getStepUpInverter(
-      this.build,
-      this.batteryTarget,
-      this.solarTarget
-    );
-  }
-
   private loadOffers(inverter: Inverter) {
     this.offers = this.productDealsService.getOffersForInverter(inverter.id);
+
+    // The empty state is reserved for builds no single station can run. When a
+    // station fits but we have no curated vendor bundle for it, synthesize a kit
+    // from the catalog (right-sized storage + solar within the station's caps) so
+    // we still recommend a complete package instead of dead-ending the user.
+    if (this.offers.length === 0) {
+      const autoKit = this.productDealsService.buildAutoKit(
+        inverter,
+        this.batteryTarget,
+        this.solarTarget,
+        this.productSelectorService.getMatchingBatteries(this.build),
+        this.productSelectorService.getMatchingSolarPanels(this.build)
+      );
+      if (autoKit) this.offers = [autoKit];
+    }
+
     this.recommendedOfferId = this.productDealsService.getRecommendedOffer(
       this.offers,
       this.batteryTarget,

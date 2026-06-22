@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
 import { inverters } from 'src/app/content/inverters';
 import { Battery } from 'src/app/interfaces/Battery';
@@ -8,6 +8,7 @@ import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
+import { AffiliateLinkService } from 'src/app/services/affiliate-link.service';
 import { BuildService } from 'src/app/services/build.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
 import { ProductDealsService } from 'src/app/services/product-deals.service';
@@ -28,7 +29,7 @@ export interface CheckoutLineItem {
 
 @Component({
   selector: 'app-checkout',
-  imports: [CommonModule, BundleOffersComponent],
+  imports: [CommonModule, BundleOffersComponent, RouterLink],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
@@ -53,7 +54,8 @@ export class CheckoutComponent implements OnInit {
     private buildService: BuildService,
     private calculationUtils: CalculationUtilsService,
     private productDealsService: ProductDealsService,
-    private productSelectorService: ProductSelectorService
+    private productSelectorService: ProductSelectorService,
+    private affiliateLink: AffiliateLinkService
   ) {}
 
   ngOnInit() {
@@ -105,12 +107,45 @@ export class CheckoutComponent implements OnInit {
     return this.build.powerSources.reduce((total, panel) => total + panel.maxOutput, 0);
   }
 
-  applyBundle(offer: ProductBundleOfferView) {
+  // A package that beats the user's current build — at least as much storage and
+  // solar for no more than they're paying now. Drives the "better package" banner.
+  get betterBundle(): ProductBundleOfferView | undefined {
+    return this.productDealsService.getBetterBundle(
+      this.offers,
+      this.stationCapacity,
+      this.solarWattage,
+      this.totalPrice,
+      this.activeBundleOffer?.id
+    );
+  }
+
+  // How much the better bundle adds over the current build, for the banner copy.
+  get betterBundleExtraStorage(): number {
+    return Math.max((this.betterBundle?.batteryCapacity ?? 0) - this.stationCapacity, 0);
+  }
+
+  get betterBundleExtraSolar(): number {
+    return Math.max((this.betterBundle?.solarWattage ?? 0) - this.solarWattage, 0);
+  }
+
+  get betterBundleSavings(): number {
+    return Math.max(this.totalPrice - (this.betterBundle?.price ?? 0), 0);
+  }
+
+  // Switch the build to the recommended package outright (replace, not merge), so
+  // the result is exactly the vendor SKU rather than the bundle stacked on top of
+  // the user's existing extras.
+  switchToBetterBundle(offer: ProductBundleOfferView) {
+    this.applyBundle(offer, 'replace');
+  }
+
+  applyBundle(offer: ProductBundleOfferView, mode: 'merge' | 'replace' = 'merge') {
     this.productDealsService.applyOfferToBuild(
       this.build,
       offer,
       this.batteries,
-      this.solarPanels
+      this.solarPanels,
+      mode
     );
     this.batteryQuantities = this.groupQuantities(this.build.batteries);
     this.solarQuantities = this.groupQuantities(this.build.powerSources);
@@ -214,6 +249,8 @@ export class CheckoutComponent implements OnInit {
       lineTotal: unitPrice * quantity,
       lineSavings: Math.max(unitListPrice - unitPrice, 0) * quantity,
       productUrl: product.productUrl
+        ? this.affiliateLink.decorate(product.productUrl, product.brand)
+        : undefined
     };
   }
 

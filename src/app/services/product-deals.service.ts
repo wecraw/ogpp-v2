@@ -29,6 +29,124 @@ export class ProductDealsService {
       .map(offer => this.toView(offer));
   }
 
+  // When no curated vendor bundle covers a station, synthesize a complete kit from
+  // the catalog so the results page can still recommend a package instead of dead-
+  // ending on an empty state. Sizes the station's compatible batteries and panels up
+  // to the build's storage/solar targets (never past the station's `maxBatteries` /
+  // `maxSolarInput` caps) and prices the result à la carte — the same price the user
+  // would pay buying the parts, since there is no fixed-SKU discount to apply.
+  // Returns undefined only when there is nothing to add (no compatible solar and the
+  // station already meets storage on its own), leaving the empty state for that case.
+  buildAutoKit(
+    inverter: Inverter,
+    batteryTarget: number,
+    solarTarget: number,
+    batteryOptions: Battery[],
+    panelOptions: PowerSource[]
+  ): ProductBundleOfferView | undefined {
+    const batteryQuantities = this.autoBatteryQuantities(inverter, batteryTarget, batteryOptions);
+    const powerSourceQuantities = this.autoPanelQuantities(inverter, solarTarget, panelOptions);
+
+    if (
+      Object.keys(batteryQuantities).length === 0 &&
+      Object.keys(powerSourceQuantities).length === 0
+    ) {
+      return undefined;
+    }
+
+    const { price, compareAtPrice } = this.alaCarteCost(
+      inverter,
+      batteryQuantities,
+      powerSourceQuantities
+    );
+
+    const offer: ProductBundleOffer = {
+      id: `auto-${inverter.id}`,
+      inverterId: inverter.id ?? '',
+      name: 'Recommended kit',
+      description: `We sized the ${inverter.brand} ${inverter.name} with matching storage and solar to meet this build's targets.`,
+      highlights: this.autoKitHighlights(
+        inverter,
+        batteryQuantities,
+        powerSourceQuantities,
+        batteryOptions,
+        panelOptions
+      ),
+      price,
+      compareAtPrice,
+      batteryQuantities,
+      powerSourceQuantities,
+      vendor: inverter.brand,
+      vendorUrl: inverter.productUrl ?? '',
+      verifiedOn: inverter.dealVerifiedOn ?? ''
+    };
+
+    return this.toView(offer);
+  }
+
+  // How many expansion batteries to add to reach the storage target: the largest
+  // compatible battery (fewest units), capped at the station's bank size. None when
+  // the built-in battery already meets the target or the station takes no expansions.
+  private autoBatteryQuantities(
+    inverter: Inverter,
+    batteryTarget: number,
+    options: Battery[]
+  ): Record<string, number> {
+    const builtIn = inverter.batteryCapacity ?? 0;
+    const maxBatteries = inverter.maxBatteries ?? 0;
+    const shortfall = batteryTarget - builtIn;
+    if (shortfall <= 0 || maxBatteries <= 0) return {};
+
+    const battery = [...options]
+      .filter(item => item.id && item.batteryCapacity > 0)
+      .sort((a, b) => b.batteryCapacity - a.batteryCapacity)[0];
+    if (!battery?.id) return {};
+
+    const needed = Math.min(Math.ceil(shortfall / battery.batteryCapacity), maxBatteries);
+    return needed > 0 ? { [battery.id]: needed } : {};
+  }
+
+  // How many panels to add to reach the solar target: the highest-output panel
+  // (fewest units), at least one so the kit is a real solar package, but never past
+  // the station's solar input ceiling.
+  private autoPanelQuantities(
+    inverter: Inverter,
+    solarTarget: number,
+    options: PowerSource[]
+  ): Record<string, number> {
+    const panel = [...options]
+      .filter(item => item.id && item.maxOutput > 0)
+      .sort((a, b) => b.maxOutput - a.maxOutput)[0];
+    if (!panel?.id) return {};
+
+    const maxByInput = inverter.maxSolarInput
+      ? Math.floor(inverter.maxSolarInput / panel.maxOutput)
+      : 0;
+    if (maxByInput <= 0) return {};
+
+    const needed = Math.min(Math.max(Math.ceil(solarTarget / panel.maxOutput), 1), maxByInput);
+    return { [panel.id]: needed };
+  }
+
+  private autoKitHighlights(
+    inverter: Inverter,
+    batteryQuantities: Record<string, number>,
+    powerSourceQuantities: Record<string, number>,
+    batteryOptions: Battery[],
+    panelOptions: PowerSource[]
+  ): string[] {
+    const highlights: string[] = [inverter.name];
+    for (const [id, quantity] of Object.entries(batteryQuantities)) {
+      const battery = batteryOptions.find(item => item.id === id);
+      if (battery) highlights.push(`${quantity} × ${battery.name}`);
+    }
+    for (const [id, quantity] of Object.entries(powerSourceQuantities)) {
+      const panel = panelOptions.find(item => item.id === id);
+      if (panel) highlights.push(`${quantity} × ${panel.name}`);
+    }
+    return highlights;
+  }
+
   getRecommendedOffer(
     offers: ProductBundleOfferView[],
     batteryTarget: number,
@@ -97,24 +215,69 @@ export class ProductDealsService {
     return { price, compareAtPrice };
   }
 
-  // Pre-seeds a build with an offer's required gear: merges the offer's required
-  // quantities into whatever the build already holds (never reducing below the
-  // user's existing picks), then flattens back into the duplicate-entry arrays
-  // the Build interface stores. Shared by checkout and the results page.
+  // The best bundle to recommend as an *upgrade over the user's current build*:
+  // one that holds at least as much storage and solar as they've configured, costs
+  // no more than their current effective price, and improves on it in at least one
+  // dimension. This is a different lens than `getRecommendedOffer` (best fit vs the
+  // build's targets) — here we compare against what the user already has and pays,
+  // surfacing "more for the same or less." Skips the already-active offer. Ranks by
+  // lowest price (biggest saving), then most coverage.
+  getBetterBundle(
+    offers: ProductBundleOfferView[],
+    currentStorage: number,
+    currentSolar: number,
+    currentPrice: number,
+    activeOfferId?: string
+  ): ProductBundleOfferView | undefined {
+    const upgrades = offers.filter(offer => {
+      if (offer.id === activeOfferId) return false;
+      const coversStorage = offer.batteryCapacity >= currentStorage;
+      const coversSolar = offer.solarWattage >= currentSolar;
+      const costsNoMore = offer.price <= currentPrice;
+      if (!coversStorage || !coversSolar || !costsNoMore) return false;
+      // Require a real improvement so we never nag with an identical package.
+      return (
+        offer.batteryCapacity > currentStorage ||
+        offer.solarWattage > currentSolar ||
+        offer.price < currentPrice
+      );
+    });
+
+    return upgrades.sort((a, b) => {
+      if (a.price !== b.price) return a.price - b.price;
+      if (a.batteryCapacity !== b.batteryCapacity) return b.batteryCapacity - a.batteryCapacity;
+      return b.solarWattage - a.solarWattage;
+    })[0];
+  }
+
+  // Pre-seeds a build with an offer's required gear, then flattens back into the
+  // duplicate-entry arrays the Build interface stores. Shared by checkout and the
+  // results page. By default `merge`s the offer's quantities on top of whatever the
+  // build already holds (never reducing the user's picks); pass `replace` to set the
+  // build's gear to exactly the offer's SKU — used when switching to a recommended
+  // package, so the result is a vendor-valid config (no over-stacked extras that
+  // could blow past `maxBatteries`).
   applyOfferToBuild(
     build: Build,
     offer: ProductBundleOfferView,
     batteryCatalog: Battery[],
-    solarCatalog: PowerSource[]
+    solarCatalog: PowerSource[],
+    mode: 'merge' | 'replace' = 'merge'
   ): Build {
-    const batteryQuantities = this.mergeRequiredQuantities(
-      this.groupQuantities(build.batteries ?? []),
-      offer.batteryQuantities
-    );
-    const solarQuantities = this.mergeRequiredQuantities(
-      this.groupQuantities(build.powerSources ?? []),
-      offer.powerSourceQuantities
-    );
+    const batteryQuantities =
+      mode === 'replace'
+        ? { ...offer.batteryQuantities }
+        : this.mergeRequiredQuantities(
+            this.groupQuantities(build.batteries ?? []),
+            offer.batteryQuantities
+          );
+    const solarQuantities =
+      mode === 'replace'
+        ? { ...offer.powerSourceQuantities }
+        : this.mergeRequiredQuantities(
+            this.groupQuantities(build.powerSources ?? []),
+            offer.powerSourceQuantities
+          );
 
     build.bundleOfferId = offer.id;
     build.batteries = this.flatten(batteryCatalog, batteryQuantities);

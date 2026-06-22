@@ -58,6 +58,6 @@ On `/build`, battery and solar quantities are persisted by pushing one entry per
 ## Current state / known gaps
 
 - **Debug bypass:** `BuilderComponent.debug = true` skips the real NREL call and stubs `monthlyGhi` to all-1s. Set to `false` to exercise real sun-hours lookups. Note this makes `getSunHoursBySeason` return 1, so `wattageNeeded` (and thus the `/build` solar target) is unrealistic while debug is on.
-- **Battery sizing is hardcoded to 1 day of autonomy** (`DAYS_OF_AUTONOMY` in `BuildComponent`). A user-facing override UI was intentionally deferred; the constant is the single place to change it.
-- **`maxBatteries` is enforced per battery model, not as a bank total** on `/build` — fine for the current single-brand-match catalogs, but revisit if a brand gains multiple battery models.
+- **Days of autonomy is user-configurable** on the Batteries step (`daysOfAutonomy` in `BuildComponent`, default 2, clamped 1–7); it scales `batteryTarget`. Builds saved before the field round-trip from the default.
+- **`maxBatteries` is enforced as a bank total** on `/build`: each card's ceiling is its own quantity plus the free bank slots (`getBatteryMaxQuantity`/`remainingBatterySlots`), gating the stepper and card toggle so a build can't link more batteries than the station supports.
 - The NREL API key is hardcoded in `SunHoursService` — move it out before any real deployment.

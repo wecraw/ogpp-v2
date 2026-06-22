@@ -379,12 +379,6 @@
     </div>
 
     <div class="compat-actions">
-      <div class="total-price inter-medium">
-        <span class="price-label inter-regular">Estimated total</span>
-        <span class="price-value"
-          >$<span [countUp]="totalPrice" [options]="countUpOptions">0</span></span
-        >
-      </div>
       @if (allComplete) {
         <button class="btn-primary finish-button fade-in inter-medium" (click)="finish()">
           Review deals

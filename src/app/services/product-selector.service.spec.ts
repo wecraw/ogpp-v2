@@ -34,11 +34,14 @@ describe('ProductSelectorService', () => {
       ]
     });
 
-    expect(matches.map(inverter => inverter.id)).toEqual([
-      'ecoflow-delta-pro-ultra',
-      'ecoflow-delta-pro-3',
-      'ecoflow-delta-pro'
-    ]);
+    // Derived from the catalog so adding stations can't make this brittle: every
+    // unit clearing the 3000 W peak, highest output first.
+    const expected = [...inverters]
+      .filter(inverter => inverter.maxOutput >= 3000)
+      .sort((first, second) => second.maxOutput - first.maxOutput)
+      .map(inverter => inverter.id);
+    expect(expected.length).toBeGreaterThan(1);
+    expect(matches.map(inverter => inverter.id)).toEqual(expected);
   });
 
   it('shows the full inverter catalog when there is no peak load yet', () => {
@@ -81,10 +84,56 @@ describe('ProductSelectorService', () => {
       ]
     });
 
-    // Qualifying maxOutputs >= 2000 are 3600, 4000, 7200 and 2200; the best fit
-    // is the 2200W Bluetti AC200MAX, not the over-sized DELTA Pro Ultra.
-    expect(anchor?.maxOutput).toBe(2200);
-    expect(anchor?.name).toBe('AC200MAX');
+    // The anchor is the smallest station that still covers the 2000 W peak —
+    // derived from the catalog so a new station can't silently invalidate it.
+    const smallestQualifyingOutput = Math.min(
+      ...inverters
+        .filter(inverter => inverter.maxOutput >= 2000)
+        .map(inverter => inverter.maxOutput)
+    );
+    expect(anchor?.maxOutput).toBe(smallestQualifyingOutput);
+  });
+
+  it('anchors on the smallest station that also reaches the storage/solar targets', () => {
+    // A peak the small DELTA 2 (500 W solar) covers, but with a solar target that
+    // exceeds its input — the engine should reach past it to the smallest station
+    // whose caps fit, instead of anchoring on DELTA 2 and prompting a step-up.
+    const peak = 1673;
+    const solarTarget = 600;
+    const build = {
+      ...defaultBuild,
+      appliances: [
+        {
+          id: 'mid-load',
+          name: 'Mid Load',
+          wattage: peak,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Test'
+        }
+      ]
+    };
+
+    const anchor = service.getAnchorInverter(build, 0, solarTarget);
+
+    // Derived from the catalog: the smallest peak-covering station whose solar input
+    // also clears the target (storage target 0 keeps storage out of the comparison).
+    const expectedOutput = Math.min(
+      ...inverters
+        .filter(inverter => inverter.maxOutput >= peak && inverter.maxSolarInput >= solarTarget)
+        .map(inverter => inverter.maxOutput)
+    );
+    expect(anchor?.maxSolarInput).toBeGreaterThanOrEqual(solarTarget);
+    expect(anchor?.maxOutput).toBe(expectedOutput);
+    // It really moved past the peak-only pick.
+    expect(anchor?.maxOutput).not.toBe(service.getAnchorInverter(build)?.maxOutput);
+  });
+
+  it('falls back to the smallest peak-covering station when no unit reaches the targets', () => {
+    const build = lightLoadBuild();
+    const targeted = service.getAnchorInverter(build, 999999, 999999);
+
+    expect(targeted?.id).toBe(service.getAnchorInverter(build)?.id);
   });
 
   it('returns undefined when no single station can cover the peak load', () => {
@@ -162,19 +211,21 @@ describe('ProductSelectorService', () => {
   });
 
   it('falls back to same-brand batteries when compatibility IDs are absent', () => {
-    const bluetti = inverters.find(inverter => inverter.id === 'bluetti-ac200max')!;
+    // Jackery's station carries no compatibleBatteryIds, so this exercises the
+    // brand-match path (AC200MAX now pins explicit IDs and would skip it).
+    const jackery = inverters.find(inverter => inverter.id === 'jackery-solar-generator-1000-v2')!;
     const matches = service.getMatchingBatteries({
       ...defaultBuild,
-      inverter: bluetti
+      inverter: jackery
     });
 
-    expect(matches.map(battery => battery.id)).toEqual(['bluetti-b230-expansion-battery']);
+    expect(matches.map(battery => battery.id)).toEqual(['jackery-battery-pack-1000-plus']);
   });
 
   it('falls back to the full battery catalog when the brand has no matches', () => {
     const matches = service.getMatchingBatteries({
       ...defaultBuild,
-      inverter: createInverter({ brand: 'Goal Zero' })
+      inverter: createInverter({ brand: 'No Such Brand' })
     });
 
     expect(matches).toEqual(batteries);
@@ -207,20 +258,17 @@ describe('ProductSelectorService', () => {
     ]);
   });
 
-  it(
-    'falls back to the full solar catalog when compatibility and brand matching find nothing',
-    () => {
-      const matches = service.getMatchingSolarPanels({
-        ...defaultBuild,
-        inverter: createInverter({
-          brand: 'Goal Zero',
-          compatiblePowerSourceIds: ['missing-panel']
-        })
-      });
+  it('falls back to the full solar catalog when compatibility and brand matching find nothing', () => {
+    const matches = service.getMatchingSolarPanels({
+      ...defaultBuild,
+      inverter: createInverter({
+        brand: 'No Such Brand',
+        compatiblePowerSourceIds: ['missing-panel']
+      })
+    });
 
-      expect(matches).toEqual(solarPanels);
-    }
-  );
+    expect(matches).toEqual(solarPanels);
+  });
 });
 
 // A small load every EcoFlow station covers, so step-up choices turn purely on the

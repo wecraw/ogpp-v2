@@ -89,10 +89,11 @@ export class BuildComponent implements OnInit {
   public readonly minDays = MIN_DAYS_OF_AUTONOMY;
   public readonly maxDays = MAX_DAYS_OF_AUTONOMY;
 
-  // Running totals
+  // Running totals. Price is intentionally absent here: the build page is for
+  // sizing/fit, and the real price (best bundle vs à-la-carte) is revealed at
+  // checkout. Per-card MSRP tags still show, for cost-of-choice between models.
   public selectedBatteryCapacity: number = 0;
   public selectedSolarWattage: number = 0;
-  public totalPrice: number = 0;
 
   // Hardware-cap state, recomputed in `recalculate()`. `atBatteryLimit`/`atSolarLimit`
   // gate the inline cap notices; `stepUpInverter` is the next larger same-brand station
@@ -425,11 +426,6 @@ export class BuildComponent implements OnInit {
       this.isInverterCompatible && this.selectedBatteryCapacity >= this.batteryTarget;
     this.isSolarCompatible =
       this.isBatteryCompatible && this.selectedSolarWattage >= this.wattageNeeded;
-
-    this.totalPrice =
-      (this.build.inverter?.price ?? 0) +
-      this.build.batteries.reduce((total, battery) => total + battery.price, 0) +
-      this.build.powerSources.reduce((total, panel) => total + panel.price, 0);
 
     const maxBatteries = this.build.inverter?.maxBatteries ?? 0;
     this.atBatteryLimit = maxBatteries > 0 && this.totalBatteryQuantity >= maxBatteries;

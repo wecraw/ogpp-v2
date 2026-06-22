@@ -124,6 +124,49 @@ describe('ProductDealsService', () => {
     expect(offer.savingsVsAlaCarte).toBe(48);
   });
 
+  it('recommends a same-gear bundle that beats the à-la-carte price', () => {
+    const offers = service.getOffersForInverter('ecoflow-delta-pro');
+    // DELTA Pro (3600 Wh built-in) + 2×220W panels built by hand costs 2197 à la
+    // carte; the matching bundle is 2149 — a free $48 for identical coverage.
+    const better = service.getBetterBundle(offers, 3600, 440, 2197);
+
+    expect(better?.id).toBe('ecoflow-delta-pro-2x220w');
+  });
+
+  it('returns no better bundle when the current build is already the cheapest coverage', () => {
+    const offers = service.getOffersForInverter('ecoflow-delta-pro');
+    // A bare DELTA Pro (1699) is cheaper than every bundle, so none is an upgrade
+    // at or below the current price.
+    expect(service.getBetterBundle(offers, 3600, 0, 1699)).toBeUndefined();
+  });
+
+  it('excludes the already-active offer from better-bundle suggestions', () => {
+    const offers = service.getOffersForInverter('ecoflow-delta-pro');
+    expect(
+      service.getBetterBundle(offers, 3600, 440, 2149, 'ecoflow-delta-pro-2x220w')
+    ).toBeUndefined();
+  });
+
+  it('replaces the build’s gear with exactly the offer SKU in replace mode', () => {
+    const offer = service
+      .getOffersForInverter('ecoflow-delta-pro')
+      .find(item => item.id === 'ecoflow-delta-pro-2x220w')!;
+    const smartBattery = batteries.find(item => item.id === 'ecoflow-delta-pro-smart-battery')!;
+    const build: Build = {
+      ...defaultBuild,
+      inverter: deltaPro,
+      batteries: [smartBattery, smartBattery],
+      powerSources: []
+    };
+
+    service.applyOfferToBuild(build, offer, batteries, solarPanels, 'replace');
+
+    // Replace drops the user's extra batteries and lands exactly on the SKU.
+    expect(build.batteries.length).toBe(0);
+    expect(build.powerSources.length).toBe(2);
+    expect(build.bundleOfferId).toBe('ecoflow-delta-pro-2x220w');
+  });
+
   it('pre-seeds a build with an offer’s required gear via applyOfferToBuild', () => {
     const offer = service
       .getOffersForInverter('ecoflow-delta-pro')

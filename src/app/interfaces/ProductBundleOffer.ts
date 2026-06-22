@@ -1,5 +1,3 @@
-export type OfferAvailability = 'available' | 'check-vendor' | 'sold-out';
-
 export interface ProductBundleOffer {
   id: string;
   inverterId: string;
@@ -15,7 +13,6 @@ export interface ProductBundleOffer {
   vendor: string;
   vendorUrl: string;
   verifiedOn: string;
-  availability: OfferAvailability;
 }
 
 export interface ProductBundleOfferView extends ProductBundleOffer {

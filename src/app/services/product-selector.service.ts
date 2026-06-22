@@ -31,12 +31,19 @@ export class ProductSelectorService {
     return matches.length > 0 ? matches : availableInverters;
   }
 
-  // The recommendation anchor: the smallest single station that still covers the
-  // build's peak load. `getMatchingInverters` returns qualifying units sorted
-  // descending by `maxOutput`, so the best fit is the last qualifying element.
-  // Returns undefined when no single station can meet the load (the matcher then
-  // falls back to the full catalog, none of which qualifies).
-  getAnchorInverter(build: Build): Inverter | undefined {
+  // The recommendation anchor: the smallest single station that fits the build.
+  // `getMatchingInverters` returns peak-qualifying units sorted descending by
+  // `maxOutput`, so the smallest is the last element. When storage/solar targets
+  // are supplied we prefer the smallest station that *also* reaches both within its
+  // caps, so the recommendation lands on a station that needs no step-up rather than
+  // anchoring on the smallest peak-covering unit and then nagging the user to upsize.
+  // Falls back to the smallest peak-covering station when no single unit can reach
+  // the targets. Returns undefined when nothing covers the peak load.
+  getAnchorInverter(
+    build: Build,
+    batteryTarget?: number,
+    solarTarget?: number
+  ): Inverter | undefined {
     const peakWattage = this.calculationUtils.peakWattage(build);
     const matches = this.getMatchingInverters(build);
 
@@ -45,7 +52,16 @@ export class ProductSelectorService {
         ? matches.filter(inverter => inverter.maxOutput >= peakWattage)
         : matches;
 
-    return qualifying.length > 0 ? qualifying[qualifying.length - 1] : undefined;
+    if (qualifying.length === 0) return undefined;
+
+    if (batteryTarget !== undefined && solarTarget !== undefined) {
+      const meetsTargets = qualifying.filter(inverter =>
+        this.inverterMeetsTargets(inverter, batteryTarget, solarTarget)
+      );
+      if (meetsTargets.length > 0) return meetsTargets[meetsTargets.length - 1];
+    }
+
+    return qualifying[qualifying.length - 1];
   }
 
   // Batteries are matched to the chosen inverter by brand. If the inverter's brand

@@ -42,6 +42,15 @@
       </div>
     </section>
 
+    <p class="affiliate-disclosure inter-regular" role="note">
+      <i class="bi bi-info-circle"></i>
+      <span>
+        Some links below are affiliate links — we may earn a commission if you buy, at no extra cost
+        to you. It never changes our recommendations.
+        <a routerLink="/affiliate-disclosure">Learn more</a>.
+      </span>
+    </p>
+
     @if (lineItems.length) {
       <section class="parts-list">
         <div class="parts-head">
@@ -90,6 +99,45 @@
             </li>
           }
         </ul>
+      </section>
+    }
+
+    @if (betterBundle) {
+      <section class="better-bundle" role="note">
+        <div class="better-bundle-text">
+          <span class="better-eyebrow inter-semibold">
+            <i class="bi bi-stars"></i>
+            Better package available
+          </span>
+          <strong class="inter-semibold">{{ betterBundle.name }}</strong>
+          <p class="inter-regular">
+            Get
+            @if (betterBundleExtraStorage > 0) {
+              <span class="delta">+{{ betterBundleExtraStorage / 1000 | number: '1.1-1' }} kWh storage</span>
+            }
+            @if (betterBundleExtraStorage > 0 && betterBundleExtraSolar > 0) {
+              and
+            }
+            @if (betterBundleExtraSolar > 0) {
+              <span class="delta">+{{ betterBundleExtraSolar | number }} W solar</span>
+            }
+            @if (betterBundleExtraStorage > 0 || betterBundleExtraSolar > 0) {
+              for
+            } @else {
+              the same gear for
+            }
+            {{ betterBundle.price | currency: 'USD' : 'symbol' : '1.0-0' }}
+            @if (betterBundleSavings > 0) {
+              — <strong class="inter-semibold">save {{ betterBundleSavings | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+              vs your current parts.
+            } @else {
+              .
+            }
+          </p>
+        </div>
+        <button class="btn-primary inter-medium" (click)="switchToBetterBundle(betterBundle)">
+          Switch to this package
+        </button>
       </section>
     }
 
