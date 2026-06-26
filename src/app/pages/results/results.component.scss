@@ -57,54 +57,130 @@
   }
 
   .summary-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     color: $text-secondary;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
-  strong {
-    color: $text-color-black;
-    font-size: 20px;
-  }
-
-  .summary-sub {
+  .info-icon {
+    font-size: 13px;
     color: $text-tertiary;
-    font-size: 12px;
-  }
-}
-
-.why-this-size {
-  margin-top: 16px;
-
-  .why-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border: 1px solid $border-hairline;
-    border-radius: $radius-pill;
-    background: $surface;
-    color: $text-color-black;
-    font-size: 14px;
     cursor: pointer;
+    text-transform: none;
+    transition: color $dur-fast $ease-out;
 
     &:hover {
-      border-color: $border-hairline-strong;
-    }
-
-    .bi-info-circle {
       color: $selected-blue;
     }
   }
 
-  .why-body {
-    max-width: 720px;
-    margin: 12px 2px 0;
-    color: $text-secondary;
+  strong {
+    color: $text-color-black;
+    font-size: 20px;
+  }
+}
+
+// Live sizing breakdown shown inside the per-metric modal — the same "ledger" the
+// manual /build route uses: a plain-language lead, one row per input, target emphasized.
+.why-panel {
+  .why-lead {
+    margin: 0 0 12px;
     font-size: 14px;
-    line-height: 1.55;
-    white-space: pre-line;
+    line-height: 1.5;
+    color: $text-secondary;
+
+    strong {
+      color: $text-color-black;
+      font-weight: 600;
+    }
+  }
+
+  .why-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+    font-size: 14px;
+
+    & + .why-row {
+      border-top: 1px solid $divider;
+    }
+
+    // The autonomy row carries a stepper, so center it rather than baseline-align.
+    &.why-row-control {
+      align-items: center;
+      padding: 6px 0;
+    }
+
+    .why-label {
+      color: $text-secondary;
+    }
+    .why-value {
+      color: $text-color-black;
+      white-space: nowrap;
+    }
+
+    &.total .why-label {
+      color: $text-color-black;
+      font-weight: 600;
+    }
+    &.total .why-value {
+      color: $selected-blue;
+      font-weight: 600;
+    }
+  }
+}
+
+.autonomy-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px;
+  border-radius: $radius-pill;
+  background-color: $surface;
+  border: 1px solid $border-hairline;
+  box-shadow: $shadow-sm;
+
+  .step-button {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: $text-color-black;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out;
+
+    i {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: $accent-tint;
+      color: $selected-blue;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  .autonomy-value {
+    min-width: 34px;
+    text-align: center;
+    font-size: 14px;
+    color: $text-color-black;
   }
 }
 
@@ -173,6 +249,119 @@ app-bundle-offers {
     color: $text-secondary;
     font-size: 14px;
     line-height: 1.5;
+  }
+}
+
+// Placeholder for the offers card while an autonomy edit recalculates. Mirrors the
+// bundle-offers container and card grid so the shimmer occupies the same footprint
+// the real offers will land in.
+$skel-base: rgba(140, 140, 150, 0.14);
+$skel-highlight: rgba(140, 140, 150, 0.26);
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.offers-skeleton {
+  margin-top: 26px;
+  padding: 22px;
+  border: 1px solid rgba(0, 113, 227, 0.16);
+  border-radius: $radius-xl;
+  background: linear-gradient(145deg, rgba(0, 113, 227, 0.07), $surface 46%);
+
+  .skel-line,
+  .skel-pill,
+  .skel-button {
+    display: block;
+    border-radius: $radius-sm;
+    background: linear-gradient(
+      90deg,
+      $skel-base 25%,
+      $skel-highlight 37%,
+      $skel-base 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+
+  .skel-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 18px;
+  }
+  .skel-eyebrow {
+    width: 130px;
+    height: 11px;
+  }
+  .skel-title {
+    width: 230px;
+    height: 20px;
+  }
+  .skel-subtitle {
+    width: 340px;
+    max-width: 90%;
+    height: 13px;
+  }
+
+  .skel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .skel-card {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    padding: 18px;
+    border: 1px solid $border-hairline;
+    border-radius: $radius-lg;
+    background: var(--surface-glass);
+    box-shadow: $shadow-sm;
+  }
+  .skel-card-title {
+    width: 55%;
+    height: 17px;
+  }
+  .skel-card-text {
+    width: 100%;
+    height: 11px;
+
+    &.short {
+      width: 70%;
+    }
+  }
+  .skel-pills {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+  }
+  .skel-pill {
+    width: 84px;
+    height: 22px;
+    border-radius: $radius-pill;
+  }
+  .skel-price {
+    width: 45%;
+    height: 24px;
+    margin-top: 8px;
+  }
+  .skel-button {
+    height: 40px;
+    margin-top: 6px;
+    border-radius: $radius-sm;
+  }
+}
+
+@media (max-width: 767px) {
+  .offers-skeleton .skel-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -63,11 +63,9 @@
   border-radius: $radius-lg;
   background: var(--surface-glass);
   box-shadow: $shadow-sm;
-  transition: border-color $dur-fast $ease-out, box-shadow $dur-fast $ease-out,
-    transform $dur-fast $ease-out;
+  transition: border-color $dur-fast $ease-out, box-shadow $dur-fast $ease-out;
 
   &:hover {
-    transform: translateY(-2px);
     box-shadow: $shadow-md;
   }
 

@@ -146,6 +146,7 @@
         [offers]="offers"
         [recommendedOfferId]="recommendedOfferId"
         [activeOfferId]="activeBundleOffer?.id"
+        [anchorInverter]="build.inverter"
         (applyOffer)="applyBundle($event)"
       ></app-bundle-offers>
     } @else {

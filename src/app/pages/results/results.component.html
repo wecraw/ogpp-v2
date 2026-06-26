@@ -33,45 +33,64 @@
     @if (!noAnchorInverter) {
       <section class="demand-summary">
         <div>
-          <span class="summary-label inter-regular">Peak draw</span>
+          <span class="summary-label inter-regular">
+            Peak power draw
+            <i class="bi bi-question-circle info-icon" (click)="openModal('peak')"></i>
+          </span>
           <strong class="inter-semibold">{{ peakWattage | number }} W</strong>
         </div>
         <div>
-          <span class="summary-label inter-regular">Daily usage</span>
+          <span class="summary-label inter-regular">
+            Daily energy usage
+            <i class="bi bi-question-circle info-icon" (click)="openModal('daily')"></i>
+          </span>
           <strong class="inter-semibold">{{ totalWattHours | number }} Wh</strong>
         </div>
         <div>
-          <span class="summary-label inter-regular">Storage target</span>
+          <span class="summary-label inter-regular">
+            Recommended storage capacity
+            <i class="bi bi-question-circle info-icon" (click)="openModal('storage')"></i>
+          </span>
           <strong class="inter-semibold">{{ batteryTarget | number }} Wh</strong>
-          <span class="summary-sub inter-regular">{{ daysOfAutonomy }}-day autonomy</span>
         </div>
         <div>
-          <span class="summary-label inter-regular">Solar target</span>
+          <span class="summary-label inter-regular">
+            Recommended solar array size
+            <i class="bi bi-question-circle info-icon" (click)="openModal('solar')"></i>
+          </span>
           <strong class="inter-semibold">{{ solarTarget | number }} W</strong>
         </div>
       </section>
-
-      <section class="why-this-size">
-        <button
-          type="button"
-          class="why-toggle inter-medium"
-          [attr.aria-expanded]="whyExpanded"
-          (click)="toggleWhy()"
-        >
-          <i class="bi bi-info-circle"></i>
-          {{ whyTitle }}
-          <i class="bi" [class.bi-chevron-down]="!whyExpanded" [class.bi-chevron-up]="whyExpanded"></i>
-        </button>
-        @if (whyExpanded) {
-          <p class="why-body inter-regular">{{ whyExplanation }}</p>
-        }
-      </section>
     }
 
-    @if (offers.length) {
+    @if (recalculating) {
+      <section class="offers-skeleton" aria-hidden="true">
+        <div class="skel-heading">
+          <span class="skel-line skel-eyebrow"></span>
+          <span class="skel-line skel-title"></span>
+          <span class="skel-line skel-subtitle"></span>
+        </div>
+        <div class="skel-grid">
+          @for (card of [0, 1]; track card) {
+            <div class="skel-card">
+              <span class="skel-line skel-card-title"></span>
+              <span class="skel-line skel-card-text"></span>
+              <span class="skel-line skel-card-text short"></span>
+              <div class="skel-pills">
+                <span class="skel-pill"></span>
+                <span class="skel-pill"></span>
+              </div>
+              <span class="skel-line skel-price"></span>
+              <span class="skel-button"></span>
+            </div>
+          }
+        </div>
+      </section>
+    } @else if (offers.length) {
       <app-bundle-offers
         [offers]="offers"
         [recommendedOfferId]="recommendedOfferId"
+        [anchorInverter]="anchorInverter"
         applyLabel="Customize this kit"
         (applyOffer)="customize($event)"
       ></app-bundle-offers>
@@ -116,3 +135,94 @@
     }
   }
 </div>
+
+@if (isModalOpen) {
+  <app-modal [modalHeader]="modalTitle" (closeModal)="closeModal()">
+    <div class="why-panel">
+      @switch (modalMetric) {
+        @case ('peak') {
+          <p class="why-lead inter-regular mb-0">
+            We size for a realistic peak of <strong>{{ peakWattage | number }} W</strong>: every
+            always-on appliance running together, plus the single largest high-draw item (like a
+            kettle or microwave). We don't assume every heavy appliance fires at the exact same
+            instant, so your power station must supply at least this much continuous output.
+          </p>
+        }
+        @case ('daily') {
+          <p class="why-lead inter-regular mb-0">
+            Your appliances draw <strong>{{ totalWattHours | number }} Wh</strong> over a full day —
+            each appliance's power multiplied by how many hours a day you run it, all added together.
+            This is the energy your batteries bank and your solar replenishes each day.
+          </p>
+        }
+        @case ('storage') {
+          <p class="why-lead inter-regular">
+            Your appliances use <strong>{{ totalWattHours | number }} Wh</strong> over a day. We size
+            storage to cover {{ daysOfAutonomy }} day{{ daysOfAutonomy === 1 ? '' : 's' }} of use
+            (your station's built-in battery counts toward this).
+          </p>
+          <div class="why-row">
+            <span class="why-label inter-regular">Daily energy use</span>
+            <span class="why-value inter-medium">{{ totalWattHours | number }} Wh/day</span>
+          </div>
+          <div class="why-row why-row-control">
+            <span class="why-label inter-regular">Days of autonomy</span>
+            <div class="autonomy-stepper">
+              <button
+                type="button"
+                class="step-button"
+                [disabled]="daysOfAutonomy <= minDays"
+                (click)="changeDaysOfAutonomy(-1)"
+                aria-label="Fewer days of autonomy"
+              >
+                <i class="bi bi-dash"></i>
+              </button>
+              <span class="autonomy-value inter-medium">× {{ daysOfAutonomy }}</span>
+              <button
+                type="button"
+                class="step-button"
+                [disabled]="daysOfAutonomy >= maxDays"
+                (click)="changeDaysOfAutonomy(1)"
+                aria-label="More days of autonomy"
+              >
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="why-row total">
+            <span class="why-label inter-regular">Target storage</span>
+            <span class="why-value inter-medium">{{ batteryTarget | number }} Wh</span>
+          </div>
+        }
+        @case ('solar') {
+          <p class="why-lead inter-regular">
+            To replenish a full day of use ({{ totalWattHours | number }} Wh) during your worst
+            selected season, your panels need enough wattage to make that energy back in a typical
+            day of sun.
+          </p>
+          <div class="why-row">
+            <span class="why-label inter-regular">Daily energy to replenish</span>
+            <span class="why-value inter-medium">{{ totalWattHours | number }} Wh</span>
+          </div>
+          <div class="why-row">
+            <span class="why-label inter-regular">
+              Worst-season sun
+              @if (build.seasons.length) {
+                ({{ build.seasons.join(', ') | titlecase }})
+              }
+            </span>
+            <span class="why-value inter-medium"
+              >{{ worstSeasonSunHours | number: '1.0-1' }} h/day</span
+            >
+          </div>
+          <div class="why-row total">
+            <span class="why-label inter-regular">
+              {{ totalWattHours | number }} Wh ÷ {{ worstSeasonSunHours | number: '1.0-1' }} h
+            </span>
+            <span class="why-value inter-medium">{{ solarTarget | number }} W</span>
+          </div>
+        }
+      }
+    </div>
+  </app-modal>
+}

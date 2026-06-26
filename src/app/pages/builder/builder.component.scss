@@ -95,6 +95,24 @@
   margin-top: 14px;
 }
 
+.more-presets-btn {
+  margin-top: 12px;
+  padding: 7px 14px;
+  background: $surface;
+  color: $text-secondary;
+  border: 1px solid $border-hairline;
+  border-radius: $radius-pill;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color $dur-fast $ease-out, background-color $dur-fast $ease-out,
+    color $dur-fast $ease-out;
+
+  &:hover {
+    border-color: $border-hairline-strong;
+    color: $text-color-black;
+  }
+}
+
 // ============================================================
 //  Confirm dialog (replace selection)
 // ============================================================

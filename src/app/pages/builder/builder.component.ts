@@ -57,6 +57,9 @@ export class BuilderComponent implements OnInit {
   public allAppliances: Appliance[] = allAppliances.map(appliance => ({ ...appliance }));
   public originalAppliances: Appliance[] = allAppliances.map(appliance => ({ ...appliance }));
   public appliancePresets: AppliancePreset[] = appliancePresets;
+  // Names shown up front; the rest are tucked behind the "More" toggle.
+  private readonly defaultPresetNames = ['Cabin weekend', 'RV kit', 'Van life basics'];
+  public showMorePresets: boolean = false;
   public applianceGroups: string[] = [];
   public modalContent: string = LOCATION_DISCLAIMER;
   public modalTitle: string = LOCATION_DISCLAIMER_TITLE;
@@ -242,6 +245,18 @@ export class BuilderComponent implements OnInit {
   }
 
   // Presets =================================================================
+
+  get defaultPresets(): AppliancePreset[] {
+    return this.appliancePresets.filter(p => this.defaultPresetNames.includes(p.name));
+  }
+
+  get extraPresets(): AppliancePreset[] {
+    return this.appliancePresets.filter(p => !this.defaultPresetNames.includes(p.name));
+  }
+
+  toggleMorePresets(): void {
+    this.showMorePresets = !this.showMorePresets;
+  }
 
   isPresetActive(preset: AppliancePreset): boolean {
     return !!preset.id && this.build.appliancePresetId === preset.id;
