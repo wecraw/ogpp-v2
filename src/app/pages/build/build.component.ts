@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CountUpDirective } from 'src/app/directives/count-up.directive';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
@@ -38,6 +39,7 @@ const MAX_DAYS_OF_AUTONOMY = 7;
     selector: 'app-build',
     imports: [
       CommonModule,
+      FormsModule,
       CountUpDirective,
       ModalComponent,
       BuildComponentCardComponent
@@ -48,6 +50,10 @@ const MAX_DAYS_OF_AUTONOMY = 7;
 export class BuildComponent implements OnInit {
   public build: Build = defaultBuild;
   public buildNotFound: boolean = false;
+
+  // Inline rename of the build, surfaced as the page title's edit affordance.
+  public isRenaming: boolean = false;
+  public draftName: string = '';
 
   constructor(
     private router: Router,
@@ -388,6 +394,31 @@ export class BuildComponent implements OnInit {
     this.router.navigate(['/builder'], { queryParams: { buildId: this.build.id } });
   }
 
+  // ----- Rename (inline) -----
+
+  // Builds may have no name yet; fall back to the chosen station, then a generic label,
+  // so the title is never blank.
+  get buildDisplayName(): string {
+    return this.build.name?.trim() || this.build.inverter?.name || 'Untitled build';
+  }
+
+  startRename() {
+    this.draftName = this.build.name?.trim() ?? '';
+    this.isRenaming = true;
+  }
+
+  saveRename() {
+    this.build.name = this.draftName.trim();
+    this.save();
+    this.isRenaming = false;
+    this.draftName = '';
+  }
+
+  cancelRename() {
+    this.isRenaming = false;
+    this.draftName = '';
+  }
+
   // ----- Bottom-bar row colors -----
 
   get inverterRowClass(): string {
@@ -462,10 +493,21 @@ export class BuildComponent implements OnInit {
   }
 
   // Rebuilds a per-id quantity map by counting duplicate entries in a persisted array.
-  private groupQuantities(list: { id?: string }[]): Record<string, number> {
+  // `allowed`, when given, restricts the map to ids currently on offer — a persisted
+  // build can carry battery/panel entries left over from a previously-chosen inverter,
+  // and those phantom ids would otherwise inflate the bank/headroom counts (consuming a
+  // slot for a card that isn't even rendered).
+  private groupQuantities(
+    list: { id?: string }[],
+    allowed?: { id?: string }[]
+  ): Record<string, number> {
+    const allowedIds = allowed
+      ? new Set(allowed.map(item => item.id).filter((id): id is string => !!id))
+      : null;
     const out: Record<string, number> = {};
     for (const item of list) {
       if (!item.id) continue;
+      if (allowedIds && !allowedIds.has(item.id)) continue;
       out[item.id] = (out[item.id] ?? 0) + 1;
     }
     return out;
@@ -481,12 +523,17 @@ export class BuildComponent implements OnInit {
       if (currentInverter) this.build.inverter = currentInverter;
 
       this.batteries = this.productSelectorService.getMatchingBatteries(this.build);
-      this.batteryQuantities = this.groupQuantities(this.build.batteries);
+      this.batteryQuantities = this.groupQuantities(this.build.batteries, this.batteries);
       this.build.batteries = this.flatten(this.batteries, this.batteryQuantities);
       this.solarPanels = this.productSelectorService.getMatchingSolarPanels(this.build);
-      this.solarQuantities = this.groupQuantities(this.build.powerSources);
+      this.solarQuantities = this.groupQuantities(this.build.powerSources, this.solarPanels);
       this.build.powerSources = this.flatten(this.solarPanels, this.solarQuantities);
       this.showStep2 = true;
+
+      // The flattens above may have dropped phantom entries (gear left over from a
+      // previously-chosen inverter). Persist the scrubbed arrays so downstream pages
+      // (e.g. /checkout pricing) don't read the stale items back from localStorage.
+      this.save();
     }
 
     this.recalculate();

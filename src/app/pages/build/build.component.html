@@ -1,5 +1,31 @@
 @if (!buildNotFound) {
   <div class="container">
+    <div class="build-title-row">
+      @if (isRenaming) {
+        <div class="rename-row">
+          <input
+            class="rename-input inter-medium"
+            [(ngModel)]="draftName"
+            (keyup.enter)="saveRename()"
+            (keyup.escape)="cancelRename()"
+            placeholder="Build name"
+            autofocus
+          />
+          <button class="icon-btn confirm" (click)="saveRename()" aria-label="Save name">
+            <i class="bi bi-check-lg"></i>
+          </button>
+          <button class="icon-btn" (click)="cancelRename()" aria-label="Cancel rename">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      } @else {
+        <h1 class="build-title inter-medium">{{ buildDisplayName }}</h1>
+        <button class="icon-btn" (click)="startRename()" aria-label="Rename build" title="Rename">
+          <i class="bi bi-pencil"></i>
+        </button>
+      }
+    </div>
+
     <div class="fade-in build-stats">
       <div class="stat-cluster">
         <div class="appliance-chip">

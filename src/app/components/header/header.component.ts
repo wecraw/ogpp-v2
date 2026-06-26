@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 type ThemePreference = 'system' | 'light' | 'dark';
@@ -14,6 +14,8 @@ export class HeaderComponent implements OnInit {
 
   menuOpen = false;
   themePreference: ThemePreference = 'system';
+
+  constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
     const savedPreference = localStorage.getItem(this.themeStorageKey);
@@ -31,6 +33,17 @@ export class HeaderComponent implements OnInit {
 
   closeMenu(): void {
     this.menuOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.menuOpen) {
+      return;
+    }
+
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.closeMenu();
+    }
   }
 
   toggleThemePreference(): void {

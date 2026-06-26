@@ -95,21 +95,54 @@
   margin-top: 14px;
 }
 
-.more-presets-btn {
+// Collapsible drawer holding the extra presets. A 0fr → 1fr grid-row
+// transition animates the height open/closed instead of snapping.
+.presets-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows $dur $ease-out;
+
+  &.open {
+    grid-template-rows: 1fr;
+  }
+}
+
+.presets-drawer-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.presets-grid--extra {
   margin-top: 12px;
-  padding: 7px 14px;
-  background: $surface;
-  color: $text-secondary;
-  border: 1px solid $border-hairline;
-  border-radius: $radius-pill;
-  font-size: 13px;
+}
+
+// Hyperlink-style toggle, matching the home page's "View all" link.
+.more-presets-btn.link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 12px;
+  padding: 4px 2px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: $selected-blue;
+  font-size: 15px;
+  white-space: nowrap;
   cursor: pointer;
-  transition: border-color $dur-fast $ease-out, background-color $dur-fast $ease-out,
-    color $dur-fast $ease-out;
+  transition: opacity $dur-fast $ease-out;
+
+  .bi {
+    font-size: 13px;
+    transition: transform $dur-fast $ease-out;
+
+    &.is-open {
+      transform: rotate(180deg);
+    }
+  }
 
   &:hover {
-    border-color: $border-hairline-strong;
-    color: $text-color-black;
+    opacity: 0.7;
   }
 }
 

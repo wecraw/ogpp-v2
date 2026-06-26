@@ -53,12 +53,12 @@
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
   padding: 18px 20px 16px;
-  transition: box-shadow $dur $ease-out, transform $dur-fast $ease-out,
-    border-color $dur $ease-out;
+  cursor: pointer;
+  transition: border-color $dur-fast $ease-out, box-shadow $dur-fast $ease-out;
 
   &:hover {
+    border-color: $border-hairline-strong;
     box-shadow: $shadow-md;
-    transform: translateY(-2px);
   }
 }
 
@@ -68,7 +68,6 @@
 
 .name-stack {
   min-width: 0;
-  cursor: pointer;
 
   .build-name {
     font-size: 18px;
@@ -92,19 +91,6 @@
   }
 }
 
-.rename-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .rename-input {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: 16px;
-    padding: 8px 11px;
-  }
-}
-
 // ============================================================
 //  Specs
 // ============================================================
@@ -113,7 +99,6 @@
   margin: 16px 0 14px;
   border-top: 1px solid $divider;
   border-bottom: 1px solid $divider;
-  cursor: pointer;
 
   .spec {
     flex: 1 1 0;

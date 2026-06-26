@@ -25,40 +25,21 @@
     <div class="row card-grid">
       @for (build of builds; track build.id; let i = $index) {
         <div class="col-lg-6 col-xl-4" [style.animation-delay.ms]="i * 55">
-          <div class="build-card">
+          <div class="build-card" (click)="onCardClick($event, build.id)">
             <!-- Name + brand -->
             <div class="card-head">
-              @if (editingId === build.id) {
-                <div class="rename-row">
-                  <input
-                    class="rename-input inter-regular"
-                    [(ngModel)]="draftName"
-                    (keyup.enter)="saveRename(build.id)"
-                    (keyup.escape)="cancelRename()"
-                    placeholder="Build name"
-                    autofocus
-                  />
-                  <button class="icon-btn confirm" (click)="saveRename(build.id)" aria-label="Save name">
-                    <i class="bi bi-check-lg"></i>
-                  </button>
-                  <button class="icon-btn" (click)="cancelRename()" aria-label="Cancel rename">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                </div>
-              } @else {
-                <div class="name-stack" (click)="reopen(build.id)">
-                  <div class="build-name inter-medium">{{ displayName(build) }}</div>
-                  @if (build.station) {
-                    <div class="build-brand inter-regular">{{ build.brand }} · {{ build.station }}</div>
-                  } @else {
-                    <div class="build-brand inter-regular">No station selected</div>
-                  }
-                </div>
-              }
+              <div class="name-stack">
+                <div class="build-name inter-medium">{{ displayName(build) }}</div>
+                @if (build.station) {
+                  <div class="build-brand inter-regular">{{ build.brand }} · {{ build.station }}</div>
+                } @else {
+                  <div class="build-brand inter-regular">No station selected</div>
+                }
+              </div>
             </div>
 
             <!-- Key specs -->
-            <div class="specs" (click)="reopen(build.id)">
+            <div class="specs">
               <div class="spec">
                 <div class="spec-value inter-medium">
                   {{ build.output | number }}<span class="spec-unit">W</span>
@@ -102,9 +83,6 @@
                 <div class="actions">
                   <button class="action-btn primary inter-medium" (click)="reopen(build.id)">
                     Open
-                  </button>
-                  <button class="icon-btn" (click)="startRename(build)" aria-label="Rename build" title="Rename">
-                    <i class="bi bi-pencil"></i>
                   </button>
                   <button class="icon-btn" (click)="duplicate(build.id)" aria-label="Duplicate build" title="Duplicate">
                     <i class="bi bi-files"></i>

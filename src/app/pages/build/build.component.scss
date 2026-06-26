@@ -1,5 +1,83 @@
 @import 'src/variables.scss';
 
+// Page title: the build's name with a quiet inline rename affordance. The pencil only
+// reveals on hover of the row so it stays unobtrusive until the user looks for it.
+.build-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-bottom: 14px;
+
+  .build-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: $text-color-black;
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover .icon-btn:not(:hover) {
+    opacity: 1;
+  }
+
+  > .icon-btn {
+    opacity: 0.55;
+  }
+
+  .rename-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+
+    .rename-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 360px;
+      font-size: 20px;
+      padding: 8px 12px;
+    }
+  }
+
+  .icon-btn {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid $border-hairline;
+    background-color: $surface;
+    color: $text-secondary;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out,
+      border-color $dur-fast $ease-out, opacity $dur-fast $ease-out;
+
+    i {
+      font-size: 15px;
+    }
+
+    &:hover {
+      background-color: $accent-tint;
+      border-color: $selected-blue;
+      color: $selected-blue;
+    }
+
+    &.confirm {
+      color: $selected-blue;
+    }
+  }
+}
+
 // Summary header: an accent-tinted icon tile pairs with a baseline-aligned count on
 // the left, while the edit action is pulled to the right as a quiet icon button. Reads
 // as one cohesive bar rather than a stacked stat + button.

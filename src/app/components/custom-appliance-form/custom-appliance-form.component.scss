@@ -150,13 +150,22 @@
 }
 
 .group-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   background-color: $surface;
+  // Custom caret (native one is removed by appearance: none)
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%238a8a8e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
   border: 1px solid $border-hairline;
   border-radius: $radius-sm;
   color: $text-color-black;
   font-size: 16px;
-  padding: 11px 13px;
+  line-height: 1.4;
+  padding: 11px 36px 11px 13px;
   outline: none;
+  cursor: pointer;
   transition: border-color $dur-fast $ease-out, box-shadow $dur-fast $ease-out;
 
   &:hover {

@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { Build } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
@@ -23,16 +22,14 @@ interface BuildSummary {
 
 @Component({
   selector: 'app-builds',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './builds.component.html',
   styleUrl: './builds.component.scss'
 })
 export class BuildsComponent implements OnInit {
   public builds: BuildSummary[] = [];
 
-  // Inline-edit state: only one card is ever renaming or confirming a delete at a time.
-  public editingId: string | null = null;
-  public draftName: string = '';
+  // Inline-edit state: only one card is ever confirming a delete at a time.
   public confirmingDeleteId: string | null = null;
 
   constructor(private router: Router, private buildService: BuildService) {}
@@ -82,33 +79,17 @@ export class BuildsComponent implements OnInit {
 
   // ----- Reopen -----
 
+  // The whole card is clickable, but clicks on the action buttons (Open, duplicate,
+  // delete, and the delete-confirm controls) should run their own handler instead of
+  // navigating. Guarding on the real event target is bulletproof regardless of how
+  // Angular dispatches the bubbled event.
+  onCardClick(event: MouseEvent, id: string) {
+    if ((event.target as HTMLElement).closest('button')) return;
+    this.reopen(id);
+  }
+
   reopen(id: string) {
     this.router.navigate(['/build'], { queryParams: { buildId: id } });
-  }
-
-  // ----- Rename (inline) -----
-
-  startRename(summary: BuildSummary) {
-    this.confirmingDeleteId = null;
-    this.editingId = summary.id;
-    this.draftName = summary.name;
-  }
-
-  saveRename(id: string) {
-    const build = this.buildService.getBuild(id);
-    if (build) {
-      build.name = this.draftName.trim();
-      build.lastEdited = new Date();
-      this.buildService.saveBuild(build);
-    }
-    this.editingId = null;
-    this.draftName = '';
-    this.loadBuilds();
-  }
-
-  cancelRename() {
-    this.editingId = null;
-    this.draftName = '';
   }
 
   // ----- Duplicate -----
@@ -131,7 +112,6 @@ export class BuildsComponent implements OnInit {
   // ----- Delete (inline confirm) -----
 
   startDelete(id: string) {
-    this.editingId = null;
     this.confirmingDeleteId = id;
   }
 
