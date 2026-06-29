@@ -40,6 +40,15 @@ export class CustomApplianceFormComponent {
 
   errors: FieldError = {};
 
+  // Until the user picks a usage type by hand, we keep it in sync with a
+  // heuristic on the wattage/hours they enter. A high-draw load used in short
+  // bursts is most likely intermittent; everything else stays continuous (the
+  // conservative default that never undersizes the inverter). Once they touch
+  // the toggle we stop guessing and respect their choice.
+  private usageTypeTouched = false;
+  private readonly intermittentMinWattage = 500;
+  private readonly intermittentMaxHours = 1.5;
+
   /** Custom first, then any existing builder groups, de-duped. */
   get groupOptions(): string[] {
     return [CUSTOM_GROUP, ...this.groups.filter(group => group !== CUSTOM_GROUP)];
@@ -47,6 +56,27 @@ export class CustomApplianceFormComponent {
 
   clearError(field: keyof FieldError): void {
     this.errors[field] = undefined;
+  }
+
+  /** User explicitly chose a usage type; stop auto-inferring it. */
+  selectUsageType(type: UsageType): void {
+    this.usageType = type;
+    this.usageTypeTouched = true;
+  }
+
+  /**
+   * Pre-select a usage type from the entered wattage/hours, unless the user has
+   * already picked one. High-draw + short-runtime reads as an intermittent
+   * burst; anything else stays continuous.
+   */
+  private applyUsageTypeHeuristic(): void {
+    if (this.usageTypeTouched) return;
+    const isBurst =
+      this.isPositive(this.wattage) &&
+      this.wattage >= this.intermittentMinWattage &&
+      this.isPositive(this.hours) &&
+      this.hours <= this.intermittentMaxHours;
+    this.usageType = isBurst ? 'intermittent' : 'continuous';
   }
 
   onHoursInput(event: Event): void {
@@ -60,6 +90,7 @@ export class CustomApplianceFormComponent {
     } else {
       this.hours = null;
     }
+    this.applyUsageTypeHeuristic();
     this.clearError('hours');
   }
 
@@ -75,6 +106,7 @@ export class CustomApplianceFormComponent {
     } else {
       this.wattage = null;
     }
+    this.applyUsageTypeHeuristic();
     this.clearError('wattage');
   }
 

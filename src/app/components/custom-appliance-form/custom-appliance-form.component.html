@@ -83,7 +83,7 @@
             type="button"
             class="segment inter-medium"
             [class.active]="usageType === 'continuous'"
-            (click)="usageType = 'continuous'"
+            (click)="selectUsageType('continuous')"
           >
             Continuous
           </button>
@@ -91,7 +91,7 @@
             type="button"
             class="segment inter-medium"
             [class.active]="usageType === 'intermittent'"
-            (click)="usageType = 'intermittent'"
+            (click)="selectUsageType('intermittent')"
           >
             Intermittent
           </button>

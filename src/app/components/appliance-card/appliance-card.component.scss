@@ -26,7 +26,7 @@
   }
 
   &.edit {
-    height: 300px;
+    height: 372px;
     z-index: 1000;
     cursor: default;
     box-shadow: $shadow-lg;
@@ -330,6 +330,45 @@
 
   &.suffix {
     right: 12px;
+  }
+}
+
+.usage-field {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
+// Segmented usage-type toggle
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  background: $page-bg;
+  border-radius: $radius-sm;
+  border: 1px solid $border-hairline;
+}
+
+.segment {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  font-size: 13px;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color $dur-fast $ease-out, color $dur-fast $ease-out,
+    box-shadow $dur-fast $ease-out;
+
+  &:hover:not(.active) {
+    color: $text-color-black;
+  }
+
+  &.active {
+    background: $surface;
+    color: $text-color-black;
+    box-shadow: $shadow-sm;
   }
 }
 

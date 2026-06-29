@@ -84,12 +84,15 @@
                   <button class="action-btn primary inter-medium" (click)="reopen(build.id)">
                     Open
                   </button>
-                  <button class="icon-btn" (click)="duplicate(build.id)" aria-label="Duplicate build" title="Duplicate">
-                    <i class="bi bi-files"></i>
-                  </button>
-                  <button class="icon-btn danger" (click)="startDelete(build.id)" aria-label="Delete build" title="Delete">
-                    <i class="bi bi-trash"></i>
-                  </button>
+                  <!-- Padded safe zone so a near-miss next to these icons doesn't navigate. -->
+                  <div class="icon-actions">
+                    <button class="icon-btn" (click)="duplicate(build.id)" aria-label="Duplicate build" title="Duplicate">
+                      <i class="bi bi-files"></i>
+                    </button>
+                    <button class="icon-btn danger" (click)="startDelete(build.id)" aria-label="Delete build" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
                 </div>
               }
             </div>

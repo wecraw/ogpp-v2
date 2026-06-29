@@ -104,6 +104,27 @@
               </div>
             </div>
           </div>
+          <div class="usage-field">
+            <label class="spec-label inter-medium">Usage type</label>
+            <div class="segmented" role="group" aria-label="Usage type">
+              <button
+                type="button"
+                class="segment inter-medium"
+                [class.active]="appliance.usageType !== 'intermittent'"
+                (click)="appliance.usageType = 'continuous'"
+              >
+                Continuous
+              </button>
+              <button
+                type="button"
+                class="segment inter-medium"
+                [class.active]="appliance.usageType === 'intermittent'"
+                (click)="appliance.usageType = 'intermittent'"
+              >
+                Intermittent
+              </button>
+            </div>
+          </div>
           @if (deletable) {
             <a (click)="deleteClicked($event)" class="reset-link delete-link inter-medium">
               <i class="bi bi-trash"></i>

@@ -84,7 +84,8 @@ export class BuildsComponent implements OnInit {
   // navigating. Guarding on the real event target is bulletproof regardless of how
   // Angular dispatches the bubbled event.
   onCardClick(event: MouseEvent, id: string) {
-    if ((event.target as HTMLElement).closest('button')) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('button') || target.closest('.icon-actions')) return;
     this.reopen(id);
   }
 
