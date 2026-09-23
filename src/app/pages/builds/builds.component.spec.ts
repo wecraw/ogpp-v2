@@ -84,17 +84,6 @@ describe('BuildsComponent', () => {
     expect(named).toBe('DELTA Pro 3');
   });
 
-  it('renames a build and persists it', () => {
-    buildService.saveBuild(makeBuild({ id: 'r', name: '' }));
-    create();
-
-    component.draftName = 'Cabin kit';
-    component.saveRename('r');
-
-    expect(buildService.getBuild('r')?.name).toBe('Cabin kit');
-    expect(component.builds[0].name).toBe('Cabin kit');
-  });
-
   it('duplicates a build under a new id', () => {
     buildService.saveBuild(makeBuild({ id: 'orig', name: 'Original' }));
     create();

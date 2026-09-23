@@ -18,10 +18,10 @@ This project is **unfinished and was picked back up from a stale state** — see
 - `npm run build` / `ng build` — production build to `dist/ogpp-v2`
 - `npm run watch` — dev build, rebuild on change
 - `npm test` / `ng test` — Karma + Jasmine unit tests (Chrome). Karma is deprecated in Angular 21; a future move to the new test runner is expected.
-- Run once, headless (CI-style): `ng test --watch=false --browsers=ChromeHeadless`
+- `npm run test:ci` — run once, headless (`ng test --watch=false --browsers=ChromeHeadless`)
 - Single test: `ng test --include='**/calculation-utils.service.spec.ts'`
 
-> The component `*.spec.ts` files are unmodified CLI scaffolding and **5 of them currently fail** — the auto-generated `should create` tests don't provide required inputs/providers (e.g. `BuilderComponent` needs `HttpClient`; `BuildComponentCardComponent` needs its `[component]` input). These are stale stubs, not real coverage; fix or delete them when you touch a component.
+> The full suite passes. Specs exist for every service, the content catalogs (integrity checks), and all pages/components except the static legal pages and footer. When changing a component, keep its spec compiling — a single type error in any spec (e.g. a spec calling a removed method) fails the entire run, not just that file.
 
 Prettier enforces: single quotes, semicolons, no trailing commas, 100-char width, avoid-arrow-parens. TypeScript runs in `strict` mode with `strictTemplates`.
 
