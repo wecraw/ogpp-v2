@@ -8,7 +8,7 @@ OGPP ("Off Grid Part Picker") recommends an all-in-one solar power system (EcoFl
 
 Angular 21 SPA, standalone components (no NgModules), built-in control flow (`@if`/`@for`), client-side only. State persists in `localStorage` — there is no backend of our own; the only external call is to NREL for solar irradiance data.
 
-> **Angular version:** on 21 (current LTS). The next major (22) requires Node ≥ 22.22.3; this machine has 22.14.0, so bump Node before running `ng update @angular/core@22 @angular/cli@22`. Upgrade one major at a time, building between each.
+> **Angular version:** on 21 (current LTS). The next major (22) requires Node ≥ 22.22.3 (this machine and CI run Node 24, so `ng update @angular/core@22 @angular/cli@22` is unblocked). Stay on npm 11+ — npm 10 rejects this lockfile (it omits optional peer deps npm 10 expects), which is why CI pins Node 24. Upgrade one major at a time, building between each.
 
 This project is **unfinished and was picked back up from a stale state** — see "Current state / known gaps" before assuming a feature works end to end.
 
