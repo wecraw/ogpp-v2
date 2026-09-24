@@ -84,6 +84,17 @@ describe('BuildsComponent', () => {
     expect(named).toBe('DELTA Pro 3');
   });
 
+  it('copies a share link for a build', async () => {
+    buildService.saveBuild(makeBuild({ id: 's', name: 'Shared' }));
+    const writeText = spyOn(navigator.clipboard, 'writeText').and.resolveTo();
+    create();
+
+    await component.share('s');
+
+    expect(writeText).toHaveBeenCalledWith(jasmine.stringMatching(/\/share#[A-Za-z0-9_-]+$/));
+    expect(component.copiedId).toBe('s');
+  });
+
   it('duplicates a build under a new id', () => {
     buildService.saveBuild(makeBuild({ id: 'orig', name: 'Original' }));
     create();

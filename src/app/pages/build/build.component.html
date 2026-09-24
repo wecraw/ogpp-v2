@@ -23,6 +23,15 @@
         <button class="icon-btn" (click)="startRename()" aria-label="Rename build" title="Rename">
           <i class="bi bi-pencil"></i>
         </button>
+        <button
+          class="btn outlined inter-regular share-btn"
+          [class.copied]="shareCopied"
+          (click)="shareBuild()"
+          title="Copy a link that opens this build on another device"
+        >
+          <i class="bi" [class.bi-check-lg]="shareCopied" [class.bi-link-45deg]="!shareCopied"></i>
+          <span>{{ shareCopied ? 'Link copied' : 'Share' }}</span>
+        </button>
       }
     </div>
 
