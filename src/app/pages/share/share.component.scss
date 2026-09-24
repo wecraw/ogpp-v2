@@ -1,0 +1,37 @@
+@import 'src/variables.scss';
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 80px 20px;
+  text-align: center;
+
+  i {
+    font-size: 34px;
+    color: $text-tertiary;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 26px;
+    color: $text-color-black;
+  }
+
+  p {
+    margin: 0;
+    max-width: 420px;
+    color: $text-secondary;
+  }
+
+  // Stacked: the primary button has a fixed app-wide width, so side by side it dwarfs
+  // the secondary action.
+  .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+}

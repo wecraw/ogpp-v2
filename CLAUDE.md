@@ -37,6 +37,8 @@ Prettier enforces: single quotes, semicolons, no trailing commas, 100-char width
 3. **`/builds`** (`BuildsComponent`) — the saved-builds list, fully implemented: lists builds from `localStorage` (most recently edited first) with inline **rename**, **duplicate**, **delete** (inline confirm), and **reopen** (→ `/build`).
 4. **`/checkout`** (`CheckoutComponent`) — final step. Reads the build, computes total price / savings, and shows vendor **bundle offers** (via `ProductDealsService` + the `bundle-offers` component) for the chosen inverter.
 
+5. **`/share`** (`ShareComponent`) — landing page for shareable build links (`/share#<payload>`). Imports the encoded build into this browser's `localStorage` (reusing an identical saved build rather than duplicating) and redirects to `/build` (or `/results` if no station is chosen yet). Share buttons live on `/build` (title row) and `/builds` (card actions).
+
 Pages pass the build between each other **only via the `?buildId=` query param**, re-loading from `localStorage` on each `ngOnInit`. There is no shared in-memory build state/store.
 
 ### Services (the domain logic lives here)
@@ -44,6 +46,7 @@ Pages pass the build between each other **only via the `?buildId=` query param**
 - **`CalculationUtilsService`** — the sizing math: `peakWattage` (sum of wattage×qty), `totalWattHours` (×hours too), `getSunHoursBySeason` (maps selected seasons → months → min monthly GHI), `wattageNeeded` (wattHours ÷ sun hours).
 - **`SunHoursService`** — calls the NREL `solar_resource` API by ZIP to get `monthlyGhi`.
 - **`ProductSelectorService`** — filters the gear catalogs against a build's requirements: `getMatchingInverters` (`maxOutput >= peakWattage`), `getMatchingBatteries` and `getMatchingSolarPanels` (both brand-match the chosen inverter, falling back to the full catalog if that brand has no entries).
+- **`BuildShareService`** — encodes a build into a compact, versioned base64url payload in the URL **fragment** (kept out of server logs — it includes the ZIP). Gear is stored as catalog slug + quantity and re-hydrated from the current catalogs on import; appliances carry their edited numbers (custom ones exist in no catalog). Changing the wire format means bumping `SHARE_VERSION`.
 - **`ProductDealsService`** — surfaces vendor bundle offers on `/checkout`: `getOffersForInverter` (reads `content/product-bundle-offers.ts`) and `getRecommendedOffer`.
 
 ### Content catalogs (hand-curated product/appliance data)

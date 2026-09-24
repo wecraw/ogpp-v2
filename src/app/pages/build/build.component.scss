@@ -153,6 +153,27 @@
   }
 }
 
+// Share sits at the far end of the title row, apart from the hover-revealed rename pencil.
+.build-title-row .share-btn {
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  font-size: 14px;
+  white-space: nowrap;
+
+  i {
+    font-size: 16px;
+  }
+
+  &.copied {
+    background: $accent-tint;
+    border-color: $selected-blue;
+  }
+}
+
 // Leave room so the last section isn't hidden behind the fixed compatibility bar.
 .container:not(.compatibility-container) {
   padding-bottom: 200px;

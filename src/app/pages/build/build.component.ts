@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CountUpDirective } from 'src/app/directives/count-up.directive';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
-import { Build, defaultBuild } from 'src/app/interfaces/Build';
+import { Build, DEFAULT_DAYS_OF_AUTONOMY, defaultBuild } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
+import { BuildShareService } from 'src/app/services/build-share.service';
 import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
 import {
   INVERTER_EXPLANATION,
@@ -30,8 +31,8 @@ import { Battery } from 'src/app/interfaces/Battery';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
 
 // Days of usage the battery bank should cover. Now user-configurable on the Batteries step
-// (see `daysOfAutonomy`); these bound the control and seed builds that predate the field.
-const DEFAULT_DAYS_OF_AUTONOMY = 2;
+// (see `daysOfAutonomy`); these bound the control. Builds that predate the field are seeded
+// with DEFAULT_DAYS_OF_AUTONOMY.
 const MIN_DAYS_OF_AUTONOMY = 1;
 const MAX_DAYS_OF_AUTONOMY = 7;
 
@@ -60,8 +61,13 @@ export class BuildComponent implements OnInit {
     private route: ActivatedRoute,
     private buildService: BuildService,
     private calculationUtils: CalculationUtilsService,
-    private productSelectorService: ProductSelectorService
+    private productSelectorService: ProductSelectorService,
+    private buildShareService: BuildShareService
   ) {}
+
+  // Briefly true after the share link is copied, to swap the button to a "Copied" state.
+  public shareCopied: boolean = false;
+  private shareCopiedTimer?: ReturnType<typeof setTimeout>;
 
   public countUpOptions = { duration: 0.7 };
 
@@ -392,6 +398,25 @@ export class BuildComponent implements OnInit {
 
   editAppliances() {
     this.router.navigate(['/builder'], { queryParams: { buildId: this.build.id } });
+  }
+
+  // ----- Share -----
+
+  // Copies a link that opens this build on another device/browser. When the Clipboard API
+  // isn't available, fall back to a prompt so the user can copy the URL by hand.
+  async shareBuild() {
+    this.save();
+    const copied = await this.buildShareService.copyShareLink(this.build);
+    if (!copied) {
+      window.prompt(
+        'Copy this link to share your build:',
+        this.buildShareService.shareUrl(this.build)
+      );
+      return;
+    }
+    this.shareCopied = true;
+    clearTimeout(this.shareCopiedTimer);
+    this.shareCopiedTimer = setTimeout(() => (this.shareCopied = false), 2000);
   }
 
   // ----- Rename (inline) -----

@@ -84,15 +84,15 @@ describe('BuildsComponent', () => {
     expect(named).toBe('DELTA Pro 3');
   });
 
-  it('renames a build and persists it', () => {
-    buildService.saveBuild(makeBuild({ id: 'r', name: '' }));
+  it('copies a share link for a build', async () => {
+    buildService.saveBuild(makeBuild({ id: 's', name: 'Shared' }));
+    const writeText = spyOn(navigator.clipboard, 'writeText').and.resolveTo();
     create();
 
-    component.draftName = 'Cabin kit';
-    component.saveRename('r');
+    await component.share('s');
 
-    expect(buildService.getBuild('r')?.name).toBe('Cabin kit');
-    expect(component.builds[0].name).toBe('Cabin kit');
+    expect(writeText).toHaveBeenCalledWith(jasmine.stringMatching(/\/share#[A-Za-z0-9_-]+$/));
+    expect(component.copiedId).toBe('s');
   });
 
   it('duplicates a build under a new id', () => {

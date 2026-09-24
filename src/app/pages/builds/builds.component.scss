@@ -211,6 +211,12 @@
     transform: scale(1.06);
   }
 
+  &.copied {
+    background-color: $accent-tint;
+    border-color: $selected-blue;
+    color: $selected-blue;
+  }
+
   &.danger:hover {
     background-color: rgba($error-red, 0.08);
     border-color: $error-red;
