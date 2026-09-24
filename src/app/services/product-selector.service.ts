@@ -101,14 +101,15 @@ export class ProductSelectorService {
 
   // The most a station can store: its built-in battery plus a full bank of the
   // largest expansion battery it accepts (`maxBatteries` is a bank total — see
-  // BuildComponent's cap getters).
+  // BuildComponent's cap getters). Only purchasable batteries count, so anchor and
+  // step-up picks reflect storage the user can actually buy; the unavailable records
+  // stay in `batteriesForInverter` so saved builds still restore.
   private maxStorageCapacity(inverter: Inverter): number {
     const builtIn = inverter.batteryCapacity ?? 0;
     const maxBatteries = inverter.maxBatteries ?? 0;
-    const largestBattery = this.batteriesForInverter(inverter).reduce(
-      (largest, battery) => Math.max(largest, battery.batteryCapacity ?? 0),
-      0
-    );
+    const largestBattery = this.batteriesForInverter(inverter)
+      .filter(battery => isPurchasable(battery.availability))
+      .reduce((largest, battery) => Math.max(largest, battery.batteryCapacity ?? 0), 0);
     return builtIn + maxBatteries * largestBattery;
   }
 

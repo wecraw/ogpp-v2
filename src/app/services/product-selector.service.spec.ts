@@ -198,7 +198,7 @@ describe('ProductSelectorService', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      5000, // within DELTA Pro's 10,800 Wh max bank
+      3000, // within DELTA Pro's 3,600 Wh built-in battery
       2000 // exceeds DELTA Pro's 1,600 W solar input
     );
 
@@ -210,7 +210,7 @@ describe('ProductSelectorService', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      15000, // exceeds DELTA Pro (10,800) and DELTA Pro 3 (12,288) max banks
+      15000, // exceeds DELTA Pro (3,600) and DELTA Pro 3 (12,288) purchasable max banks
       1000
     );
 
@@ -222,11 +222,24 @@ describe('ProductSelectorService', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      5000,
+      3000,
       1000
     );
 
     expect(stepUp).toBeUndefined();
+  });
+
+  it("does not count sold-out expansion batteries toward a station's storage", () => {
+    // DELTA Pro's only expansion battery is out of stock, so its reachable storage is
+    // the 3,600 Wh built-in pack, not a 10,800 Wh bank.
+    const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: deltaPro },
+      5000,
+      1000
+    );
+
+    expect(stepUp?.id).toBe('ecoflow-delta-pro-3');
   });
 
   it('returns undefined when no larger same-brand station can reach the targets', () => {
