@@ -8,7 +8,7 @@ OGPP ("Off Grid Part Picker") recommends an all-in-one solar power system (EcoFl
 
 Angular 21 SPA, standalone components (no NgModules), built-in control flow (`@if`/`@for`), client-side only. State persists in `localStorage` — there is no backend of our own; the only external call is to NREL for solar irradiance data.
 
-> **Angular version:** on 21 (current LTS). The next major (22) requires Node ≥ 22.22.3; this machine has 22.14.0, so bump Node before running `ng update @angular/core@22 @angular/cli@22`. Upgrade one major at a time, building between each.
+> **Angular version:** on 21 (current LTS). The next major (22) requires Node ≥ 22.22.3 (this machine and CI run Node 24, so `ng update @angular/core@22 @angular/cli@22` is unblocked). Stay on npm 11+ — npm 10 rejects this lockfile (it omits optional peer deps npm 10 expects), which is why CI pins Node 24. Upgrade one major at a time, building between each.
 
 This project is **unfinished and was picked back up from a stale state** — see "Current state / known gaps" before assuming a feature works end to end.
 
@@ -18,7 +18,7 @@ This project is **unfinished and was picked back up from a stale state** — see
 - `npm run build` / `ng build` — production build to `dist/ogpp-v2`
 - `npm run watch` — dev build, rebuild on change
 - `npm test` / `ng test` — Karma + Jasmine unit tests (Chrome). Karma is deprecated in Angular 21; a future move to the new test runner is expected.
-- `npm run test:ci` — run once, headless (`ng test --watch=false --browsers=ChromeHeadless`)
+- `npm run test:ci` — run once, headless (`ng test --watch=false --browsers=ChromeHeadlessCI`, a no-sandbox launcher defined in `karma.conf.js`). GitHub Actions (`.github/workflows/ci.yml`) runs this plus `npm run build` on every PR and push to `main`.
 - Single test: `ng test --include='**/calculation-utils.service.spec.ts'`
 
 > The full suite passes. Specs exist for every service, the content catalogs (integrity checks), and all pages/components except the static legal pages and footer. When changing a component, keep its spec compiling — a single type error in any spec (e.g. a spec calling a removed method) fails the entire run, not just that file.
