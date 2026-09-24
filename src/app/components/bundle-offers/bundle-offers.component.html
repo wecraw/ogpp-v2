@@ -28,7 +28,12 @@
           } @else if (activeOfferId === offer.id) {
             <span class="offer-badge applied inter-semibold">Applied</span>
           }
-          <h4 class="inter-semibold">{{ offer.name }}</h4>
+          <h4 class="inter-semibold">
+            {{ offer.name }}
+            @if (statusLabel(offer); as status) {
+              <span class="status-chip inter-medium">{{ status }}</span>
+            }
+          </h4>
           <p class="description inter-regular">{{ offer.description }}</p>
         </div>
 

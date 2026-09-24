@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
-import { inverters } from 'src/app/content/inverters';
+import { CATALOG, Catalog } from 'src/app/content/catalog';
+import { availabilityLabel } from 'src/app/interfaces/Availability';
 import { Battery } from 'src/app/interfaces/Battery';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
@@ -25,6 +26,8 @@ export interface CheckoutLineItem {
   lineTotal: number;
   lineSavings: number;
   productUrl?: string;
+  // "Sold out" / "Pre-order" / "Discontinued"; unset for in-stock or unverified.
+  availabilityLabel?: string;
 }
 
 @Component({
@@ -55,7 +58,8 @@ export class CheckoutComponent implements OnInit {
     private calculationUtils: CalculationUtilsService,
     private productDealsService: ProductDealsService,
     private productSelectorService: ProductSelectorService,
-    private affiliateLink: AffiliateLinkService
+    private affiliateLink: AffiliateLinkService,
+    @Inject(CATALOG) private catalog: Catalog
   ) {}
 
   ngOnInit() {
@@ -168,7 +172,9 @@ export class CheckoutComponent implements OnInit {
   }
 
   private refreshCatalogSelections() {
-    const currentInverter = inverters.find(inverter => inverter.id === this.build.inverter?.id);
+    const currentInverter = this.catalog.inverters.find(
+      inverter => inverter.id === this.build.inverter?.id
+    );
     if (currentInverter) this.build.inverter = currentInverter;
 
     this.batteries = this.productSelectorService.getMatchingBatteries(this.build);
@@ -250,7 +256,8 @@ export class CheckoutComponent implements OnInit {
       lineSavings: Math.max(unitListPrice - unitPrice, 0) * quantity,
       productUrl: product.productUrl
         ? this.affiliateLink.decorate(product.productUrl, product.brand)
-        : undefined
+        : undefined,
+      availabilityLabel: availabilityLabel(product.availability)
     };
   }
 

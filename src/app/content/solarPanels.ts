@@ -10,7 +10,13 @@ let solarPanels: PowerSource[] = [
     price: 599,
     listPrice: 699,
     productUrl: 'https://us.ecoflow.com/products/400w-portable-solar-panel',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '39998021697609',
+      sku: 'SOLAR400W',
+      variantTitle: '400W Portable Solar Panel'
+    }
   },
   {
     id: 'ecoflow-220w-bifacial-panel',
@@ -20,7 +26,13 @@ let solarPanels: PowerSource[] = [
     maxOutput: 220,
     price: 399,
     productUrl: 'https://us.ecoflow.com/products/nextgen-220w-bifacial-portable-solar-panel',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '41670394576969',
+      sku: 'EFSOLAR220W-N',
+      variantTitle: 'NextGen 220W Bifacial Portable Solar Panel'
+    }
   },
   {
     // No longer listed on EcoFlow US as of 2026-09-23; unverified legacy entry.
@@ -28,7 +40,8 @@ let solarPanels: PowerSource[] = [
     brand: 'EcoFlow',
     icon: 'bi-bounding-box',
     maxOutput: 100,
-    price: 199
+    price: 199,
+    availability: 'discontinued'
   },
   {
     // Sold out on the official US page as of 2026-09-23; price is the last verified
@@ -41,7 +54,8 @@ let solarPanels: PowerSource[] = [
     price: 599,
     listPrice: 699,
     productUrl: 'https://www.ankersolix.com/products/400w-portable-solar-panel',
-    dealVerifiedOn: '2026-06-21'
+    dealVerifiedOn: '2026-06-21',
+    availability: 'out-of-stock'
   },
   {
     // Verified in-browser (price renders via JS). $699.99 standalone; Anker offers it
@@ -52,7 +66,8 @@ let solarPanels: PowerSource[] = [
     maxOutput: 400,
     price: 699,
     productUrl: 'https://www.ankersolix.com/products/ps400-bifacial-portable-solar-panel',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock'
   },
   {
     // No longer listed on Bluetti US as of 2026-09-23; unverified legacy entry.
@@ -60,7 +75,8 @@ let solarPanels: PowerSource[] = [
     brand: 'Bluetti',
     icon: 'bi-bounding-box',
     maxOutput: 200,
-    price: 499
+    price: 499,
+    availability: 'discontinued'
   },
   {
     // Sold out on the official US store as of 2026-09-23 (price still listed).
@@ -71,7 +87,13 @@ let solarPanels: PowerSource[] = [
     price: 209,
     listPrice: 299,
     productUrl: 'https://www.bluettipower.com/products/bluetti-pv120s-solar-panel-120w',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'out-of-stock',
+    vendorRef: {
+      variantId: '46032679698651',
+      sku: 'PV120S-EU-GY-BL-SPFUS-00',
+      variantTitle: '120W Solar Panel | 120W'
+    }
   },
   {
     // Bluetti's SP200L.
@@ -81,7 +103,13 @@ let solarPanels: PowerSource[] = [
     maxOutput: 200,
     price: 399,
     productUrl: 'https://www.bluettipower.com/products/bluetti-sp200l-solar-panel-200w',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '46104316248283',
+      sku: 'PV200-UJ-BK-MD-SPFUS-00',
+      variantTitle: '200W Solar Panel | 200W'
+    }
   },
   {
     name: '350W Solar Panel',
@@ -90,7 +118,13 @@ let solarPanels: PowerSource[] = [
     maxOutput: 350,
     price: 649,
     productUrl: 'https://www.bluettipower.com/products/350w-solar-panel',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '49045516320987',
+      sku: 'PV350-UJ-BK-MD-SPFUS-00',
+      variantTitle: '350W Solar Panel | 350W'
+    }
   },
   {
     name: 'SolarSaga 200W',
@@ -100,7 +134,13 @@ let solarPanels: PowerSource[] = [
     price: 379,
     listPrice: 429,
     productUrl: 'https://www.jackery.com/products/solarsaga-200w-solar-panel',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '39263317000279',
+      sku: '21-0002-000063',
+      variantTitle: 'Default Title'
+    }
   },
   {
     // Only sold refurbished on jackery.com as of 2026-09-23; unverified legacy entry.
@@ -108,7 +148,8 @@ let solarPanels: PowerSource[] = [
     brand: 'Jackery',
     icon: 'bi-bounding-box',
     maxOutput: 100,
-    price: 249
+    price: 249,
+    availability: 'discontinued'
   },
   {
     name: 'SolarSaga 500 X',
@@ -118,7 +159,13 @@ let solarPanels: PowerSource[] = [
     price: 799,
     listPrice: 999,
     productUrl: 'https://www.jackery.com/products/jackery-solarsaga-500-x',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '41317177000023',
+      sku: '21-0002-000093',
+      variantTitle: 'Default Title'
+    }
   }
 ];
 

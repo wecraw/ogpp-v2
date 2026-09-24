@@ -67,7 +67,12 @@
                 <i class="bi {{ item.icon || 'bi-box' }}"></i>
               </div>
               <div class="part-info">
-                <span class="part-role inter-regular">{{ item.role }}</span>
+                <span class="part-role inter-regular">
+                  {{ item.role }}
+                  @if (item.availabilityLabel) {
+                    <span class="status-chip inter-medium">{{ item.availabilityLabel }}</span>
+                  }
+                </span>
                 <strong class="inter-semibold">{{ item.brand }} {{ item.name }}</strong>
                 <span class="part-meta inter-regular">
                   {{ item.quantity }} ×

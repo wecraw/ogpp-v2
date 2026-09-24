@@ -1,9 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 import { allAppliances } from '../content/appliances';
-import { batteries as batteryCatalog } from '../content/batteries';
-import { inverters as inverterCatalog } from '../content/inverters';
-import { solarPanels as solarPanelCatalog } from '../content/solarPanels';
+import { CATALOG, Catalog } from '../content/catalog';
 import { Appliance, UsageType } from '../interfaces/Appliance';
 import { Battery } from '../interfaces/Battery';
 import { Build, DEFAULT_DAYS_OF_AUTONOMY, Month, MonthlyGhi } from '../interfaces/Build';
@@ -97,7 +95,8 @@ export class InvalidShareLinkError extends Error {
 export class BuildShareService {
   constructor(
     private buildService: BuildService,
-    private productSelector: ProductSelectorService
+    private productSelector: ProductSelectorService,
+    @Inject(CATALOG) private catalog: Catalog
   ) {}
 
   // ----- Encoding -----
@@ -175,7 +174,7 @@ export class BuildShareService {
     if (!isPayload(payload)) throw new InvalidShareLinkError();
 
     const inverter = payload.inv
-      ? inverterCatalog.find(candidate => candidate.id === payload.inv)
+      ? this.catalog.inverters.find(candidate => candidate.id === payload.inv)
       : undefined;
     const now = new Date();
 
@@ -255,7 +254,7 @@ export class BuildShareService {
   private fitBatteries(build: Build, pairs?: [string, number][]): Battery[] {
     const compatible = idsOf(this.productSelector.getMatchingBatteries(build));
     const limit = build.inverter.maxBatteries ?? 0;
-    return this.expand(batteryCatalog, pairs)
+    return this.expand(this.catalog.batteries, pairs)
       .filter(battery => compatible.has(battery.id))
       .slice(0, limit);
   }
@@ -264,7 +263,7 @@ export class BuildShareService {
   private fitSolarPanels(build: Build, pairs?: [string, number][]): PowerSource[] {
     const compatible = idsOf(this.productSelector.getMatchingSolarPanels(build));
     let headroom = build.inverter.maxSolarInput ?? 0;
-    return this.expand(solarPanelCatalog, pairs).filter(panel => {
+    return this.expand(this.catalog.solarPanels, pairs).filter(panel => {
       const wattage = panel.maxOutput ?? 0;
       if (!compatible.has(panel.id) || wattage > headroom) return false;
       headroom -= wattage;

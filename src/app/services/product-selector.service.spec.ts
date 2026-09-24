@@ -3,15 +3,18 @@ import { TestBed } from '@angular/core/testing';
 import { ProductSelectorService } from './product-selector.service';
 import { defaultBuild } from '../interfaces/Build';
 import { Inverter } from '../interfaces/Inverter';
-import { batteries } from '../content/batteries';
-import { inverters } from '../content/inverters';
-import { solarPanels } from '../content/solarPanels';
+import { isPurchasable } from '../interfaces/Availability';
+import { CATALOG_FIXTURE, provideCatalogFixture } from 'src/testing/catalog-fixture';
+
+const { inverters, batteries, solarPanels } = CATALOG_FIXTURE;
+const purchasableInverters = inverters.filter(inverter => isPurchasable(inverter.availability));
+const listedInverters = inverters.filter(inverter => inverter.availability !== 'discontinued');
 
 describe('ProductSelectorService', () => {
   let service: ProductSelectorService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({ providers: [provideCatalogFixture()] });
     service = TestBed.inject(ProductSelectorService);
   });
 
@@ -36,7 +39,7 @@ describe('ProductSelectorService', () => {
 
     // Derived from the catalog so adding stations can't make this brittle: every
     // unit clearing the 3000 W peak, highest output first.
-    const expected = [...inverters]
+    const expected = [...listedInverters]
       .filter(inverter => inverter.maxOutput >= 3000)
       .sort((first, second) => second.maxOutput - first.maxOutput)
       .map(inverter => inverter.id);
@@ -65,8 +68,21 @@ describe('ProductSelectorService', () => {
       ]
     });
 
-    expect(matches.length).toBe(inverters.length);
+    expect(matches.length).toBe(listedInverters.length);
     expect(matches.map(inverter => inverter.id)).toEqual(sortedInverterIds());
+  });
+
+  it('hides discontinued stations unless the build already uses one', () => {
+    const discontinued = inverters.find(inverter => inverter.availability === 'discontinued')!;
+    expect(discontinued).toBeDefined();
+
+    const freshIds = service.getMatchingInverters(defaultBuild).map(inverter => inverter.id);
+    expect(freshIds).not.toContain(discontinued.id);
+
+    const savedIds = service
+      .getMatchingInverters({ ...defaultBuild, inverter: { ...discontinued } })
+      .map(inverter => inverter.id);
+    expect(savedIds).toContain(discontinued.id);
   });
 
   it('anchors on the smallest station that still covers the peak load', () => {
@@ -84,10 +100,10 @@ describe('ProductSelectorService', () => {
       ]
     });
 
-    // The anchor is the smallest station that still covers the 2000 W peak —
-    // derived from the catalog so a new station can't silently invalidate it.
+    // The anchor is the smallest purchasable station that still covers the 2000 W
+    // peak (the out-of-stock AC200MAX is skipped).
     const smallestQualifyingOutput = Math.min(
-      ...inverters
+      ...purchasableInverters
         .filter(inverter => inverter.maxOutput >= 2000)
         .map(inverter => inverter.maxOutput)
     );
@@ -95,10 +111,10 @@ describe('ProductSelectorService', () => {
   });
 
   it('anchors on the smallest station that also reaches the storage/solar targets', () => {
-    // A peak the small DELTA 2 (500 W solar) covers, but with a solar target that
-    // exceeds its input — the engine should reach past it to the smallest station
-    // whose caps fit, instead of anchoring on DELTA 2 and prompting a step-up.
-    const peak = 1673;
+    // A peak the small Jackery 1000 v2 (400 W solar) covers, but with a solar target
+    // that exceeds its input — the engine should reach past it to the smallest station
+    // whose caps fit, instead of anchoring on it and prompting a step-up.
+    const peak = 1400;
     const solarTarget = 600;
     const build = {
       ...defaultBuild,
@@ -119,7 +135,7 @@ describe('ProductSelectorService', () => {
     // Derived from the catalog: the smallest peak-covering station whose solar input
     // also clears the target (storage target 0 keeps storage out of the comparison).
     const expectedOutput = Math.min(
-      ...inverters
+      ...purchasableInverters
         .filter(inverter => inverter.maxOutput >= peak && inverter.maxSolarInput >= solarTarget)
         .map(inverter => inverter.maxOutput)
     );
@@ -154,11 +170,49 @@ describe('ProductSelectorService', () => {
     expect(anchor).toBeUndefined();
   });
 
+  it('never anchors on a discontinued or sold-out station when a purchasable one fits', () => {
+    // 1,600 W is covered first by the discontinued DELTA 2 (1,800 W) and the
+    // out-of-stock AC200MAX (2,200 W); the anchor must skip both.
+    const anchor = service.getAnchorInverter({
+      ...defaultBuild,
+      appliances: [
+        {
+          id: 'mid-load',
+          name: 'Mid Load',
+          wattage: 1600,
+          hours: 1,
+          quantity: 1,
+          applianceGroup: 'Test'
+        }
+      ]
+    });
+
+    expect(anchor?.id).toBe('ecoflow-delta-pro');
+  });
+
+  it('never steps up to a sold-out sibling', () => {
+    // The out-of-stock AC200MAX would be the smallest larger Bluetti that clears a
+    // 800 W solar target; the step-up must go to the Apex 300 instead.
+    const smallBluetti = createInverter({
+      id: 'bluetti-small',
+      brand: 'Bluetti',
+      maxOutput: 1000,
+      maxSolarInput: 100
+    });
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: smallBluetti },
+      0,
+      800
+    );
+
+    expect(stepUp?.id).toBe('bluetti-apex-300');
+  });
+
   it('steps up to the next station whose solar input clears the target', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      5000, // within DELTA Pro's 10,800 Wh max bank
+      3000, // within DELTA Pro's 3,600 Wh built-in battery
       2000 // exceeds DELTA Pro's 1,600 W solar input
     );
 
@@ -170,7 +224,7 @@ describe('ProductSelectorService', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      15000, // exceeds DELTA Pro (10,800) and DELTA Pro 3 (12,288) max banks
+      15000, // exceeds DELTA Pro (3,600) and DELTA Pro 3 (12,288) purchasable max banks
       1000
     );
 
@@ -182,11 +236,24 @@ describe('ProductSelectorService', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      5000,
+      3000,
       1000
     );
 
     expect(stepUp).toBeUndefined();
+  });
+
+  it("does not count sold-out expansion batteries toward a station's storage", () => {
+    // DELTA Pro's only expansion battery is out of stock, so its reachable storage is
+    // the 3,600 Wh built-in pack, not a 10,800 Wh bank.
+    const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
+    const stepUp = service.getStepUpInverter(
+      { ...lightLoadBuild(), inverter: deltaPro },
+      5000,
+      1000
+    );
+
+    expect(stepUp?.id).toBe('ecoflow-delta-pro-3');
   });
 
   it('returns undefined when no larger same-brand station can reach the targets', () => {
@@ -300,7 +367,7 @@ function lightLoadBuild() {
 }
 
 function sortedInverterIds(): (string | undefined)[] {
-  return [...inverters]
+  return [...listedInverters]
     .sort((first, second) => second.maxOutput - first.maxOutput)
     .map(inverter => inverter.id);
 }

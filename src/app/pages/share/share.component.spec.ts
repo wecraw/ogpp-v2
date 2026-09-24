@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 
 import { ShareComponent } from './share.component';
-import { inverters } from 'src/app/content/inverters';
+import { LIVE_CATALOG } from 'src/app/content/catalog';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
 import { BuildShareService } from 'src/app/services/build-share.service';
@@ -37,12 +37,13 @@ describe('ShareComponent', () => {
   function encode(build: Build): string {
     return new BuildShareService(
       new BuildService(),
-      new ProductSelectorService(new CalculationUtilsService())
+      new ProductSelectorService(new CalculationUtilsService(), LIVE_CATALOG),
+      LIVE_CATALOG
     ).encode(build);
   }
 
   it('imports a shared build and opens it on /build', () => {
-    create(encode({ ...defaultBuild, name: 'Van', inverter: inverters[0] }));
+    create(encode({ ...defaultBuild, name: 'Van', inverter: LIVE_CATALOG.inverters[0] }));
 
     const [saved] = TestBed.inject(BuildService).listBuilds();
     expect(saved.name).toBe('Van');

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { availabilityLabel } from 'src/app/interfaces/Availability';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 import { AffiliateLinkService } from 'src/app/services/affiliate-link.service';
@@ -41,6 +42,10 @@ export class BundleOffersComponent {
   get pricesCheckedOn(): string | undefined {
     const dates = this.offers.map(offer => offer.verifiedOn).filter(date => !!date);
     return dates.length ? [...dates].sort()[0] : undefined;
+  }
+
+  statusLabel(offer: ProductBundleOfferView): string | undefined {
+    return availabilityLabel(offer.availability);
   }
 
   savings(offer: ProductBundleOfferView): number {

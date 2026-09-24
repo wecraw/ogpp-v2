@@ -21,7 +21,13 @@ let inverters: Inverter[] = [
     price: 1899,
     listPrice: 2799,
     productUrl: 'https://us.ecoflow.com/products/delta-pro-portable-power-station',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '40516140138569',
+      sku: 'DELTAPro-1600W-US',
+      variantTitle: 'DELTA Pro Portable Power Station'
+    }
   },
   {
     // EcoFlow states both the DELTA Pro 3 Extra Battery and the older DELTA Pro Smart
@@ -44,7 +50,13 @@ let inverters: Inverter[] = [
     price: 2799,
     listPrice: 3699,
     productUrl: 'https://us.ecoflow.com/products/delta-pro-3-portable-power-station',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '41385721004105',
+      sku: 'EFDELTAPRO3-US',
+      variantTitle: 'DELTA Pro 3'
+    }
   },
   {
     name: 'DELTA Pro Ultra',
@@ -65,7 +77,13 @@ let inverters: Inverter[] = [
     price: 4199,
     listPrice: 5799,
     productUrl: 'https://us.ecoflow.com/products/delta-pro-ultra',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '40758830071881',
+      sku: 'DPU-US',
+      variantTitle: 'DELTA Pro Ultra (1 × Inverter + 1 × Battery)'
+    }
   },
   {
     // Discontinued on EcoFlow US: as of 2026-09-23 the product page redirects to DELTA 3.
@@ -87,7 +105,8 @@ let inverters: Inverter[] = [
     ],
     price: 684,
     listPrice: 1648,
-    dealVerifiedOn: '2026-06-20'
+    dealVerifiedOn: '2026-06-20',
+    availability: 'discontinued'
   },
   {
     name: 'DELTA 2 Max',
@@ -108,7 +127,13 @@ let inverters: Inverter[] = [
     price: 1029,
     listPrice: 1299,
     productUrl: 'https://us.ecoflow.com/products/delta-2-max-portable-power-station',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '54615943512137',
+      sku: 'EFDELTA2Max-US',
+      variantTitle: 'DELTA 2 Max Portable Power Station'
+    }
   },
   {
     // Verified in-browser on the official US page (price renders via JS, so WebFetch
@@ -129,7 +154,8 @@ let inverters: Inverter[] = [
     ],
     price: 2199,
     productUrl: 'https://www.ankersolix.com/products/f3800',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock'
   },
   {
     // Verified in-browser on the official US page. 240V only when two units are paired
@@ -149,7 +175,8 @@ let inverters: Inverter[] = [
     compatiblePowerSourceIds: ['anker-solix-ps400-bifacial-portable-solar-panel'],
     price: 1499,
     productUrl: 'https://www.ankersolix.com/products/f3000',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock'
   },
   {
     // The Explorer 1000 v2 station alone (solar panel not included). It has no
@@ -167,7 +194,13 @@ let inverters: Inverter[] = [
     price: 499,
     listPrice: 559,
     productUrl: 'https://www.jackery.com/products/jackery-explorer-1000-v2',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '41738382245975',
+      sku: '21-0001-000220',
+      variantTitle: 'Black / Explorer 1000 v2 Portable Power Station'
+    }
   },
   {
     // Single unit is 120V; maxTotalInput is the 1,800W (15A) AC input.
@@ -185,7 +218,13 @@ let inverters: Inverter[] = [
     price: 1069,
     listPrice: 1199,
     productUrl: 'https://www.jackery.com/products/jackery-homepower-2000-plus-v2',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '43933829038167',
+      sku: '21-0001-000402',
+      variantTitle: 'HomePower 2000 Plus v2'
+    }
   },
   {
     // Single unit is 120V (240V needs two units on the AC expansion port);
@@ -204,7 +243,13 @@ let inverters: Inverter[] = [
     price: 1709,
     listPrice: 1899,
     productUrl: 'https://www.jackery.com/products/jackery-homepower-3600-plus',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '41939875102807',
+      sku: '21-0001-000340',
+      variantTitle: 'HomePower 3600 Plus'
+    }
   },
   {
     // Sold out on the official US store as of 2026-09-23 (price still listed).
@@ -226,7 +271,13 @@ let inverters: Inverter[] = [
     price: 1199,
     listPrice: 1699,
     productUrl: 'https://www.bluettipower.com/products/ac200max-power-station',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'out-of-stock',
+    vendorRef: {
+      variantId: '44272419995867',
+      sku: 'AC200MAX-US-GY-BL-SPFUS',
+      variantTitle: 'AC200MAX | 2,200W 2,048Wh'
+    }
   },
   {
     // NEMA 14-50R gives 120/240V from a single unit. maxTotalInput is the unit-alone
@@ -245,7 +296,13 @@ let inverters: Inverter[] = [
     price: 1499,
     listPrice: 1699,
     productUrl: 'https://www.bluettipower.com/products/apex-300-home-battery-backup',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '47351562174683',
+      sku: 'APEX300-US-GY-BL-ID-SPFUS-00',
+      variantTitle: 'Apex 300'
+    }
   }
 ];
 

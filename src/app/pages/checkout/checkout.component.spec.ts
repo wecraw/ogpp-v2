@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { inverters } from 'src/app/content/inverters';
-import { solarPanels } from 'src/app/content/solarPanels';
+import { CATALOG_FIXTURE, provideCatalogFixture } from 'src/testing/catalog-fixture';
 import { Build, MonthlyGhi } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
 import { CheckoutComponent } from './checkout.component';
@@ -22,6 +21,7 @@ describe('CheckoutComponent', () => {
     nov: 5,
     dec: 5
   };
+  const { inverters, solarPanels } = CATALOG_FIXTURE;
   const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
   const fourHundredWattPanel = solarPanels.find(
     panel => panel.id === 'ecoflow-400w-portable-solar-panel'
@@ -58,6 +58,7 @@ describe('CheckoutComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CheckoutComponent],
       providers: [
+        provideCatalogFixture(),
         {
           provide: ActivatedRoute,
           useValue: { queryParams: of({ buildId: build.id }) }
@@ -89,8 +90,7 @@ describe('CheckoutComponent', () => {
     // bundle price (and its compare-at), never a mixed total.
     TestBed.overrideProvider(BuildService, {
       useValue: {
-        getBuild: () =>
-          structuredClone({ ...build, powerSources: [], batteries: [] }),
+        getBuild: () => structuredClone({ ...build, powerSources: [], batteries: [] }),
         saveBuild
       }
     });

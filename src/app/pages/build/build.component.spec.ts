@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { batteries } from 'src/app/content/batteries';
-import { inverters } from 'src/app/content/inverters';
-import { solarPanels } from 'src/app/content/solarPanels';
+import { CATALOG_FIXTURE, provideCatalogFixture } from 'src/testing/catalog-fixture';
+
+const { inverters, batteries, solarPanels } = CATALOG_FIXTURE;
 import { Build, defaultBuild, MonthlyGhi } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
 
@@ -284,6 +284,7 @@ function setup(savedBuild: Build | null): {
   TestBed.configureTestingModule({
     imports: [BuildComponent],
     providers: [
+      provideCatalogFixture(),
       {
         provide: ActivatedRoute,
         useValue: { queryParams: of({ buildId: 'build-1' }) }
