@@ -1,3 +1,27 @@
+import { Availability } from './Availability';
+import { VendorRef } from './ProductPricing';
+
+// A vendor bundle as authored in `content/product-bundle-offers.ts`: what the vendor
+// sells and for how much. The price the app actually quotes is derived from this
+// (see `resolveBundleOffer`), so authors never hand-compute it.
+export interface ProductBundleOfferSource {
+  id: string;
+  inverterId: string;
+  name: string;
+  description: string;
+  highlights: string[];
+  // The vendor's preset package price, exactly as listed.
+  packagePrice: number;
+  compareAtPrice: number;
+  batteryQuantities: Record<string, number>;
+  powerSourceQuantities: Record<string, number>;
+  vendor: string;
+  vendorUrl: string;
+  verifiedOn: string;
+  availability?: Availability;
+  vendorRef?: VendorRef;
+}
+
 export interface ProductBundleOffer {
   id: string;
   inverterId: string;
@@ -13,6 +37,8 @@ export interface ProductBundleOffer {
   vendor: string;
   vendorUrl: string;
   verifiedOn: string;
+  availability?: Availability;
+  vendorRef?: VendorRef;
 }
 
 export interface ProductBundleOfferView extends ProductBundleOffer {

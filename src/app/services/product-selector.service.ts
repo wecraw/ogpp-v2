@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Inverter } from 'src/app/interfaces/Inverter';
-import { inverters } from 'src/app/content/inverters'; // Assuming the inverter data is in a separate file
-import { batteries } from 'src/app/content/batteries';
-import { solarPanels } from 'src/app/content/solarPanels';
+import { CATALOG, Catalog } from 'src/app/content/catalog';
+import { isPurchasable } from 'src/app/interfaces/Availability';
 import { Build } from 'src/app/interfaces/Build';
 import { CalculationUtilsService } from './calculation-utils.service';
 import { Battery } from '../interfaces/Battery';
@@ -12,11 +11,14 @@ import { PowerSource } from '../interfaces/PowerSource';
   providedIn: 'root'
 })
 export class ProductSelectorService {
-  constructor(private calculationUtils: CalculationUtilsService) {}
+  constructor(
+    private calculationUtils: CalculationUtilsService,
+    @Inject(CATALOG) private catalog: Catalog
+  ) {}
 
   getMatchingInverters(build: Build): Inverter[] {
     const peakWattage = this.calculationUtils.peakWattage(build);
-    const availableInverters = [...inverters].sort(
+    const availableInverters = [...this.catalog.inverters].sort(
       (first, second) => second.maxOutput - first.maxOutput
     );
 
@@ -38,7 +40,9 @@ export class ProductSelectorService {
   // caps, so the recommendation lands on a station that needs no step-up rather than
   // anchoring on the smallest peak-covering unit and then nagging the user to upsize.
   // Falls back to the smallest peak-covering station when no single unit can reach
-  // the targets. Returns undefined when nothing covers the peak load.
+  // the targets. Returns undefined when nothing covers the peak load. Stations that
+  // can't be ordered today (sold out / discontinued) are only anchored on when no
+  // purchasable station covers the peak.
   getAnchorInverter(
     build: Build,
     batteryTarget?: number,
@@ -47,10 +51,12 @@ export class ProductSelectorService {
     const peakWattage = this.calculationUtils.peakWattage(build);
     const matches = this.getMatchingInverters(build);
 
-    const qualifying =
+    const peakQualifying =
       Number.isFinite(peakWattage) && peakWattage > 0
         ? matches.filter(inverter => inverter.maxOutput >= peakWattage)
         : matches;
+    const purchasable = peakQualifying.filter(inverter => isPurchasable(inverter.availability));
+    const qualifying = purchasable.length > 0 ? purchasable : peakQualifying;
 
     if (qualifying.length === 0) return undefined;
 
@@ -68,7 +74,7 @@ export class ProductSelectorService {
   // has no batteries in the catalog, fall back to the full list so the flow never
   // dead-ends.
   getMatchingBatteries(build: Build): Battery[] {
-    return build.inverter ? this.batteriesForInverter(build.inverter) : batteries;
+    return build.inverter ? this.batteriesForInverter(build.inverter) : this.catalog.batteries;
   }
 
   // Same matching logic as `getMatchingBatteries`, keyed off a bare inverter so the
@@ -79,6 +85,7 @@ export class ProductSelectorService {
     // brand/full catalog and offer cards the user can never add.
     if (inverter.maxBatteries === 0) return [];
 
+    const batteries = this.catalog.batteries;
     const compatibleIds = inverter.compatibleBatteryIds;
     if (compatibleIds?.length) {
       const compatible = batteries.filter(battery =>
@@ -122,7 +129,8 @@ export class ProductSelectorService {
   // storage/solar targets within its caps — its `maxSolarInput` is below the panel
   // target, or a full battery bank still falls short of the storage target — return
   // the smallest larger same-brand station that *can* (e.g. DELTA Pro → DELTA Pro 3 /
-  // Ultra). Returns undefined when the anchor already fits or no larger sibling does.
+  // Ultra). Only purchasable stations are suggested. Returns undefined when the anchor
+  // already fits or no larger sibling does.
   getStepUpInverter(
     build: Build,
     batteryTarget: number,
@@ -134,10 +142,11 @@ export class ProductSelectorService {
 
     const peakWattage = this.calculationUtils.peakWattage(build);
 
-    return inverters
+    return this.catalog.inverters
       .filter(
         inverter =>
           inverter.brand === anchor.brand &&
+          isPurchasable(inverter.availability) &&
           inverter.maxOutput > anchor.maxOutput &&
           inverter.maxOutput >= peakWattage &&
           this.inverterMeetsTargets(inverter, batteryTarget, solarTarget)
@@ -147,6 +156,7 @@ export class ProductSelectorService {
 
   // Solar panels use the same brand-match-with-fallback strategy as batteries.
   getMatchingSolarPanels(build: Build): PowerSource[] {
+    const solarPanels = this.catalog.solarPanels;
     const compatibleIds = build.inverter?.compatiblePowerSourceIds;
     if (compatibleIds?.length) {
       const compatible = solarPanels.filter(panel =>
@@ -156,9 +166,7 @@ export class ProductSelectorService {
     }
 
     const brand = build.inverter?.brand;
-    const brandMatches = brand
-      ? solarPanels.filter(panel => panel.brand === brand)
-      : [];
+    const brandMatches = brand ? solarPanels.filter(panel => panel.brand === brand) : [];
     return brandMatches.length > 0 ? brandMatches : solarPanels;
   }
 }

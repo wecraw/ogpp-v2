@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { Battery } from 'src/app/interfaces/Battery';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
+import { availabilityLabel } from 'src/app/interfaces/Availability';
 @Component({
     selector: 'build-component-card',
     imports: [CommonModule, FormsModule],
@@ -39,6 +40,11 @@ export class BuildComponentCardComponent implements OnInit {
   get isSelected(): boolean {
     if (this.locked) return true;
     return this.quantityMode ? this.quantity > 0 : this.selected;
+  }
+
+  // Stock status shown under the price when the item isn't simply in stock.
+  get statusLabel(): string | undefined {
+    return availabilityLabel(this.buildComponent?.availability);
   }
 
   get canIncrement(): boolean {

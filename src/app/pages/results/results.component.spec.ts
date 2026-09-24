@@ -6,6 +6,7 @@ import { Inverter } from 'src/app/interfaces/Inverter';
 import { BuildService } from 'src/app/services/build.service';
 import { ProductDealsService } from 'src/app/services/product-deals.service';
 import { ProductSelectorService } from 'src/app/services/product-selector.service';
+import { provideCatalogFixture } from 'src/testing/catalog-fixture';
 import { ResultsComponent } from './results.component';
 
 describe('ResultsComponent', () => {
@@ -61,6 +62,7 @@ describe('ResultsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ResultsComponent],
       providers: [
+        provideCatalogFixture(),
         {
           provide: ActivatedRoute,
           useValue: { queryParams: of({ buildId: build.id }) }

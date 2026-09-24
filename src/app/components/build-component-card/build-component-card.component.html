@@ -57,6 +57,11 @@
                 | currency: 'USD' : 'symbol' : '1.0-0'
             }}</span>
           </div>
+          @if (statusLabel) {
+            <div class="detail">
+              <span class="status-chip inter-medium">{{ statusLabel }}</span>
+            </div>
+          }
         }
       </div>
     }

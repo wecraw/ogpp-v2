@@ -181,6 +181,42 @@ describe('catalog integrity', () => {
     });
   });
 
+  // Availability and vendor references are what a price refresh keys on, so they
+  // must be internally consistent.
+  describe('availability and vendor references', () => {
+    const products = [...inverters, ...batteries, ...solarPanels];
+
+    it('no bundle is marked purchasable for a discontinued station', () => {
+      const discontinued = new Set(
+        inverters.filter(item => item.availability === 'discontinued').map(item => item.id)
+      );
+      const contradictory = productBundleOffers
+        .filter(
+          offer =>
+            discontinued.has(offer.inverterId) &&
+            offer.availability !== 'discontinued' &&
+            offer.availability !== 'out-of-stock'
+        )
+        .map(offer => offer.id);
+      expect(contradictory).withContext('live bundles for discontinued stations').toEqual([]);
+    });
+
+    it('every vendorRef identifies a listing', () => {
+      const empty = [...products, ...productBundleOffers]
+        .filter(item => item.vendorRef && !item.vendorRef.variantId && !item.vendorRef.sku)
+        .map(item => item.id);
+      expect(empty).withContext('vendorRef with neither variantId nor sku').toEqual([]);
+    });
+
+    it('no two records point at the same vendor variant', () => {
+      const ids = [...products, ...productBundleOffers]
+        .map(item => item.vendorRef?.variantId)
+        .filter((id): id is string => !!id);
+      const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+      expect(duplicates).withContext('variant ids shared by two records').toEqual([]);
+    });
+  });
+
   // Outbound product/offer links are decorated by AffiliateLinkService, keyed on
   // the product `brand` / offer `vendor` string. A brand with no entry in the
   // vendor map still links out, but carries no affiliate `ref` — money left on

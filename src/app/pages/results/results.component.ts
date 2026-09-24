@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
-import { batteries as batteryCatalog } from 'src/app/content/batteries';
-import { solarPanels as solarPanelCatalog } from 'src/app/content/solarPanels';
+import { CATALOG, Catalog } from 'src/app/content/catalog';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
@@ -82,7 +81,8 @@ export class ResultsComponent implements OnInit, OnDestroy {
     private buildService: BuildService,
     private calculationUtils: CalculationUtilsService,
     private productDealsService: ProductDealsService,
-    private productSelectorService: ProductSelectorService
+    private productSelectorService: ProductSelectorService,
+    @Inject(CATALOG) private catalog: Catalog
   ) {}
 
   ngOnInit() {
@@ -219,8 +219,8 @@ export class ResultsComponent implements OnInit, OnDestroy {
     this.productDealsService.applyOfferToBuild(
       this.build,
       offer,
-      batteryCatalog,
-      solarPanelCatalog
+      this.catalog.batteries,
+      this.catalog.solarPanels
     );
     this.save();
     this.goToBuild();

@@ -13,7 +13,13 @@ let batteries: Battery[] = [
     price: 1199,
     listPrice: 1999,
     productUrl: 'https://us.ecoflow.com/products/delta-pro-smart-extra-battery',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'out-of-stock',
+    vendorRef: {
+      variantId: '40558805385289',
+      sku: 'DELTAProEB-US',
+      variantTitle: 'DELTA Pro Smart Extra Battery'
+    }
   },
   {
     name: 'DELTA Pro 3 Extra Battery',
@@ -22,7 +28,13 @@ let batteries: Battery[] = [
     batteryCapacity: 4096,
     price: 1899,
     productUrl: 'https://us.ecoflow.com/products/delta-pro-3-extra-battery',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '41385808199753',
+      sku: 'EFDELTAPRO3EB',
+      variantTitle: 'DELTA Pro 3 Extra Battery'
+    }
   },
   {
     // EcoFlow US has no standalone listing; $1,800 is the difference between the
@@ -51,7 +63,8 @@ let batteries: Battery[] = [
     batteryCapacity: 1024,
     price: 369,
     listPrice: 799,
-    dealVerifiedOn: '2026-06-20'
+    dealVerifiedOn: '2026-06-20',
+    availability: 'discontinued'
   },
   {
     // Out of stock standalone on EcoFlow US as of 2026-09-23 (still sold in the
@@ -62,7 +75,13 @@ let batteries: Battery[] = [
     batteryCapacity: 2048,
     price: 899,
     productUrl: 'https://us.ecoflow.com/products/delta-2-max-smart-extra-battery',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'out-of-stock',
+    vendorRef: {
+      variantId: '40954813448265',
+      sku: 'EFDELTA2MaxEB',
+      variantTitle: 'DELTA 2 Max Smart Extra Battery'
+    }
   },
   {
     // Verified in-browser on the official US page (price renders via JS).
@@ -72,7 +91,8 @@ let batteries: Battery[] = [
     batteryCapacity: 3840,
     price: 1799,
     productUrl: 'https://www.ankersolix.com/products/bp3800-expansion-battery',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock'
   },
   {
     // Verified in-browser on the official F3000 page's add-on list (price renders via JS).
@@ -82,7 +102,8 @@ let batteries: Battery[] = [
     batteryCapacity: 3072,
     price: 1199,
     productUrl: 'https://www.ankersolix.com/products/bp3000-expansion-battery-for-f3000',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock'
   },
   {
     // Sold out on the official US store as of 2026-09-23 (price still listed).
@@ -93,7 +114,13 @@ let batteries: Battery[] = [
     price: 999,
     listPrice: 1299,
     productUrl: 'https://www.bluettipower.com/products/b230-battery-pack',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'out-of-stock',
+    vendorRef: {
+      variantId: '44466852823259',
+      sku: 'B230-UN-GY-BL-SPFUS',
+      variantTitle: 'Default Title'
+    }
   },
   {
     name: 'B300K Expansion Battery',
@@ -103,7 +130,13 @@ let batteries: Battery[] = [
     price: 1099,
     listPrice: 1699,
     productUrl: 'https://www.bluettipower.com/products/bluetti-b300k-expansion-battery',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '45969643110619',
+      sku: 'B300K-UN-GY-BL-SPFUS-00',
+      variantTitle: 'B300K Expansion Battery | 2,764.8Wh'
+    }
   },
   {
     // No longer sold new on jackery.com as of 2026-09-23; unverified legacy entry.
@@ -111,7 +144,8 @@ let batteries: Battery[] = [
     brand: 'Jackery',
     icon: 'bi-battery-full',
     batteryCapacity: 1264,
-    price: 699
+    price: 699,
+    availability: 'discontinued'
   },
   {
     name: 'Battery Pack 2000 Plus v2',
@@ -121,7 +155,13 @@ let batteries: Battery[] = [
     price: 899,
     listPrice: 999,
     productUrl: 'https://www.jackery.com/products/jackery-battery-pack-homepower-2000-plus-v2',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '44040604876887',
+      sku: '21-0008-000050',
+      variantTitle: 'Default Title'
+    }
   },
   {
     name: 'Battery Pack 3600 Plus',
@@ -131,7 +171,13 @@ let batteries: Battery[] = [
     price: 1349,
     listPrice: 1499,
     productUrl: 'https://www.jackery.com/products/battery-pack-3600-plus',
-    dealVerifiedOn: '2026-09-23'
+    dealVerifiedOn: '2026-09-23',
+    availability: 'in-stock',
+    vendorRef: {
+      variantId: '43985714479191',
+      sku: '21-0008-000034',
+      variantTitle: 'Default Title'
+    }
   }
 ];
 

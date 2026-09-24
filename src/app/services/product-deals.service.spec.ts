@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { ProductDealsService } from './product-deals.service';
-import { batteries } from '../content/batteries';
-import { inverters } from '../content/inverters';
-import { solarPanels } from '../content/solarPanels';
 import { Build, defaultBuild } from '../interfaces/Build';
+import { CATALOG_FIXTURE, provideCatalogFixture } from 'src/testing/catalog-fixture';
+
+const { inverters, batteries, solarPanels } = CATALOG_FIXTURE;
 
 describe('ProductDealsService', () => {
   let service: ProductDealsService;
   const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({ providers: [provideCatalogFixture()] });
     service = TestBed.inject(ProductDealsService);
   });
 
@@ -19,6 +19,22 @@ describe('ProductDealsService', () => {
 
     expect(offers.length).toBe(4);
     expect(offers.map(offer => offer.id)).toContain('ecoflow-delta-pro-complete');
+  });
+
+  it('leaves out bundles the vendor has sold out of', () => {
+    // The fixture's only DELTA Pro 3 bundle is out of stock.
+    expect(service.getOffersForInverter('ecoflow-delta-pro-3')).toEqual([]);
+  });
+
+  it('builds auto-kits from in-stock parts when any exist', () => {
+    // The out-of-stock DELTA Pro battery is the larger option, but the kit should
+    // use the in-stock B300K rather than a part nobody can order.
+    const soldOut = batteries.find(item => item.id === 'ecoflow-delta-pro-smart-battery')!;
+    const inStock = batteries.find(item => item.id === 'bluetti-b300k-expansion-battery')!;
+
+    const kit = service.buildAutoKit(deltaPro, 8000, 0, [soldOut, inStock], []);
+
+    expect(Object.keys(kit!.batteryQuantities)).toEqual(['bluetti-b300k-expansion-battery']);
   });
 
   it('recommends the lowest-price bundle that meets the build targets', () => {
@@ -186,7 +202,9 @@ describe('ProductDealsService', () => {
     expect(build.batteries.length).toBe(1);
     expect(build.batteries[0].id).toBe('ecoflow-delta-pro-smart-battery');
     expect(build.powerSources.length).toBe(2);
-    expect(build.powerSources.every(panel => panel.id === 'ecoflow-220w-bifacial-panel')).toBeTrue();
+    expect(
+      build.powerSources.every(panel => panel.id === 'ecoflow-220w-bifacial-panel')
+    ).toBeTrue();
   });
 
   it('never reduces quantities the user already chose when applying an offer', () => {

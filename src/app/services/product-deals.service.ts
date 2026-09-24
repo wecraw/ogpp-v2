@@ -1,31 +1,26 @@
-import { Injectable } from '@angular/core';
-import { batteries } from 'src/app/content/batteries';
-import { inverters } from 'src/app/content/inverters';
-import { productBundleOffers } from 'src/app/content/product-bundle-offers';
-import { solarPanels } from 'src/app/content/solarPanels';
+import { Inject, Injectable } from '@angular/core';
+import { CATALOG, Catalog } from 'src/app/content/catalog';
+import { AlaCarteCost, alaCarteCost } from 'src/app/content/offer-pricing';
+import { isPurchasable } from 'src/app/interfaces/Availability';
 import { Battery } from 'src/app/interfaces/Battery';
 import { Build } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { PowerSource } from 'src/app/interfaces/PowerSource';
-import {
-  ProductBundleOffer,
-  ProductBundleOfferView
-} from 'src/app/interfaces/ProductBundleOffer';
-
-export interface AlaCarteCost {
-  price: number;
-  compareAtPrice: number;
-}
+import { ProductBundleOffer, ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductDealsService {
+  constructor(@Inject(CATALOG) private catalog: Catalog) {}
+
+  // Bundles the vendor currently sells for this station. Sold-out or discontinued
+  // bundles are left out: a fixed SKU nobody can order isn't a recommendation.
   getOffersForInverter(inverterId?: string): ProductBundleOfferView[] {
     if (!inverterId) return [];
 
-    return productBundleOffers
-      .filter(offer => offer.inverterId === inverterId)
+    return this.catalog.bundleOffers
+      .filter(offer => offer.inverterId === inverterId && isPurchasable(offer.availability))
       .map(offer => this.toView(offer));
   }
 
@@ -97,9 +92,9 @@ export class ProductDealsService {
     const shortfall = batteryTarget - builtIn;
     if (shortfall <= 0 || maxBatteries <= 0) return {};
 
-    const battery = [...options]
-      .filter(item => item.id && item.batteryCapacity > 0)
-      .sort((a, b) => b.batteryCapacity - a.batteryCapacity)[0];
+    const battery = this.preferPurchasable(
+      options.filter(item => item.id && item.batteryCapacity > 0)
+    ).sort((a, b) => b.batteryCapacity - a.batteryCapacity)[0];
     if (!battery?.id) return {};
 
     const needed = Math.min(Math.ceil(shortfall / battery.batteryCapacity), maxBatteries);
@@ -114,9 +109,9 @@ export class ProductDealsService {
     solarTarget: number,
     options: PowerSource[]
   ): Record<string, number> {
-    const panel = [...options]
-      .filter(item => item.id && item.maxOutput > 0)
-      .sort((a, b) => b.maxOutput - a.maxOutput)[0];
+    const panel = this.preferPurchasable(
+      options.filter(item => item.id && item.maxOutput > 0)
+    ).sort((a, b) => b.maxOutput - a.maxOutput)[0];
     if (!panel?.id) return {};
 
     const maxByInput = inverter.maxSolarInput
@@ -126,6 +121,13 @@ export class ProductDealsService {
 
     const needed = Math.min(Math.max(Math.ceil(solarTarget / panel.maxOutput), 1), maxByInput);
     return { [panel.id]: needed };
+  }
+
+  // Auto-kits should be buildable today: pick from in-stock parts when any exist,
+  // falling back to the full list rather than producing an empty kit.
+  private preferPurchasable<T extends Battery | PowerSource>(items: T[]): T[] {
+    const purchasable = items.filter(item => isPurchasable(item.availability));
+    return purchasable.length > 0 ? purchasable : [...items];
   }
 
   private autoKitHighlights(
@@ -153,10 +155,8 @@ export class ProductDealsService {
     solarTarget: number
   ): ProductBundleOfferView | undefined {
     const ranked = [...offers].sort((a, b) => {
-      const aMeetsTargets =
-        a.batteryCapacity >= batteryTarget && a.solarWattage >= solarTarget;
-      const bMeetsTargets =
-        b.batteryCapacity >= batteryTarget && b.solarWattage >= solarTarget;
+      const aMeetsTargets = a.batteryCapacity >= batteryTarget && a.solarWattage >= solarTarget;
+      const bMeetsTargets = b.batteryCapacity >= batteryTarget && b.solarWattage >= solarTarget;
 
       if (aMeetsTargets !== bMeetsTargets) return aMeetsTargets ? -1 : 1;
 
@@ -187,32 +187,14 @@ export class ProductDealsService {
   }
 
   // The cost of buying a station plus the given battery/solar quantities one
-  // product at a time, at current per-product deal prices. `price` uses each
-  // product's `price`; `compareAtPrice` uses `listPrice` (falling back to
-  // `price` when a product carries no list price).
+  // product at a time, at current per-product deal prices (see `alaCarteCost` in
+  // offer-pricing.ts, which bundle offers are priced against too).
   alaCarteCost(
     inverter: Inverter | undefined,
     batteryQuantities: Record<string, number>,
     solarQuantities: Record<string, number>
   ): AlaCarteCost {
-    let price = inverter?.price ?? 0;
-    let compareAtPrice = inverter?.listPrice ?? inverter?.price ?? 0;
-
-    for (const [id, quantity] of Object.entries(batteryQuantities)) {
-      const battery = batteries.find(item => item.id === id);
-      if (!battery || quantity <= 0) continue;
-      price += battery.price * quantity;
-      compareAtPrice += (battery.listPrice ?? battery.price) * quantity;
-    }
-
-    for (const [id, quantity] of Object.entries(solarQuantities)) {
-      const panel = solarPanels.find(item => item.id === id);
-      if (!panel || quantity <= 0) continue;
-      price += panel.price * quantity;
-      compareAtPrice += (panel.listPrice ?? panel.price) * quantity;
-    }
-
-    return { price, compareAtPrice };
+    return alaCarteCost(this.catalog, inverter, batteryQuantities, solarQuantities);
   }
 
   // The best bundle to recommend as an *upgrade over the user's current build*:
@@ -286,6 +268,7 @@ export class ProductDealsService {
   }
 
   private toView(offer: ProductBundleOffer): ProductBundleOfferView {
+    const { inverters, batteries, solarPanels } = this.catalog;
     const inverterCapacity =
       inverters.find(inverter => inverter.id === offer.inverterId)?.batteryCapacity ?? 0;
     const batteryCapacity = Object.entries(offer.batteryQuantities).reduce(
@@ -324,9 +307,7 @@ export class ProductDealsService {
     batteryTarget: number,
     solarTarget: number
   ): number {
-    const batteryCoverage = batteryTarget
-      ? Math.min(offer.batteryCapacity / batteryTarget, 1)
-      : 1;
+    const batteryCoverage = batteryTarget ? Math.min(offer.batteryCapacity / batteryTarget, 1) : 1;
     const solarCoverage = solarTarget ? Math.min(offer.solarWattage / solarTarget, 1) : 1;
     return batteryCoverage + solarCoverage;
   }
@@ -362,13 +343,10 @@ export class ProductDealsService {
     return quantities;
   }
 
-  private flatten<T extends { id?: string }>(
-    items: T[],
-    quantities: Record<string, number>
-  ): T[] {
+  private flatten<T extends { id?: string }>(items: T[], quantities: Record<string, number>): T[] {
     const result: T[] = [];
     for (const item of items) {
-      const quantity = item.id ? quantities[item.id] ?? 0 : 0;
+      const quantity = item.id ? (quantities[item.id] ?? 0) : 0;
       for (let index = 0; index < quantity; index++) {
         result.push(item);
       }

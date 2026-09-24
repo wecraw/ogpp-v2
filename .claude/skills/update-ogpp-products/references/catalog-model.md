@@ -9,17 +9,21 @@ Verified against the codebase. Field names and behaviors below are exact.
 | Power stations ("inverters") | `src/app/content/inverters.ts` |
 | Expansion batteries | `src/app/content/batteries.ts` |
 | Solar panels (`PowerSource`) | `src/app/content/solarPanels.ts` |
-| Vendor bundle offers | `src/app/content/product-bundle-offers.ts` |
+| Vendor bundle offers (authored as sources) | `src/app/content/product-bundle-offers.ts` |
+| Bundle price resolution + à-la-carte math | `src/app/content/offer-pricing.ts` |
+| `CATALOG` injection token (live catalog) | `src/app/content/catalog.ts` |
+| Frozen spec fixture | `src/testing/catalog-fixture.ts` |
 | Stable-ID assignment | `src/app/content/catalog-utils.ts` |
 | Referential-integrity guard (run after any edit) | `src/app/content/catalog-integrity.spec.ts` |
-| Shared pricing fields | `src/app/interfaces/ProductPricing.ts` |
+| Shared pricing fields + `VendorRef` | `src/app/interfaces/ProductPricing.ts` |
+| Stock status | `src/app/interfaces/Availability.ts` |
 | Power station schema | `src/app/interfaces/Inverter.ts` |
 | Battery schema | `src/app/interfaces/Battery.ts` |
 | Panel schema | `src/app/interfaces/PowerSource.ts` |
 | Bundle schema | `src/app/interfaces/ProductBundleOffer.ts` |
 | Compatibility filtering | `src/app/services/product-selector.service.ts` |
 | Offer ranking / derived metrics | `src/app/services/product-deals.service.ts` |
-| Sizing/checkout UI | `src/app/pages/build/`, `src/app/pages/checkout/` |
+| Sizing/checkout UI | `src/app/pages/build/`, `src/app/pages/results/`, `src/app/pages/checkout/` |
 
 > Terminology: in this codebase an **"inverter" is the whole all-in-one power station**
 > (e.g. DELTA Pro 3), not a DC→AC converter. **Solar panels are modeled as `PowerSource`** and
@@ -31,15 +35,26 @@ Every catalog product (inverter, battery, panel) extends this:
 
 ```ts
 interface ProductPricing {
-  price: number;          // current verified price — used for configuration totals (required)
-  listPrice?: number;     // vendor list/compare price, when verified
-  productUrl?: string;    // direct official US product page
-  dealVerifiedOn?: string;// ISO date 'YYYY-MM-DD'
+  price: number;              // current verified price — used for configuration totals (required)
+  listPrice?: number;         // vendor compare price, only when > price
+  productUrl?: string;        // direct official US product page
+  dealVerifiedOn?: string;    // ISO date 'YYYY-MM-DD'
+  availability?: Availability;// 'in-stock' | 'out-of-stock' | 'preorder' | 'discontinued'
+  vendorRef?: VendorRef;      // the exact vendor variant this record prices
+}
+
+interface VendorRef {
+  variantId?: string;         // Shopify variant id (or feed item id)
+  sku?: string;
+  variantTitle?: string;      // vendor's label, for humans reading refresh diffs
 }
 ```
 
-`price` is required; the other three are optional but should all be filled when you have verified
-deal data (a real product gets a URL + verification date).
+`price` is required. A verified product should carry `productUrl`, `dealVerifiedOn`,
+`availability` and (where the vendor exposes it) `vendorRef`. Leave `availability` unset when
+stock wasn't checked. Behavior: sold-out/discontinued stations are never anchored or offered as a
+step-up, bundle offers that aren't purchasable are hidden, auto-kits prefer purchasable parts, and
+cards/checkout show a status chip.
 
 ## Record templates
 
@@ -62,10 +77,12 @@ deal data (a real product gets a URL + verification date).
     'ecoflow-400w-portable-solar-panel',
     'ecoflow-220w-bifacial-panel'
   ],
-  price: 2599,
+  price: 2799,
   listPrice: 3699,
   productUrl: 'https://us.ecoflow.com/products/delta-pro-3-portable-power-station',
-  dealVerifiedOn: '2026-06-12'
+  dealVerifiedOn: '2026-09-23',
+  availability: 'in-stock',
+  vendorRef: { variantId: '41385721004105', sku: 'EFDELTAPRO3-US', variantTitle: 'DELTA Pro 3' }
 }
 ```
 
@@ -82,10 +99,12 @@ when they're absent. There is also an older `compatibleBatteries?: Battery[]` fi
   brand: 'EcoFlow',
   icon: 'bi-battery-full',
   batteryCapacity: 3600,                // Wh
-  price: 999,
-  listPrice: 2799,
+  price: 1199,
+  listPrice: 1999,
   productUrl: 'https://us.ecoflow.com/products/delta-pro-smart-extra-battery',
-  dealVerifiedOn: '2026-06-12'
+  dealVerifiedOn: '2026-09-23',
+  availability: 'out-of-stock',
+  vendorRef: { variantId: '40558805385289', sku: 'DELTAProEB-US', variantTitle: '…' }
 }
 ```
 
@@ -97,10 +116,12 @@ when they're absent. There is also an older `compatibleBatteries?: Battery[]` fi
   brand: 'EcoFlow',
   icon: 'bi-bounding-box',
   maxOutput: 400,                       // W rated output
-  price: 469,
-  listPrice: 1199,
+  price: 599,
+  listPrice: 699,
   productUrl: 'https://us.ecoflow.com/products/400w-portable-solar-panel',
-  dealVerifiedOn: '2026-06-12'
+  dealVerifiedOn: '2026-09-23',
+  availability: 'in-stock',
+  vendorRef: { variantId: '39998021697609', sku: 'SOLAR400W', variantTitle: '…' }
 }
 ```
 
@@ -112,40 +133,54 @@ assignStableIds(batteries, battery => `${battery.brand}-${battery.name}`);
 
 ## Bundle offers — `product-bundle-offers.ts`
 
+Offers are **authored as sources** and resolved at module load:
+
 ```ts
-interface ProductBundleOffer {
+interface ProductBundleOfferSource {
   id: string;                   // stable offer id (e.g. 'ecoflow-delta-pro-400w')
   inverterId: string;           // stable id of the power station this offer is for
   name: string;                 // user-facing offer name
   description: string;
   highlights: string[];
-  price: number;                // optimized price actually charged
-  presetPrice?: number;         // vendor's preset package price, if higher than `price`
-  optimizationNote?: string;    // one sentence explaining price vs presetPrice
-  compareAtPrice: number;       // vendor list/compare total (savings reference)
+  packagePrice: number;         // the vendor's preset package price, exactly as listed
+  compareAtPrice: number;       // see pricing-rules.md
   batteryQuantities: Record<string, number>;     // batteryId -> qty
   powerSourceQuantities: Record<string, number>; // panelId -> qty
   vendor: string;
   vendorUrl: string;
   verifiedOn: string;           // 'YYYY-MM-DD'
-  availability: 'available' | 'check-vendor' | 'sold-out';
+  availability?: Availability;  // not purchasable -> hidden from /results and /checkout
+  vendorRef?: VendorRef;        // the preset variant
 }
 ```
+
+`resolveBundleOffers` (offer-pricing.ts) turns each source into a `ProductBundleOffer` with
+`price` = the cheaper of `packagePrice` and the parts bought separately (parts only count when all
+are purchasable), `presetPrice` = `packagePrice` when the parts win, and a generated
+`optimizationNote`. **Never write `price`, `presetPrice` or `optimizationNote` by hand.**
 
 - `inverterId` and the keys of `batteryQuantities` / `powerSourceQuantities` are **stable catalog
   IDs**. The file defines local `const`s for these IDs at the top — reuse / add them rather than
   inlining string literals.
 - **Don't duplicate** battery capacity or panel wattage in offer data. `ProductDealsService` derives
   `batteryCapacity` and `solarWattage` (the `ProductBundleOfferView`) from the current catalogs.
-- Default `availability` to `'check-vendor'` unless you've confirmed live stock.
+- Saved builds may persist `bundleOfferId`. Removing or recomposing an offer is safe: checkout
+  clears a stale id and falls back to à-la-carte pricing.
+
+## Reading the catalog in code
+
+Services and pages inject `CATALOG` (`src/app/content/catalog.ts`) instead of importing the catalog
+files. Specs provide `provideCatalogFixture()` from `src/testing/catalog-fixture.ts`, a frozen
+snapshot — so a price refresh never breaks a unit test. Only `catalog-integrity.spec.ts` reads the
+live catalog.
 
 ## Compatibility behavior (`product-selector.service.ts`)
 
 - Inverters: recommended when `maxOutput >= peakWattage`, sorted by `maxOutput` desc. If none meet
   peak load, the whole catalog is shown (ordered by output) with an oversized-load warning — never
-  an empty list.
-- Batteries: filtered by `inverter.compatibleBatteryIds` when present; otherwise brand-match against
-  the inverter's brand; otherwise the full catalog.
+  an empty list. The anchor (default pick) and step-up skip stations that aren't purchasable.
+- Batteries: none when `maxBatteries === 0`; otherwise filtered by `inverter.compatibleBatteryIds`
+  when present; otherwise brand-match against the inverter's brand; otherwise the full catalog.
 - Panels: same strategy via `compatiblePowerSourceIds`, then brand, then full catalog.
 
 Prefer exact IDs so the brand fallback is never needed for your new product.
@@ -165,6 +200,7 @@ Prefer exact IDs so the brand fallback is never needed for your new product.
 ## Route ownership
 
 - `/builder` — appliances, seasons, location (ZIP).
+- `/results` — picks the anchor station and shows ranked bundle offers (or a synthesized kit).
 - `/build` — size and select station, batteries, panels. **No vendor shopping UI here.**
-- `/checkout` — compare and apply vendor bundle offers.
-- `/builds` — saved builds list (currently a placeholder).
+- `/checkout` — parts list, compare and apply vendor bundle offers.
+- `/builds` — saved builds list.
