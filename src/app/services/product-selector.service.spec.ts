@@ -8,6 +8,7 @@ import { CATALOG_FIXTURE, provideCatalogFixture } from 'src/testing/catalog-fixt
 
 const { inverters, batteries, solarPanels } = CATALOG_FIXTURE;
 const purchasableInverters = inverters.filter(inverter => isPurchasable(inverter.availability));
+const listedInverters = inverters.filter(inverter => inverter.availability !== 'discontinued');
 
 describe('ProductSelectorService', () => {
   let service: ProductSelectorService;
@@ -38,7 +39,7 @@ describe('ProductSelectorService', () => {
 
     // Derived from the catalog so adding stations can't make this brittle: every
     // unit clearing the 3000 W peak, highest output first.
-    const expected = [...inverters]
+    const expected = [...listedInverters]
       .filter(inverter => inverter.maxOutput >= 3000)
       .sort((first, second) => second.maxOutput - first.maxOutput)
       .map(inverter => inverter.id);
@@ -67,8 +68,21 @@ describe('ProductSelectorService', () => {
       ]
     });
 
-    expect(matches.length).toBe(inverters.length);
+    expect(matches.length).toBe(listedInverters.length);
     expect(matches.map(inverter => inverter.id)).toEqual(sortedInverterIds());
+  });
+
+  it('hides discontinued stations unless the build already uses one', () => {
+    const discontinued = inverters.find(inverter => inverter.availability === 'discontinued')!;
+    expect(discontinued).toBeDefined();
+
+    const freshIds = service.getMatchingInverters(defaultBuild).map(inverter => inverter.id);
+    expect(freshIds).not.toContain(discontinued.id);
+
+    const savedIds = service
+      .getMatchingInverters({ ...defaultBuild, inverter: { ...discontinued } })
+      .map(inverter => inverter.id);
+    expect(savedIds).toContain(discontinued.id);
   });
 
   it('anchors on the smallest station that still covers the peak load', () => {
@@ -353,7 +367,7 @@ function lightLoadBuild() {
 }
 
 function sortedInverterIds(): (string | undefined)[] {
-  return [...inverters]
+  return [...listedInverters]
     .sort((first, second) => second.maxOutput - first.maxOutput)
     .map(inverter => inverter.id);
 }

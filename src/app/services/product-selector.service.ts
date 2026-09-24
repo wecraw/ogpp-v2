@@ -16,11 +16,17 @@ export class ProductSelectorService {
     @Inject(CATALOG) private catalog: Catalog
   ) {}
 
+  // Discontinued stations stay in the catalog so saved builds still rehydrate, but
+  // they're only offered here when the build already uses one. Sold-out stations
+  // remain listed (with a status chip) since they're expected back in stock.
   getMatchingInverters(build: Build): Inverter[] {
     const peakWattage = this.calculationUtils.peakWattage(build);
-    const availableInverters = [...this.catalog.inverters].sort(
-      (first, second) => second.maxOutput - first.maxOutput
-    );
+    const availableInverters = this.catalog.inverters
+      .filter(
+        inverter =>
+          inverter.availability !== 'discontinued' || inverter.id === build.inverter?.id
+      )
+      .sort((first, second) => second.maxOutput - first.maxOutput);
 
     if (!Number.isFinite(peakWattage) || peakWattage <= 0) {
       return availableInverters;
