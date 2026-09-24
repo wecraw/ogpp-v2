@@ -5,10 +5,13 @@ import { batteries as batteryCatalog } from '../content/batteries';
 import { inverters as inverterCatalog } from '../content/inverters';
 import { solarPanels as solarPanelCatalog } from '../content/solarPanels';
 import { Appliance, UsageType } from '../interfaces/Appliance';
+import { Battery } from '../interfaces/Battery';
 import { Build, DEFAULT_DAYS_OF_AUTONOMY, Month, MonthlyGhi } from '../interfaces/Build';
 import { defaultInverter } from '../interfaces/Inverter';
+import { PowerSource } from '../interfaces/PowerSource';
 import { Season } from '../interfaces/Season';
 import { BuildService } from './build.service';
+import { ProductSelectorService } from './product-selector.service';
 
 /**
  * Shareable build links.
@@ -46,6 +49,13 @@ const MONTHS: Month[] = [
 ];
 const SEASONS: Season[] = ['winter', 'spring', 'summer', 'fall'];
 
+// Bounds on appliance numbers accepted from a link. They mirror what the builder UI can
+// produce (custom-appliance form caps wattage at 30 kW and hours at 24), so a hand-crafted
+// payload can't smuggle in negative demand or values that overflow the sizing math.
+const MAX_APPLIANCE_WATTAGE = 30000;
+const MAX_APPLIANCE_HOURS = 24;
+const MAX_APPLIANCE_QUANTITY = 1000;
+
 // Short keys keep the URL small; this shape is the wire format, so change it only by
 // bumping SHARE_VERSION and keeping a decoder for the old version.
 interface SharedAppliance {
@@ -56,6 +66,7 @@ interface SharedAppliance {
   h: number; // hours
   q: number; // quantity
   u?: UsageType;
+  ds?: string; // description — custom appliances only; catalog items restore their own
 }
 
 interface SharedBuildPayload {
@@ -84,7 +95,10 @@ export class InvalidShareLinkError extends Error {
   providedIn: 'root'
 })
 export class BuildShareService {
-  constructor(private buildService: BuildService) {}
+  constructor(
+    private buildService: BuildService,
+    private productSelector: ProductSelectorService
+  ) {}
 
   // ----- Encoding -----
 
@@ -101,6 +115,9 @@ export class BuildShareService {
         };
         if (appliance.id) shared.i = appliance.id;
         if (appliance.usageType) shared.u = appliance.usageType;
+        if (appliance.description && !findCatalogAppliance(appliance.id)) {
+          shared.ds = appliance.description;
+        }
         return shared;
       }),
       s: build.seasons ?? [],
@@ -143,8 +160,10 @@ export class BuildShareService {
 
   /**
    * Parses a payload back into a fresh Build (new id, dates set to now). Gear whose catalog
-   * id no longer exists is dropped rather than failing the import; the recipient can re-pick
-   * it on /build. Throws `InvalidShareLinkError` for anything that isn't a valid payload.
+   * id no longer exists, or that the station can't take (incompatible, or past its
+   * `maxBatteries` / `maxSolarInput` caps), is dropped rather than failing the import; the
+   * recipient can re-pick it on /build. Throws `InvalidShareLinkError` for anything that
+   * isn't a valid payload.
    */
   decode(encoded: string): Build {
     let payload: SharedBuildPayload;
@@ -167,13 +186,17 @@ export class BuildShareService {
       seasons: payload.s.filter(season => SEASONS.includes(season)),
       zipCode: payload.z,
       monthlyGhi: payload.m ? toMonthlyGhi(payload.m) : null,
-      powerSources: inverter ? this.expand(solarPanelCatalog, payload.ps) : [],
+      powerSources: [],
       inverter: inverter ?? defaultInverter,
-      batteries: inverter ? this.expand(batteryCatalog, payload.b) : [],
+      batteries: [],
       daysOfAutonomy: payload.d,
       createdOn: now,
       lastEdited: now
     };
+    if (inverter) {
+      build.batteries = this.fitBatteries(build, payload.b);
+      build.powerSources = this.fitSolarPanels(build, payload.ps);
+    }
     if (payload.p) build.appliancePresetId = payload.p;
     if (payload.o && inverter) build.bundleOfferId = payload.o;
     return build;
@@ -227,12 +250,32 @@ export class BuildShareService {
     return result;
   }
 
+  // Same limits /build enforces: only batteries the station accepts, and no more than its
+  // `maxBatteries` bank total (the built-in battery isn't counted).
+  private fitBatteries(build: Build, pairs?: [string, number][]): Battery[] {
+    const compatible = idsOf(this.productSelector.getMatchingBatteries(build));
+    const limit = build.inverter.maxBatteries ?? 0;
+    return this.expand(batteryCatalog, pairs)
+      .filter(battery => compatible.has(battery.id))
+      .slice(0, limit);
+  }
+
+  // Only compatible panels, and only as many as fit within the station's `maxSolarInput`.
+  private fitSolarPanels(build: Build, pairs?: [string, number][]): PowerSource[] {
+    const compatible = idsOf(this.productSelector.getMatchingSolarPanels(build));
+    let headroom = build.inverter.maxSolarInput ?? 0;
+    return this.expand(solarPanelCatalog, pairs).filter(panel => {
+      const wattage = panel.maxOutput ?? 0;
+      if (!compatible.has(panel.id) || wattage > headroom) return false;
+      headroom -= wattage;
+      return true;
+    });
+  }
+
   // User-editable numbers come from the payload; display-only fields (description, icon)
   // are filled back in from the catalog when the appliance is a catalog item.
   private toAppliance(shared: SharedAppliance): Appliance {
-    const catalogItem = shared.i
-      ? allAppliances.find(candidate => candidate.id === shared.i)
-      : undefined;
+    const catalogItem = findCatalogAppliance(shared.i);
     const appliance: Appliance = {
       ...(catalogItem ?? {}),
       name: shared.n,
@@ -244,8 +287,17 @@ export class BuildShareService {
     if (shared.i) appliance.id = shared.i;
     if (shared.u) appliance.usageType = shared.u;
     else delete appliance.usageType;
+    if (!catalogItem && shared.ds) appliance.description = shared.ds;
     return appliance;
   }
+}
+
+function idsOf(items: { id?: string }[]): Set<string | undefined> {
+  return new Set(items.map(item => item.id));
+}
+
+function findCatalogAppliance(id?: string): Appliance | undefined {
+  return id ? allAppliances.find(candidate => candidate.id === id) : undefined;
 }
 
 // ----- Wire-format helpers -----
@@ -275,6 +327,9 @@ function toMonthlyGhi(values: number[]): MonthlyGhi {
 const isNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value);
 
+const inRange = (value: unknown, min: number, max: number): boolean =>
+  isNumber(value) && value >= min && value <= max;
+
 const isPairList = (value: unknown): boolean =>
   value === undefined ||
   (Array.isArray(value) &&
@@ -302,9 +357,11 @@ function isPayload(value: unknown): value is SharedBuildPayload {
         typeof appliance === 'object' &&
         typeof appliance.n === 'string' &&
         typeof appliance.g === 'string' &&
-        isNumber(appliance.w) &&
-        isNumber(appliance.h) &&
-        isNumber(appliance.q) &&
+        inRange(appliance.w, 0, MAX_APPLIANCE_WATTAGE) &&
+        inRange(appliance.h, 0, MAX_APPLIANCE_HOURS) &&
+        Number.isInteger(appliance.q) &&
+        inRange(appliance.q, 1, MAX_APPLIANCE_QUANTITY) &&
+        (appliance.ds === undefined || typeof appliance.ds === 'string') &&
         (appliance.i === undefined || typeof appliance.i === 'string') &&
         (appliance.u === undefined ||
           appliance.u === 'continuous' ||

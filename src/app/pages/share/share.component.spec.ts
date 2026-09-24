@@ -7,6 +7,8 @@ import { inverters } from 'src/app/content/inverters';
 import { Build, defaultBuild } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
 import { BuildShareService } from 'src/app/services/build-share.service';
+import { CalculationUtilsService } from 'src/app/services/calculation-utils.service';
+import { ProductSelectorService } from 'src/app/services/product-selector.service';
 
 describe('ShareComponent', () => {
   const navigate = jasmine.createSpy('navigate');
@@ -33,7 +35,10 @@ describe('ShareComponent', () => {
 
   // Encoding is pure, so a standalone instance avoids depending on the TestBed injector.
   function encode(build: Build): string {
-    return new BuildShareService(new BuildService()).encode(build);
+    return new BuildShareService(
+      new BuildService(),
+      new ProductSelectorService(new CalculationUtilsService())
+    ).encode(build);
   }
 
   it('imports a shared build and opens it on /build', () => {

@@ -116,6 +116,45 @@ describe('BuildShareService', () => {
     expect(decoded.batteries).toEqual([deltaProBattery]);
   });
 
+  it('keeps a custom appliance description', () => {
+    const build = makeBuild();
+    build.appliances[1] = { ...build.appliances[1], description: 'Base station, 50 W TX' };
+    const [fridge, radio] = service.decode(service.encode(build)).appliances;
+    expect(radio.description).toBe('Base station, 50 W TX');
+    // Catalog appliances still take their description from the catalog.
+    expect(fridge.description).toBe('20 cu ft cycling');
+  });
+
+  it('clamps gear to what the station supports', () => {
+    const otherBrandBattery = batteries.find(item => item.brand !== 'EcoFlow')!;
+    const build = makeBuild({
+      // maxBatteries is 2, and only the Smart Extra Battery is compatible.
+      batteries: [otherBrandBattery, ...Array(5).fill(deltaProBattery)],
+      // 5 x 400 W exceeds the DELTA Pro's 1600 W solar input.
+      powerSources: Array(5).fill(panel400)
+    });
+    const decoded = service.decode(service.encode(build));
+    expect(decoded.batteries).toEqual([deltaProBattery, deltaProBattery]);
+    expect(decoded.powerSources.length).toBe(4);
+  });
+
+  it('rejects appliance numbers the builder could never produce', () => {
+    const encodeWith = (appliance: object) =>
+      toBase64Url({
+        v: 1,
+        a: [{ n: 'X', g: 'Custom', w: 100, h: 1, q: 1, ...appliance }],
+        s: [],
+        z: '',
+        d: 2
+      });
+    expect(() => service.decode(encodeWith({}))).not.toThrow();
+    for (const bad of [{ w: -5 }, { w: 1e308 }, { h: 25 }, { h: -1 }, { q: 1.5 }, { q: 0 }]) {
+      expect(() => service.decode(encodeWith(bad)))
+        .withContext(JSON.stringify(bad))
+        .toThrowError(InvalidShareLinkError);
+    }
+  });
+
   it('shares a builder-only build with no station chosen', () => {
     const build = makeBuild({ inverter: {} as Build['inverter'], batteries: [], powerSources: [] });
     const decoded = service.decode(service.encode(build));
@@ -160,3 +199,7 @@ describe('BuildShareService', () => {
     expect(url).not.toContain('?');
   });
 });
+
+function toBase64Url(value: object): string {
+  return btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
