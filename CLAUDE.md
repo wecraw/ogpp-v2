@@ -18,7 +18,7 @@ This project is **unfinished and was picked back up from a stale state** — see
 - `npm run build` / `ng build` — production build to `dist/ogpp-v2`
 - `npm run watch` — dev build, rebuild on change
 - `npm test` / `ng test` — Karma + Jasmine unit tests (Chrome). Karma is deprecated in Angular 21; a future move to the new test runner is expected.
-- `npm run test:ci` — run once, headless (`ng test --watch=false --browsers=ChromeHeadless`)
+- `npm run test:ci` — run once, headless (`ng test --watch=false --browsers=ChromeHeadlessCI`, a no-sandbox launcher defined in `karma.conf.js`). GitHub Actions (`.github/workflows/ci.yml`) runs this plus `npm run build` on every PR and push to `main`.
 - Single test: `ng test --include='**/calculation-utils.service.spec.ts'`
 
 > The full suite passes. Specs exist for every service, the content catalogs (integrity checks), and all pages/components except the static legal pages and footer. When changing a component, keep its spec compiling — a single type error in any spec (e.g. a spec calling a removed method) fails the entire run, not just that file.
