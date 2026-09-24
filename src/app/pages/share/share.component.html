@@ -1,0 +1,18 @@
+@if (invalidLink) {
+  <div class="container">
+    <div class="empty-state fade-in">
+      <i class="bi bi-link-45deg"></i>
+      <h1 class="inter-semibold">This share link doesn't work</h1>
+      <p class="inter-regular">
+        It may have been cut off when it was copied. Ask for the link again, or start a build of
+        your own.
+      </p>
+      <div class="actions">
+        <button class="btn-primary inter-medium" (click)="createBuild()">Create a build</button>
+        <button class="btn outlined inter-regular" (click)="viewSavedBuilds()">
+          View saved builds
+        </button>
+      </div>
+    </div>
+  </div>
+}

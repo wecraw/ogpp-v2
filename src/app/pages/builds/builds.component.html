@@ -31,7 +31,9 @@
               <div class="name-stack">
                 <div class="build-name inter-medium">{{ displayName(build) }}</div>
                 @if (build.station) {
-                  <div class="build-brand inter-regular">{{ build.brand }} · {{ build.station }}</div>
+                  <div class="build-brand inter-regular">
+                    {{ build.brand }} · {{ build.station }}
+                  </div>
                 } @else {
                   <div class="build-brand inter-regular">No station selected</div>
                 }
@@ -86,10 +88,35 @@
                   </button>
                   <!-- Padded safe zone so a near-miss next to these icons doesn't navigate. -->
                   <div class="icon-actions">
-                    <button class="icon-btn" (click)="duplicate(build.id)" aria-label="Duplicate build" title="Duplicate">
+                    <button
+                      class="icon-btn"
+                      [class.copied]="copiedId === build.id"
+                      (click)="share(build.id)"
+                      [attr.aria-label]="
+                        copiedId === build.id ? 'Share link copied' : 'Copy share link'
+                      "
+                      [title]="copiedId === build.id ? 'Link copied' : 'Copy share link'"
+                    >
+                      <i
+                        class="bi"
+                        [class.bi-check-lg]="copiedId === build.id"
+                        [class.bi-link-45deg]="copiedId !== build.id"
+                      ></i>
+                    </button>
+                    <button
+                      class="icon-btn"
+                      (click)="duplicate(build.id)"
+                      aria-label="Duplicate build"
+                      title="Duplicate"
+                    >
                       <i class="bi bi-files"></i>
                     </button>
-                    <button class="icon-btn danger" (click)="startDelete(build.id)" aria-label="Delete build" title="Delete">
+                    <button
+                      class="icon-btn danger"
+                      (click)="startDelete(build.id)"
+                      aria-label="Delete build"
+                      title="Delete"
+                    >
                       <i class="bi bi-trash"></i>
                     </button>
                   </div>

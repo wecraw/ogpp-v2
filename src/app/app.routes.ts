@@ -5,6 +5,7 @@ import { BuildsComponent } from './pages/builds/builds.component';
 import { BuildComponent } from './pages/build/build.component';
 import { ResultsComponent } from './pages/results/results.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
+import { ShareComponent } from './pages/share/share.component';
 import { PrivacyComponent } from './pages/legal/privacy/privacy.component';
 import { TermsComponent } from './pages/legal/terms/terms.component';
 import { AffiliateDisclosureComponent } from './pages/legal/affiliate-disclosure/affiliate-disclosure.component';
@@ -33,6 +34,10 @@ export const routes: Routes = [
   {
     path: 'checkout',
     component: CheckoutComponent
+  },
+  {
+    path: 'share',
+    component: ShareComponent
   },
   {
     path: 'privacy',

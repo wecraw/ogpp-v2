@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BundleOffersComponent } from 'src/app/components/bundle-offers/bundle-offers.component';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
 import { CATALOG, Catalog } from 'src/app/content/catalog';
-import { Build, defaultBuild } from 'src/app/interfaces/Build';
+import { Build, DEFAULT_DAYS_OF_AUTONOMY, defaultBuild } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { ProductBundleOfferView } from 'src/app/interfaces/ProductBundleOffer';
 import { BuildService } from 'src/app/services/build.service';
@@ -12,10 +12,8 @@ import { CalculationUtilsService } from 'src/app/services/calculation-utils.serv
 import { ProductDealsService } from 'src/app/services/product-deals.service';
 import { ProductSelectorService } from 'src/app/services/product-selector.service';
 
-// Mirrors the default in BuildComponent: builds arrive from the "dumb" builder
-// without a days-of-autonomy choice, so the results page falls back to the same
-// value when sizing the battery target.
-const DEFAULT_DAYS_OF_AUTONOMY = 2;
+// Builds arrive from the "dumb" builder without a days-of-autonomy choice, so the
+// results page falls back to DEFAULT_DAYS_OF_AUTONOMY when sizing the battery target.
 const MIN_DAYS_OF_AUTONOMY = 1;
 const MAX_DAYS_OF_AUTONOMY = 7;
 

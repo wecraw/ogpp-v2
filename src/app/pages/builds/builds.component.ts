@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 import { Build } from 'src/app/interfaces/Build';
 import { BuildService } from 'src/app/services/build.service';
+import { BuildShareService } from 'src/app/services/build-share.service';
 
 // A flattened, display-ready view of a Build for the saved-builds list. Computing the
 // key specs once on load keeps the template free of reduce()/null-guard logic.
@@ -32,7 +33,15 @@ export class BuildsComponent implements OnInit {
   // Inline-edit state: only one card is ever confirming a delete at a time.
   public confirmingDeleteId: string | null = null;
 
-  constructor(private router: Router, private buildService: BuildService) {}
+  // The card whose share link was just copied, for a brief "copied" check state.
+  public copiedId: string | null = null;
+  private copiedTimer?: ReturnType<typeof setTimeout>;
+
+  constructor(
+    private router: Router,
+    private buildService: BuildService,
+    private buildShareService: BuildShareService
+  ) {}
 
   ngOnInit() {
     this.loadBuilds();
@@ -108,6 +117,23 @@ export class BuildsComponent implements OnInit {
     };
     this.buildService.saveBuild(copy);
     this.loadBuilds();
+  }
+
+  // ----- Share -----
+
+  // Copies a link that opens the build on another device/browser, falling back to a prompt
+  // with the URL when the Clipboard API isn't available.
+  async share(id: string) {
+    const build = this.buildService.getBuild(id);
+    if (!build) return;
+    const copied = await this.buildShareService.copyShareLink(build);
+    if (!copied) {
+      window.prompt('Copy this link to share your build:', this.buildShareService.shareUrl(build));
+      return;
+    }
+    this.copiedId = id;
+    clearTimeout(this.copiedTimer);
+    this.copiedTimer = setTimeout(() => (this.copiedId = null), 2000);
   }
 
   // ----- Delete (inline confirm) -----

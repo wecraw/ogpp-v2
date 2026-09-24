@@ -20,6 +20,9 @@ export type Month =
 
 export type MonthlyGhi = Record<Month, number>;
 
+// Days of autonomy assumed for builds that predate the field (see `Build.daysOfAutonomy`).
+export const DEFAULT_DAYS_OF_AUTONOMY = 2;
+
 export interface Build {
   name: string;
   id: string;
