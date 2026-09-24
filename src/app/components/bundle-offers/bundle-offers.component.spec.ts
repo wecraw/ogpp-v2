@@ -73,6 +73,24 @@ describe('BundleOffersComponent', () => {
     expect(component.bundleHeading).toBe('EcoFlow DELTA Pro bundles');
   });
 
+  it('shows the oldest offer verification date as the prices-checked note', () => {
+    fixture.componentRef.setInput('offers', [
+      makeOffer({ id: 'fresh', verifiedOn: '2026-09-23' }),
+      makeOffer({ id: 'stale', verifiedOn: '2026-06-12' })
+    ]);
+    fixture.detectChanges();
+
+    const note = fixture.nativeElement.querySelector('.verified') as HTMLElement;
+    expect(note.textContent).toContain('Prices checked June 12, 2026');
+  });
+
+  it('hides the prices-checked note when no offer carries a date', () => {
+    fixture.componentRef.setInput('offers', [makeOffer({ verifiedOn: '' })]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.verified')).toBeNull();
+  });
+
   it('computes savings against the compare-at price', () => {
     expect(component.savings(offers[1])).toBe(1200);
   });

@@ -75,6 +75,10 @@ export class ProductSelectorService {
   // step-up sizing can ask "what's the most storage this station could ever hold?"
   // without a full Build in hand.
   private batteriesForInverter(inverter: Inverter): Battery[] {
+    // A station with no expansion port takes no batteries; don't fall back to the
+    // brand/full catalog and offer cards the user can never add.
+    if (inverter.maxBatteries === 0) return [];
+
     const compatibleIds = inverter.compatibleBatteryIds;
     if (compatibleIds?.length) {
       const compatible = batteries.filter(battery =>

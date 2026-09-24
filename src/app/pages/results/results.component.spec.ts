@@ -4,6 +4,8 @@ import { of } from 'rxjs';
 import { Build, MonthlyGhi } from 'src/app/interfaces/Build';
 import { Inverter } from 'src/app/interfaces/Inverter';
 import { BuildService } from 'src/app/services/build.service';
+import { ProductDealsService } from 'src/app/services/product-deals.service';
+import { ProductSelectorService } from 'src/app/services/product-selector.service';
 import { ResultsComponent } from './results.component';
 
 describe('ResultsComponent', () => {
@@ -22,11 +24,10 @@ describe('ResultsComponent', () => {
     dec: 5
   };
 
-  // A 3000 W load that runs for 1 hour: the 3000 W peak is covered by the DELTA
-  // Pro (3600 W) but not the smaller Bluetti/Jackery stations, and the modest
-  // storage/solar targets it implies stay within the DELTA Pro's caps. The
-  // targets-aware anchor therefore lands on the DELTA Pro — the smallest
-  // qualifying station that also meets the targets — so the pick is deterministic.
+  // A 3000 W load that runs for 1 hour: covered by several mid-size stations. Which
+  // one the targets-aware anchor picks depends on the live catalog, so the tests
+  // below derive the expected station and offers from the services rather than
+  // pinning a product that a catalog refresh could displace.
   const build: Build = {
     name: 'Test build',
     id: 'build-1',
@@ -84,10 +85,18 @@ describe('ResultsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
 
+    const expected = TestBed.inject(ProductSelectorService).getAnchorInverter(
+      component.build,
+      component.batteryTarget,
+      component.solarTarget
+    );
+
     expect(component.noAnchorInverter).toBeFalse();
-    expect(component.build.inverter.id).toBe('ecoflow-delta-pro');
+    expect(expected?.id).toBeTruthy();
+    expect(component.build.inverter.id).toBe(expected!.id);
+    expect(expected!.maxOutput).toBeGreaterThanOrEqual(3000);
     expect(saveBuild).toHaveBeenCalled();
-    expect(saveBuild.calls.mostRecent().args[0].inverter.id).toBe('ecoflow-delta-pro');
+    expect(saveBuild.calls.mostRecent().args[0].inverter.id).toBe(expected!.id);
   });
 
   it('renders ranked vendor offers with a recommendation', () => {
@@ -95,28 +104,39 @@ describe('ResultsComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
 
-    expect(component.offers.length).toBe(4);
+    // Curated vendor bundles for the anchor, or a synthesized kit when it has none.
+    const anchorId = component.build.inverter.id!;
+    const curated = TestBed.inject(ProductDealsService).getOffersForInverter(anchorId);
+    expect(component.offers.map(offer => offer.id)).toEqual(
+      curated.length ? curated.map(offer => offer.id) : [`auto-${anchorId}`]
+    );
     expect(component.recommendedOfferId).toBeTruthy();
-    expect(
-      component.offers.some(offer => offer.id === component.recommendedOfferId)
-    ).toBeTrue();
+    expect(component.offers.some(offer => offer.id === component.recommendedOfferId)).toBeTrue();
   });
 
   it('Customize seeds the build from an offer and navigates to /build', () => {
     const fixture = TestBed.createComponent(ResultsComponent);
     fixture.detectChanges();
     const component = fixture.componentInstance;
-    const offer = component.offers.find(item => item.id === 'ecoflow-delta-pro-complete')!;
+    // Prefer a kit that adds both batteries and panels so both arrays are exercised.
+    const offer =
+      component.offers.find(
+        item =>
+          Object.keys(item.batteryQuantities).length > 0 &&
+          Object.keys(item.powerSourceQuantities).length > 0
+      ) ?? component.offers[0];
+    const sum = (quantities: Record<string, number>) =>
+      Object.values(quantities).reduce((total, quantity) => total + quantity, 0);
 
     component.customize(offer);
 
-    expect(component.build.bundleOfferId).toBe('ecoflow-delta-pro-complete');
-    // The "complete" kit adds one extra battery and two 220W panels.
-    expect(component.build.batteries.length).toBe(1);
-    expect(component.build.powerSources.length).toBe(2);
+    expect(component.build.bundleOfferId).toBe(offer.id);
+    // The build starts empty, so it holds exactly the kit's units.
+    expect(component.build.batteries.length).toBe(sum(offer.batteryQuantities));
+    expect(component.build.powerSources.length).toBe(sum(offer.powerSourceQuantities));
 
     const savedBuild = saveBuild.calls.mostRecent().args[0];
-    expect(savedBuild.bundleOfferId).toBe('ecoflow-delta-pro-complete');
+    expect(savedBuild.bundleOfferId).toBe(offer.id);
     expect(navigate).toHaveBeenCalledWith(['/build'], {
       queryParams: { buildId: 'build-1' }
     });
