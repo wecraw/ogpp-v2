@@ -7,10 +7,12 @@
         We ranked these packages against this build's storage and solar targets.
       </p>
     </div>
-    <div class="verified inter-regular">
-      <i class="bi bi-clock-history"></i>
-      Prices checked June 12, 2026
-    </div>
+    @if (pricesCheckedOn) {
+      <div class="verified inter-regular">
+        <i class="bi bi-clock-history"></i>
+        Prices checked {{ pricesCheckedOn | date: 'MMMM d, y' }}
+      </div>
+    }
   </div>
 
   <div class="offer-grid">

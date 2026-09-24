@@ -170,7 +170,7 @@ describe('ProductSelectorService', () => {
     const deltaPro = inverters.find(inverter => inverter.id === 'ecoflow-delta-pro')!;
     const stepUp = service.getStepUpInverter(
       { ...lightLoadBuild(), inverter: deltaPro },
-      15000, // exceeds DELTA Pro (10,800) and DELTA Pro 3 (11,296) max banks
+      15000, // exceeds DELTA Pro (10,800) and DELTA Pro 3 (12,288) max banks
       1000
     );
 
@@ -211,15 +211,27 @@ describe('ProductSelectorService', () => {
   });
 
   it('falls back to same-brand batteries when compatibility IDs are absent', () => {
-    // Jackery's station carries no compatibleBatteryIds, so this exercises the
-    // brand-match path (AC200MAX now pins explicit IDs and would skip it).
-    const jackery = inverters.find(inverter => inverter.id === 'jackery-solar-generator-1000-v2')!;
+    // Every catalog station pins explicit IDs, so a synthetic Jackery unit exercises
+    // the brand-match path.
     const matches = service.getMatchingBatteries({
       ...defaultBuild,
-      inverter: jackery
+      inverter: createInverter({ brand: 'Jackery', maxBatteries: 2 })
     });
 
-    expect(matches.map(battery => battery.id)).toEqual(['jackery-battery-pack-1000-plus']);
+    expect(matches.map(battery => battery.id)).toEqual(
+      batteries.filter(battery => battery.brand === 'Jackery').map(battery => battery.id)
+    );
+  });
+
+  it('offers no batteries for a station without an expansion port', () => {
+    // The Explorer 1000 v2 takes no expansion batteries; it must not fall back to
+    // listing same-brand packs it can never accept.
+    const jackery = inverters.find(inverter => inverter.id === 'jackery-solar-generator-1000-v2')!;
+    expect(jackery.maxBatteries).toBe(0);
+
+    const matches = service.getMatchingBatteries({ ...defaultBuild, inverter: jackery });
+
+    expect(matches).toEqual([]);
   });
 
   it('falls back to the full battery catalog when the brand has no matches', () => {
@@ -246,16 +258,14 @@ describe('ProductSelectorService', () => {
   });
 
   it('falls back to same-brand solar panels when compatibility IDs are absent', () => {
-    const jackery = inverters.find(inverter => inverter.id === 'jackery-solar-generator-1000-v2')!;
     const matches = service.getMatchingSolarPanels({
       ...defaultBuild,
-      inverter: jackery
+      inverter: createInverter({ brand: 'Jackery' })
     });
 
-    expect(matches.map(panel => panel.id)).toEqual([
-      'jackery-solarsaga-200w',
-      'jackery-solarsaga-100w'
-    ]);
+    expect(matches.map(panel => panel.id)).toEqual(
+      solarPanels.filter(panel => panel.brand === 'Jackery').map(panel => panel.id)
+    );
   });
 
   it('falls back to the full solar catalog when compatibility and brand matching find nothing', () => {

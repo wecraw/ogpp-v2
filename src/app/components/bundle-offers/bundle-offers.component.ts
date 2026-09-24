@@ -35,6 +35,14 @@ export class BundleOffersComponent {
     return label ? `${label} bundles` : 'Recommended bundles';
   }
 
+  // The oldest verification date among the shown offers, so the "prices checked"
+  // note never claims more freshness than the stalest price on screen. Undefined
+  // when no offer carries a date (e.g. an auto-kit for an unverified station).
+  get pricesCheckedOn(): string | undefined {
+    const dates = this.offers.map(offer => offer.verifiedOn).filter(date => !!date);
+    return dates.length ? [...dates].sort()[0] : undefined;
+  }
+
   savings(offer: ProductBundleOfferView): number {
     return offer.compareAtPrice - offer.price;
   }

@@ -87,6 +87,15 @@ describe('catalog integrity', () => {
       expect(dangling).withContext('dangling compatibleBatteryIds').toEqual([]);
     });
 
+    it('a station with maxBatteries 0 lists no compatible batteries', () => {
+      // The selector returns no batteries for such a station, so any IDs here
+      // would be silently ignored and signal a data mix-up.
+      const contradictory = inverters
+        .filter(inverter => inverter.maxBatteries === 0 && inverter.compatibleBatteryIds?.length)
+        .map(inverter => inverter.id);
+      expect(contradictory).withContext('maxBatteries 0 with compatibleBatteryIds').toEqual([]);
+    });
+
     it('every compatiblePowerSourceIds entry points at a real panel', () => {
       const dangling = inverters.flatMap(inverter =>
         (inverter.compatiblePowerSourceIds ?? [])

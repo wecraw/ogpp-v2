@@ -120,8 +120,8 @@ describe('CheckoutComponent', () => {
     expect(component.solarWattage).toBe(840);
     expect(component.build.batteries.length).toBe(1);
     expect(component.activeBundleOffer).toBeUndefined();
-    // 1699 station + 999 battery + 469 (400W) + 2 × 249 (220W) = 3665 à la carte.
-    expect(component.totalPrice).toBe(3665);
+    // 1899 station + 1199 battery + 599 (400W) + 2 × 399 (220W) = 4495 à la carte.
+    expect(component.totalPrice).toBe(4495);
     expect(saveBuild).toHaveBeenCalled();
     // The build was priced à-la-carte, so it must not persist a fixed-SKU
     // bundle id that no longer matches its gear.

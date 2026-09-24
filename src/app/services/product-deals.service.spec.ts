@@ -35,13 +35,14 @@ describe('ProductDealsService', () => {
     expect(recommendation?.id).toBe('ecoflow-delta-pro-complete');
   });
 
-  it('uses discounted add-ons when they beat EcoFlow preset package pricing', () => {
+  it('uses discounted add-ons when they beat a vendor preset package price', () => {
     const offer = service
-      .getOffersForInverter('ecoflow-delta-pro')
-      .find(item => item.id === 'ecoflow-delta-pro-complete')!;
+      .getOffersForInverter('bluetti-apex-300')
+      .find(item => item.id === 'bluetti-apex-300-complete')!;
 
-    expect(offer.price).toBe(3196);
-    expect(offer.presetPrice).toBe(3498);
+    // 1499 station + 1099 B300K + 2 × 399 panels beats Bluetti's 3499 preset.
+    expect(offer.price).toBe(3396);
+    expect(offer.presetPrice).toBe(3499);
   });
 
   it('treats a bundle as active only when quantities match exactly', () => {
@@ -98,10 +99,11 @@ describe('ProductDealsService', () => {
       { 'ecoflow-220w-bifacial-panel': 2 }
     );
 
-    // 1699 station + 999 battery + 2 × 249 panels
-    expect(cost.price).toBe(3196);
-    // 3699 + 2799 + 2 × 649 list prices
-    expect(cost.compareAtPrice).toBe(7796);
+    // 1899 station + 1199 battery + 2 × 399 panels
+    expect(cost.price).toBe(3896);
+    // 2799 + 1999 list prices + 2 × 399 (the 220W panel has no list price, so its
+    // price stands in)
+    expect(cost.compareAtPrice).toBe(5596);
   });
 
   it('ignores unknown ids and non-positive quantities in à-la-carte sums', () => {
@@ -119,31 +121,31 @@ describe('ProductDealsService', () => {
       .getOffersForInverter('ecoflow-delta-pro')
       .find(item => item.id === 'ecoflow-delta-pro-2x220w')!;
 
-    // 1699 station + 2 × 249 panels = 2197 à la carte vs the 2149 bundle price.
-    expect(offer.alaCartePrice).toBe(2197);
-    expect(offer.savingsVsAlaCarte).toBe(48);
+    // 1899 station + 2 × 399 panels = 2697 à la carte vs the 2399 bundle price.
+    expect(offer.alaCartePrice).toBe(2697);
+    expect(offer.savingsVsAlaCarte).toBe(298);
   });
 
   it('recommends a same-gear bundle that beats the à-la-carte price', () => {
     const offers = service.getOffersForInverter('ecoflow-delta-pro');
-    // DELTA Pro (3600 Wh built-in) + 2×220W panels built by hand costs 2197 à la
-    // carte; the matching bundle is 2149 — a free $48 for identical coverage.
-    const better = service.getBetterBundle(offers, 3600, 440, 2197);
+    // DELTA Pro (3600 Wh built-in) + 2×220W panels built by hand costs 2697 à la
+    // carte; the matching bundle is 2399 — a free $298 for identical coverage.
+    const better = service.getBetterBundle(offers, 3600, 440, 2697);
 
     expect(better?.id).toBe('ecoflow-delta-pro-2x220w');
   });
 
   it('returns no better bundle when the current build is already the cheapest coverage', () => {
     const offers = service.getOffersForInverter('ecoflow-delta-pro');
-    // A bare DELTA Pro (1699) is cheaper than every bundle, so none is an upgrade
+    // A bare DELTA Pro (1899) is cheaper than every bundle, so none is an upgrade
     // at or below the current price.
-    expect(service.getBetterBundle(offers, 3600, 0, 1699)).toBeUndefined();
+    expect(service.getBetterBundle(offers, 3600, 0, 1899)).toBeUndefined();
   });
 
   it('excludes the already-active offer from better-bundle suggestions', () => {
     const offers = service.getOffersForInverter('ecoflow-delta-pro');
     expect(
-      service.getBetterBundle(offers, 3600, 440, 2149, 'ecoflow-delta-pro-2x220w')
+      service.getBetterBundle(offers, 3600, 440, 2399, 'ecoflow-delta-pro-2x220w')
     ).toBeUndefined();
   });
 
